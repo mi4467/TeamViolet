@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MyTimeTracker</string>
+    <string name="home">Home</string>
+    <string name="stats_viewer">Stats</string>
+    <string name="calendar_viewer">Calendar</string>
+    <string name="task_creator">Add Task</string>
+    <string name="task_viewer">Tasks</string>
 </resources>
