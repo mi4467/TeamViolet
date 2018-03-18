@@ -1,8 +1,41 @@
 <resources>
     <string name="app_name">MyTimeTracker</string>
+
+    <!-- This is for the bottom navigation menu -->
     <string name="home">Home</string>
     <string name="stats_viewer">Stats</string>
     <string name="calendar_viewer">Calendar</string>
     <string name="task_creator">Add Task</string>
     <string name="task_viewer">Tasks</string>
+
+
+    <!-- This is for the Toolbar -->
+    <string name="settings">Settings</string>
+
+    <!-- String Values for adding tasks -->
+    <string name="create_cat">Create Category</string>
+    <string name="cat_name">Category Name:</string>
+    <string name="cat_color">Category Color:</string>
+
+    <string name="pick_cat">Pick Category:</string>
+    <string name="create_task">Name Task:</string>
+    <string name="str_time">Start Time:</string>
+    <string name="end_time">End Time:</string>
+    <string name="due_date">Due Date:</string>
+
+    <string name="add_rtask">Add Reoccurring Task</string>
+    <string name="days">Days:</string>
+
+    <string name="days_dialog_title">Days of the Week</string>
+    <string-array name="days_list">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
