@@ -1,6 +1,7 @@
 package com.hfad.mytimetracker;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
@@ -22,6 +23,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.amitshekhar.DebugDB;
+import com.facebook.stetho.Stetho;
+
 import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,9 +35,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SQLiteDatabase mydatabase = openOrCreateDatabase("MyTimeTrackerDB",MODE_PRIVATE,null);
-        SQLiteOpenHelper yo = new TimeTrackerDataBaseHelper(this);
-        yo.getReadableDatabase();
-        Log.d("yolo", mydatabase.isOpen() + " hello");
+        TimeTrackerDataBaseHelper yo = new TimeTrackerDataBaseHelper(this);
+        //yo.getReadableDatabase();
+
+        Stetho.initialize(Stetho.newInitializerBuilder(this)
+                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
+                .build());
+        Cursor c = null;
+
+        try{
+            c = mydatabase.query("TASK_CATEGORY_INFO", null, null, null, null, null, null);
+            Log.d("TableTest", "Table exists");
+        }
+        catch(Exception e ){
+            Log.d("TableTest", " shit is broke");
+        }
+        Log.d("yolo", mydatabase.isOpen() + " hello " + DebugDB.getAddressLog());
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         BottomNavigationHelper.removeShiftMode(bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(

@@ -29,11 +29,12 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
        Log.d(TAG, "onCreate: we made the database");
     }
 
-    private void initTaskCatStatsTable(SQLiteDatabase sqLiteDatabase) {
+    protected void initTaskCatStatsTable(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(
                 "CREATE TABLE TASK_CATEGORY_INFO ("
                         + "_ID INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        + "CATEGORY_GENERAL BOOLEAN, "
+                        + "CATEGORY_NAME TEXT, "
+                        + "COLOR INTEGER, "
                         + "COMPLETED INTEGER, "
                         + "NOT_COMPLETED INTEGER, "
                         + "NOT_ON_TIME INTEGER, "
@@ -71,6 +72,8 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+        initTaskInfoTable(sqLiteDatabase);
+        initTaskStatsTable(sqLiteDatabase);
+        initTaskCatStatsTable(sqLiteDatabase);
     }
 }
