@@ -107,26 +107,26 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-//        switch (item.getItemId()){
-//            case R.id.settings:
-//                Intent intent = new Intent(this, SettingsActivity.class);
-//                startActivity(intent);
-//                return true;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//        return true; //put in fragment for settings
+        switch (item.getItemId()){
+            case R.id.settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        //return true; //put in fragment for settings
 
-        SettingsFragment settings = new SettingsFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        viewPager.setCurrentItem(3);
+//        SettingsFragment settings = new SettingsFragment();
+//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+//        viewPager.setCurrentItem(3);
 
 //        ft.replace(viewPager.getCurrentItem(), settings);
 //        ft.addToBackStack(null);
 //        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 //        ft.commit();
-        return  super.onOptionsItemSelected(item);
+       // return  super.onOptionsItemSelected(item);
     }
 
 

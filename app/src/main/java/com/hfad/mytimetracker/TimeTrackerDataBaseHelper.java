@@ -56,7 +56,6 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("CREATE TABLE TASK_INFORMATION ("
                 + "_ID INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "TASK_NAME TEXT, "
-                + "TASK_CATEGORY TEXT, "
                 + "DUE_DATE DATE, "
                 + "START_TIME TIME, "
                 + "END_TIME TIME);");
