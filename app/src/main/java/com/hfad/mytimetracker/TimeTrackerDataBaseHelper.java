@@ -47,6 +47,7 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
                 + "TASK_NAME TEXT, "
                 + "CATEGORY_GENERAL BOOLEAN, "
                 + "COMPLETED BOOLEAN, "
+                + "DUE_DATE DATE, "
                 + "NOT_COMPLETED BOOLEAN, "
                 + "NOT_ON_TIME BOOLEAN, "
                 + "ON_TIME BOOLEAN);");

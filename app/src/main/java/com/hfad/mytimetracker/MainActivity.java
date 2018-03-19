@@ -29,6 +29,7 @@ import com.facebook.stetho.Stetho;
 import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
+    MenuItem prevMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TableTest", " shit is broke");
         }
         Log.d("yolo", mydatabase.isOpen() + " hello " + DebugDB.getAddressLog());
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        final BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         BottomNavigationHelper.removeShiftMode(bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener(){
@@ -90,6 +91,31 @@ public class MainActivity extends AppCompatActivity {
 
         SectionsPagerAdapter pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (prevMenuItem != null) {
+                    prevMenuItem.setChecked(false);
+                }
+                else
+                {
+                    bottomNavigationView.getMenu().getItem(0).setChecked(false);
+                }
+
+                bottomNavigationView.getMenu().getItem(position).setChecked(true);
+                prevMenuItem = bottomNavigationView.getMenu().getItem(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         pager.setAdapter(pagerAdapter);
     }
 
@@ -98,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -142,16 +169,24 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
+            BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
             switch (position){
                 case 0:
+                    //bottomNavigationView.getItem(R.id.task_calendar);
                     return new CalendarFragment();
                 case 1:
+                   // bottomNavigationView.setSelectedItemId(R.id.task_viewer);
                     return new TasksListFragment();
                 case 2:
+                   // bottomNavigationView.setSelectedItemId(R.id.home);
                     return new HomeFragment();
                 case 3:
+                   // bottomNavigationView.setSelectedItemId(R.id.task_creator);
+                    bottomNavigationView.getMenu().findItem(R.id.stats_viewer).setChecked(false);
                     return new TaskCreatorFragment();
                 case 4:
+                   // bottomNavigationView.setSelectedItemId(R.id.stats_viewer);
+                    bottomNavigationView.getMenu().findItem(R.id.stats_viewer).setChecked(true);
                     return new StatsFragment();
             }
             return null;

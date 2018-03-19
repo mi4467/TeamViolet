@@ -1,7 +1,5 @@
 package com.hfad.mytimetracker;
 
-
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -10,17 +8,12 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.design.internal.BottomNavigationItemView;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -37,25 +30,24 @@ import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Arrays.*;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 
-import static com.amitshekhar.utils.Constants.NULL;
-
-
 /**
  * A simple {@link Fragment} subclass.
+ *
+ * NOTES FOR LATER:
+ * Try and split up the sql writes and reads in a non conflicting way, and in turn make these synchronized methods
+ * --Also eventually try and set up ASYNC tasks to further parralize and lighten the load on the main thread
+ * All of these fields could possible be better kept in some sort of interface file, and we then have this fragment implement this interface
+ * At the end, implement the state saving methods for the fragments and fields
  */
 public class TaskCreatorFragment extends Fragment implements  View.OnClickListener {
     private static Integer color = null;                  //use for first card view
     private static String categoryName = null;            //use for first cardView
-
-
 
     private static Integer year;                   //use for second cardView
     private static Integer month;
@@ -87,8 +79,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         // Required empty public constructor
     }
 
-
-
     //@Override
     //public void onCreate(Bundle savedInstanceState){
 
@@ -99,8 +89,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_task_creator, container, false);
-//        BottomNavigationView bottomNavigationView = (BottomNavigationView) getActivity().findViewById(R.id.bottom_navigation);
-//        bottomNavigationView.getMenu().getItem(4).setChecked(true);
         Button pickColor = (Button) layout.findViewById(R.id.color_button);                             //for first card view
         Button submitCat = (Button) layout.findViewById(R.id.submit_cat);
 
@@ -117,12 +105,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         Button pickDateTask = (Button) layout.findViewById(R.id.add_task_date_picker);
         Button pickOpions = (Button)   layout.findViewById(R.id.reocc_cat_list);
         Button submitTask = (Button) layout.findViewById(R.id.submit_task);
-
-
-
-       // txt = (TextView) layout.findViewById(R.id.colorbox);
-       // txt.setBackgroundColor(Color.BLUE);
-        // Log.d("time picker test", pickTime.hasOnClickListeners() +" it entered before creating the  listener");
 
         pickColor.setOnClickListener(this);                                                             //add listeners
         submitCat.setOnClickListener(this);
@@ -170,9 +152,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                 .setPositiveButton("ok", new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                         TextView yolo = (TextView) getActivity().findViewById(R.id.colorbox);
-                         Log.d("ColorTest", "Color selected is: " + selectedColor + "");
-                        //txt.getBackground().setColorFilter(selectedColor, PorterDuff.Mode.SRC_ATOP);
+                        TextView yolo = (TextView) getActivity().findViewById(R.id.colorbox);
                         color = selectedColor;
                         yolo.setBackgroundColor(selectedColor);
                     }
@@ -194,8 +174,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                     @Override
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         TaskCreatorFragment.days = which;
-                        Log.d("Days test",  Arrays.toString(which));
-                        Log.d("Days test",  Arrays.toString(text));
                         return true;
                     }
                 })
@@ -212,8 +190,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                     @Override
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         TaskCreatorFragment.taskCategoryNames =  text;
-                        Log.d("Days test",  Arrays.toString(which));
-                        Log.d("Days test",  Arrays.toString(text));
                         return true;
                     }
                 })
@@ -230,8 +206,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                     @Override
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         TaskCreatorFragment.categoriesReocc = text;
-                        Log.d("Days test",  Arrays.toString(which));
-                        Log.d("Days test",  Arrays.toString(text));
                         return true;
                     }
                 })
@@ -251,7 +225,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
             result[i] = name;
             categories.moveToNext();
         }
-        Log.d("taskCatTest", Arrays.toString(result));
         return result;
     }
 
@@ -262,10 +235,12 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                 showColorWheelDialog(view);
                 break;
             case R.id.start_time_reocc_picker:
+                Log.d("ReoccTest", "was called");
                 TimePickerFragment.flag=2;
                 showTimePickerDialog(view);
                 break;
             case R.id.end_time_reocc_picker:
+                Log.d("ReoccTest", "was called as well");
                 TimePickerFragment.flag=3;
                 showTimePickerDialog(view);
                 break;
@@ -321,6 +296,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         String startTime = TaskCreatorFragment.startHourReocc + "-" + TaskCreatorFragment.startMinuteReocc + "-00";
         String endTime = TaskCreatorFragment.endHourReocc + "-" + TaskCreatorFragment.endMinuteReocc + "-00";
         Log.d("ReoccTest", startDate + " " + endDate);
+
         Toast.makeText(getActivity(), startDate + " " + endDate, Toast.LENGTH_LONG).show();
         TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
         SQLiteDatabase write = categoryHelper.getWritableDatabase();
@@ -353,6 +329,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                    taskStatsParams.put("CATEGORY_GENERAL", "1");
                    taskStatsParams.put("NOT_COMPLETED", "1");
                    taskStatsParams.put("COMPLETED", "0");
+                   taskStatsParams.put("DUE_DATE", dueDate);
                    for(int i =0; i<TaskCreatorFragment.categoriesReocc.length; i++){
                        taskStatsParams.put(TaskCreatorFragment.categoriesReocc[i].toString(), "1");
                    }
@@ -459,6 +436,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         recordParamaterstwo.put("CATEGORY_GENERAL", "1");
         recordParamaterstwo.put("NOT_COMPLETED", "1");
         recordParamaterstwo.put("COMPLETED", "0");
+        recordParamaterstwo.put("DUE_DATE", dueDate);
         Log.d("TestAddTask", TaskCreatorFragment.taskCategoryNames.length + "");
         for(int i =0; i<TaskCreatorFragment.taskCategoryNames.length; i++){
             Log.d("TestAddTask", TaskCreatorFragment.taskCategoryNames[i].toString());
@@ -498,28 +476,25 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
     private boolean checkValidityOfReoccTask(){
+      //  Log.d("ReoccTest", TaskCreatorFragment.startYear + " " + TaskCreatorFragment.startMonth + " " + TaskCreatorFragment.startDate);
+      //  Log.d("ReoccTest", TaskCreatorFragment.endYear + " " + TaskCreatorFragment.endMonth +  " " + TaskCreatorFragment.endDay);
         if(TaskCreatorFragment.reoccTaskName.equals("")){                      //change
-            //cleanUpCardViewTwo();
             Toast.makeText(getActivity(), "Choose a Task!", Toast.LENGTH_SHORT).show();
             return false;
         }
         if(TaskCreatorFragment.endYear==null){
-            // cleanUpCardViewTwo();
             Toast.makeText(getActivity(), "Choose a End Date!", Toast.LENGTH_SHORT).show();
             return false;
         }
         if(TaskCreatorFragment.startYear==null){
-            // cleanUpCardViewTwo();
             Toast.makeText(getActivity(), "Choose a Start Date!", Toast.LENGTH_SHORT).show();
             return false;
         }
         if(TaskCreatorFragment.startHourReocc==null){
-            // cleanUpCardViewTwo();
             Toast.makeText(getActivity(), "Choose a Start Time!", Toast.LENGTH_SHORT).show();
             return false;
         }
         if(TaskCreatorFragment.endHourReocc==null){
-            // cleanUpCardViewTwo();
             Toast.makeText(getActivity(), "Choose a End Time!", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -534,6 +509,8 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
 
         //Check the following three validity cases, if either start date or end date is before the current date, if end date is before start date, and if end time is less than start time(
         //All of them should be implemented, just test again
+        Log.d("ReoccTest", TaskCreatorFragment.startHourReocc + " " + TaskCreatorFragment.startMinuteReocc);
+        Log.d("ReoccTest", TaskCreatorFragment.endHourReocc + " " + TaskCreatorFragment.endMinuteReocc);
         if(TaskCreatorFragment.endHourReocc<TaskCreatorFragment.startHourReocc || (TaskCreatorFragment.endHourReocc==TaskCreatorFragment.startHourReocc && TaskCreatorFragment.endMinuteReocc<TaskCreatorFragment.startMinuteReocc)){
             Toast.makeText(getActivity(), "This Time is Invalid! Make End Time After Start Time", Toast.LENGTH_SHORT).show();
             return false;
@@ -542,10 +519,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         Integer cday = today.get(Calendar.DAY_OF_MONTH);
         Integer cmonth = today.get(Calendar.MONTH);
         Integer cyear = today.get(Calendar.YEAR);
-        if(TaskCreatorFragment.startYear<cyear ||  (TaskCreatorFragment.startYear==cyear && TaskCreatorFragment.startMonth<cmonth) || (TaskCreatorFragment.startYear==cyear && TaskCreatorFragment.startMonth==cmonth && TaskCreatorFragment.startDate<cday) ){
-            Toast.makeText(getActivity(), "The Start Date is Invalid! Make The Start Date Today or After", Toast.LENGTH_SHORT).show();
-            return false;
-        }
         if(TaskCreatorFragment.startYear<cyear ||  (TaskCreatorFragment.startYear==cyear && TaskCreatorFragment.startMonth<cmonth) || (TaskCreatorFragment.startYear==cyear && TaskCreatorFragment.startMonth==cmonth && TaskCreatorFragment.startDate<cday) ){
             Toast.makeText(getActivity(), "The Start Date is Invalid! Make The Start Date Today or After", Toast.LENGTH_SHORT).show();
             return false;
@@ -563,24 +536,19 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
 
 
     private boolean checkValidityOfTask(){
-        //Log.d("CARDVIEWTWOTEST", TaskCreatorFragment.categoryName);
         if(TaskCreatorFragment.taskName.equals("")){
-            //cleanUpCardViewTwo();
             Toast.makeText(getActivity(), "Choose a Task!", Toast.LENGTH_SHORT).show();
             return false;
         }
         if(TaskCreatorFragment.year==null){
-           // cleanUpCardViewTwo();
             Toast.makeText(getActivity(), "Choose a Due Date!", Toast.LENGTH_SHORT).show();
             return false;
         }
         if(TaskCreatorFragment.startHour==null){
-           // cleanUpCardViewTwo();
             Toast.makeText(getActivity(), "Choose a Start Time!", Toast.LENGTH_SHORT).show();
             return false;
         }
         if(TaskCreatorFragment.endHour==null){
-           // cleanUpCardViewTwo();
             Toast.makeText(getActivity(), "Choose a End Time!", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -618,11 +586,8 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                     DateFormat.is24HourFormat(getActivity()));
         }
 
-        public void setFlag(int c){
-            flag =c;
-        }
-
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            Log.d("ReoccTest", flag + "");
             if(flag==0){
                 TaskCreatorFragment.startMinute = minute;
                 TaskCreatorFragment.startHour = hourOfDay;
@@ -658,10 +623,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         }
 
         private static int flag;
-
-        public void setFlag(int c){
-            flag =c;
-        }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             if(flag==0){
