@@ -42,6 +42,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Arrays.*;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
 
 import static com.amitshekhar.utils.Constants.NULL;
 
@@ -307,16 +309,77 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                 break;
 
         }
-
-
-        //showTimePickerDialog(view);
     }
 
-    private void enterReoccTasksInDB() {
+    private void enterReoccTasksInDB()  {
         TaskCreatorFragment.reoccTaskName = ((EditText) getActivity().findViewById(R.id.reocc_task_name)).getText().toString();
-        checkValidityOfReoccTask();
-        //enter all database processing code here
+        if(!checkValidityOfReoccTask()){
+            return;
+        }
+        String startDate = constructDateStr(TaskCreatorFragment.startYear, TaskCreatorFragment.startMonth, TaskCreatorFragment.startDate);
+        String endDate = constructDateStr(TaskCreatorFragment.endYear, TaskCreatorFragment.endMonth, TaskCreatorFragment.endDay);
+        String startTime = TaskCreatorFragment.startHourReocc + "-" + TaskCreatorFragment.startMinuteReocc + "-00";
+        String endTime = TaskCreatorFragment.endHourReocc + "-" + TaskCreatorFragment.endMinuteReocc + "-00";
+        Log.d("ReoccTest", startDate + " " + endDate);
+        Toast.makeText(getActivity(), startDate + " " + endDate, Toast.LENGTH_LONG).show();
+        TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
+        SQLiteDatabase write = categoryHelper.getWritableDatabase();
+        HashSet<Integer> days = new HashSet<Integer>();
+        for(int i=0; i< TaskCreatorFragment.days.length; i++){
+            days.add(TaskCreatorFragment.days[i]+1);
+        }
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");      //year.month.day
+            Date start = sdf.parse(startDate);
+            Date end = sdf.parse(endDate);
+
+            GregorianCalendar gcal = new GregorianCalendar();
+            gcal.setTime(start);
+            while (!gcal.getTime().after(end)) {
+               if(days.contains(gcal.get(Calendar.DAY_OF_WEEK))){
+                   //We want to put in the task in task info
+                   String dueDate = constructDateStr(gcal.get(Calendar.YEAR), gcal.get(Calendar.MONTH), gcal.get(Calendar.DAY_OF_MONTH));
+                   ContentValues recordParamaters = new ContentValues();                   //insert task info, insert task stats
+                   recordParamaters.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
+                   recordParamaters.put("DUE_DATE", dueDate);
+                   recordParamaters.put("START_TIME", startTime);
+                   recordParamaters.put("END_TIME", endTime);
+                   //construct date value, start time value, end time value
+                   write.insert("TASK_INFORMATION", null, recordParamaters);
+
+                   //We want to put in the task in task stats
+                   ContentValues taskStatsParams = new ContentValues();
+                   taskStatsParams.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
+                   taskStatsParams.put("CATEGORY_GENERAL", "1");
+                   taskStatsParams.put("NOT_COMPLETED", "1");
+                   taskStatsParams.put("COMPLETED", "0");
+                   for(int i =0; i<TaskCreatorFragment.categoriesReocc.length; i++){
+                       taskStatsParams.put(TaskCreatorFragment.categoriesReocc[i].toString(), "1");
+                   }
+                   write.insert("TASK_STATS", null, taskStatsParams);      //issue here
+               }
+                gcal.add(Calendar.DATE, 1);
+            }
+        }
+        catch (Exception e){
+            Log.d("ReoccTest", "Did not work");
+        }
         cleanUpCardViewThree();
+    }
+
+    private String constructDateStr(int y, int m, int d){
+        m = m+1;
+        StringBuilder result = new StringBuilder();
+        result.append(y+"-");
+        if(m<10){
+            result.append("0");
+        }
+        result.append(m +"-");
+        if(d<10){
+            result.append("0");
+        }
+        result.append(d + "");
+        return new String(result);
     }
 
     private void enterCatInDB() {
@@ -370,7 +433,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
     private void enterTaskInDB() {
-        String dueDate = TaskCreatorFragment.year + "-" + TaskCreatorFragment.month + "-" + TaskCreatorFragment.date;
+        String dueDate = constructDateStr(TaskCreatorFragment.year, TaskCreatorFragment.month, TaskCreatorFragment.date);
         String startTime = TaskCreatorFragment.startHour + "-" + TaskCreatorFragment.startMinute + "-00";
         String endTime = TaskCreatorFragment.endHour + "-" + TaskCreatorFragment.endMinute + "-00";
         TaskCreatorFragment.categoryName = ((EditText) getActivity().findViewById(R.id.cat_name_task_adder)).getText().toString().toUpperCase();
@@ -405,8 +468,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         Log.d("InsertTaskTest", "it worked");
         cleanUpCardViewTwo();
     }
-
-    //private void enterRe
 
     private void cleanUpCardViewTwo(){
         TaskCreatorFragment.year=null;
