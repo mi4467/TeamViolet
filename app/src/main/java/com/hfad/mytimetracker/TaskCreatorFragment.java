@@ -344,7 +344,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         cleanUpCardViewThree();
     }
 
-    private String constructDateStr(int y, int m, int d){
+    public static String constructDateStr(int y, int m, int d){
         m = m+1;
         StringBuilder result = new StringBuilder();
         result.append(y+"-");

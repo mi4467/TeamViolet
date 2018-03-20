@@ -2,14 +2,28 @@ package com.hfad.mytimetracker;
 
 
 import android.annotation.SuppressLint;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
+import android.widget.CalendarView;
+import android.widget.CursorAdapter;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
@@ -17,65 +31,156 @@ import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import java.util.Calendar;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CalendarFragment extends Fragment implements View.OnClickListener{
+public class CalendarFragment extends Fragment {
 
     private ExpandableLayout expandableLayout0;
     private ExpandableLayout expandableLayout1;
-
+    SQLiteDatabase database;
     public CalendarFragment() {
         // Required empty public constructor
     }
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-//        BottomNavigationView bottomNavigationView = (BottomNavigationView) getActivity().findViewById(R.id.bottom_navigation);
-//        bottomNavigationView.getMenu().getItem(1).setChecked(true);
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //use the cachapa library to make the list view of tasks
-        View layout = inflater.inflate(R.layout.fragment_calendar, container, false);
+        final View layout = inflater.inflate(R.layout.fragment_calendar, container, false);
 
-        expandableLayout0 = layout.findViewById(R.id.expandable_layout_0);
-        expandableLayout1 = layout.findViewById(R.id.expandable_layout_1);
-
-        expandableLayout0.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+        NestedScrollView C = layout.findViewById(R.id.nested_scroll_view);
+        C.smoothScrollTo(0,0);
+        CalendarView view = layout.findViewById(R.id.simpleCalendarView);
+        view.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-               // Log.d("ExpandableLayout0", "State: " + state);
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
+                TimeTrackerDataBaseHelper dataBaseHelper = new TimeTrackerDataBaseHelper(getActivity());
+                SQLiteDatabase database = dataBaseHelper.getReadableDatabase();
+                String date = TaskCreatorFragment.constructDateStr(i, i1, i2);
+                Cursor stats = database.rawQuery("SELECT * FROM TASK_STATS", null);
+                Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
+                Cursor data = database.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
+                Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
+                RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                recyclerView.setAdapter(new CalendarFragment.SimpleAdapter(recyclerView, data, stats));
             }
         });
 
-        expandableLayout1.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-               // Log.d("ExpandableLayout1", "State: " + state);
-            }
-        });
+        Calendar today = Calendar.getInstance();
+        Integer cday = today.get(Calendar.DAY_OF_MONTH);
+        Integer cmonth = today.get(Calendar.MONTH);
+        Integer cyear = today.get(Calendar.YEAR);
 
-        layout.findViewById(R.id.expand_button).setOnClickListener(this);
-
+        RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        TimeTrackerDataBaseHelper dataBaseHelper = new TimeTrackerDataBaseHelper(getActivity());
+         database = dataBaseHelper.getReadableDatabase();
+        String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
+        Cursor stats = database.rawQuery("SELECT * FROM TASK_STATS", null);
+        Log.d("CursorDebug", date);
+        Cursor data = database.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
+        Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
+        recyclerView.setAdapter(new SimpleAdapter(recyclerView, data, stats));       //pass in a cursor, then use this cursor to bind in data
 
         return layout;
     }
 
-    @Override
-    public void onClick(View view) {
-        if (expandableLayout0.isExpanded()) {
-            expandableLayout0.collapse();
-        } else if (expandableLayout1.isExpanded()) {
-            expandableLayout1.collapse();
-        } else {
-            expandableLayout0.expand();
-            expandableLayout1.expand();
+    private  class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder> {
+
+        private static final int UNSELECTED = -1;
+        private RecyclerView recyclerView;
+        private Cursor data;
+        private Cursor stats;
+        private int selectedItem = UNSELECTED;
+
+        public SimpleAdapter(RecyclerView recyclerView, Cursor data, Cursor stats) {
+            this.recyclerView = recyclerView;
+            this.data = data;
+            data.moveToFirst();
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item, parent, false);
+                return new ViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            holder.bind();
+            //data.moveToNext();
+        }
+
+        @Override
+        public int getItemCount() {
+            return data.getCount();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, ExpandableLayout.OnExpansionUpdateListener {
+
+            private ExpandableLayout expandableLayout;
+            private TextView expandButton;
+
+            public ViewHolder(View itemView){
+                super(itemView);
+                expandableLayout = itemView.findViewById(R.id.expandable_layout);
+                expandableLayout.setInterpolator(new OvershootInterpolator());
+                expandableLayout.setOnExpansionUpdateListener(this);
+                expandButton = itemView.findViewById(R.id.expand_button);
+
+                expandButton.setOnClickListener(this);
+            }
+
+            public void bind() {
+                int position = getAdapterPosition();
+                boolean isSelected = position == selectedItem;
+                //This is where you want to connect the data
+                //expandButton.setText(position + ". Tap to expand");
+
+                expandButton.setText(data.getString(1));
+               expandButton.setBackgroundColor(getColor(data.getString(1)));
+                data.moveToNext();
+                expandButton.setSelected(isSelected);
+                expandableLayout.setExpanded(isSelected, false);
+            }
+
+            public int getColor(String name){
+               Cursor innerj = database.rawQuery("SELECT * FROM TASK_STATS INNER JOIN TASK_INFORMATION ON TASK_STATS.TASK_NAME = TASK_INFORMATION.TASK_NAME", null);
+               Log.d("ColorDebug", DatabaseUtils.dumpCursorToString(innerj));
+               return Color.DKGRAY;
+            }
+
+            @Override
+            public void onClick(View view) {
+                ViewHolder holder = (ViewHolder) recyclerView.findViewHolderForAdapterPosition(selectedItem);
+                if (holder != null) {
+                    holder.expandButton.setSelected(false);
+                    holder.expandableLayout.collapse();
+                }
+                int position = getAdapterPosition();
+                if (position == selectedItem) {
+                    selectedItem = UNSELECTED;
+                }
+                else {
+                    expandButton.setSelected(true);
+                    expandableLayout.expand();
+                    selectedItem = position;
+                }
+
+            }
+
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+                Log.d("ExpandableLayout", "State: " + state);
+                if (state == ExpandableLayout.State.EXPANDING) {
+                    recyclerView.smoothScrollToPosition(getAdapterPosition());
+                }
+            }
         }
     }
-    ;
-
-
 }
