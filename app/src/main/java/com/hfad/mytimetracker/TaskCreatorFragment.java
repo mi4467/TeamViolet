@@ -300,6 +300,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         Toast.makeText(getActivity(), startDate + " " + endDate, Toast.LENGTH_LONG).show();
         TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
         SQLiteDatabase write = categoryHelper.getWritableDatabase();
+        SQLiteDatabase read = categoryHelper.getReadableDatabase();
         HashSet<Integer> days = new HashSet<Integer>();
         for(int i=0; i< TaskCreatorFragment.days.length; i++){
             days.add(TaskCreatorFragment.days[i]+1);
@@ -323,11 +324,15 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                    //construct date value, start time value, end time value
                    write.insert("TASK_INFORMATION", null, recordParamaters);
 
+                   Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
+                   id.moveToFirst();
+
                    //We want to put in the task in task stats
                    ContentValues taskStatsParams = new ContentValues();
                    taskStatsParams.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
                    taskStatsParams.put("CATEGORY_GENERAL", "1");
                    taskStatsParams.put("NOT_COMPLETED", "1");
+                   taskStatsParams.put("TASK_ID", id.getString(0));
                    taskStatsParams.put("COMPLETED", "0");
                    taskStatsParams.put("DUE_DATE", dueDate);
                    for(int i =0; i<TaskCreatorFragment.categoriesReocc.length; i++){
@@ -420,6 +425,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         }
         TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
         SQLiteDatabase write = categoryHelper.getWritableDatabase();
+        SQLiteDatabase read = categoryHelper.getReadableDatabase();
 
         ContentValues recordParamaters = new ContentValues();                   //insert task info, insert task stats
         recordParamaters.put("TASK_NAME", TaskCreatorFragment.taskName);
@@ -431,9 +437,12 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         write.insert("TASK_INFORMATION", null, recordParamaters);
         Log.d("InsertTaskTest", "it worked");
 
+        Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
+        id.moveToFirst();
         ContentValues recordParamaterstwo = new ContentValues();
         recordParamaterstwo.put("TASK_NAME", TaskCreatorFragment.taskName);
         recordParamaterstwo.put("CATEGORY_GENERAL", "1");
+        recordParamaterstwo.put("TASK_ID", id.getString(0));
         recordParamaterstwo.put("NOT_COMPLETED", "1");
         recordParamaterstwo.put("COMPLETED", "0");
         recordParamaterstwo.put("DUE_DATE", dueDate);

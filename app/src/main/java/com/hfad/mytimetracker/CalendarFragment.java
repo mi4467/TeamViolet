@@ -20,6 +20,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.view.animation.OvershootInterpolator;
 import android.widget.CalendarView;
 import android.widget.CursorAdapter;
@@ -85,10 +87,24 @@ public class CalendarFragment extends Fragment {
         Log.d("CursorDebug", date);
         Cursor data = database.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
+        int resId = R.anim.layout_animation_fall_down;
         recyclerView.setAdapter(new SimpleAdapter(recyclerView, data, stats));       //pass in a cursor, then use this cursor to bind in data
 
         return layout;
     }
+
+    private void markComplete(){
+
+    }
+
+    private void deleteTask(){
+
+    }
+
+    private void startTaskActivity(){
+
+    }
+
 
     private  class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder> {
 
@@ -143,7 +159,7 @@ public class CalendarFragment extends Fragment {
                 //expandButton.setText(position + ". Tap to expand");
 
                 expandButton.setText(data.getString(1));
-               expandButton.setBackgroundColor(getColor(data.getString(1)));
+                //expandButton.setBackgroundColor(getColor(data.getString(1)));
                 data.moveToNext();
                 expandButton.setSelected(isSelected);
                 expandableLayout.setExpanded(isSelected, false);
