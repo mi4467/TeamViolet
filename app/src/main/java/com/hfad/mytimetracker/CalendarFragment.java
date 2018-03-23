@@ -2,10 +2,12 @@ package com.hfad.mytimetracker;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
@@ -16,6 +18,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +26,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.view.animation.OvershootInterpolator;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CursorAdapter;
 import android.widget.SimpleAdapter;
@@ -35,15 +39,20 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 
 import java.util.Calendar;
 
+import io.github.yavski.fabspeeddial.FabSpeedDial;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CalendarFragment extends Fragment {
-
+public class CalendarFragment extends Fragment  {
+    private int currentId;
     private ExpandableLayout expandableLayout0;
     private ExpandableLayout expandableLayout1;
     SQLiteDatabase database;
+    Button button;
+    View yolo;
+    FabSpeedDial fabSpeedDial;
     public CalendarFragment() {
         // Required empty public constructor
     }
@@ -57,6 +66,7 @@ public class CalendarFragment extends Fragment {
         NestedScrollView C = layout.findViewById(R.id.nested_scroll_view);
         C.smoothScrollTo(0,0);
         CalendarView view = layout.findViewById(R.id.simpleCalendarView);
+
         view.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
@@ -73,10 +83,28 @@ public class CalendarFragment extends Fragment {
             }
         });
 
+        fabSpeedDial = (FabSpeedDial) layout.findViewById(R.id.calendar_fab);
+        fabSpeedDial.setVisibility(View.GONE);
+
         Calendar today = Calendar.getInstance();
         Integer cday = today.get(Calendar.DAY_OF_MONTH);
         Integer cmonth = today.get(Calendar.MONTH);
         Integer cyear = today.get(Calendar.YEAR);
+
+
+        yolo = inflater.inflate(R.layout.recycler_item, container, false);
+        button = yolo.findViewById(R.id.task_activity);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startTaskActivity();
+            }
+        });
+        Log.d("ButtonCheck", button.getText().toString());
+        //button.performClick();
+
+
+
 
         RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -102,7 +130,10 @@ public class CalendarFragment extends Fragment {
     }
 
     private void startTaskActivity(){
-
+        Log.d("TaskActivity", "Should Direct to an activity");
+        Intent intent = new Intent(getContext(), TaskActivity.class);
+        intent.putExtra("TASK_ID", currentId);
+        startActivity(intent);
     }
 
 
@@ -128,6 +159,7 @@ public class CalendarFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
+           // holder.onClick(new Button(getContext()));
             holder.bind();
             //data.moveToNext();
         }
@@ -148,7 +180,6 @@ public class CalendarFragment extends Fragment {
                 expandableLayout.setInterpolator(new OvershootInterpolator());
                 expandableLayout.setOnExpansionUpdateListener(this);
                 expandButton = itemView.findViewById(R.id.expand_button);
-
                 expandButton.setOnClickListener(this);
             }
 
@@ -159,7 +190,13 @@ public class CalendarFragment extends Fragment {
                 //expandButton.setText(position + ". Tap to expand");
 
                 expandButton.setText(data.getString(1));
+
+                currentId = data.getInt(0);
+                //expandButton.setTag(0, data.getInt(0));                 //we pass in the _id to the button
+
+
                 //expandButton.setBackgroundColor(getColor(data.getString(1)));
+
                 data.moveToNext();
                 expandButton.setSelected(isSelected);
                 expandableLayout.setExpanded(isSelected, false);
@@ -177,6 +214,7 @@ public class CalendarFragment extends Fragment {
                 if (holder != null) {
                     holder.expandButton.setSelected(false);
                     holder.expandableLayout.collapse();
+                    fabSpeedDial.setVisibility(View.INVISIBLE);
                 }
                 int position = getAdapterPosition();
                 if (position == selectedItem) {
@@ -185,7 +223,16 @@ public class CalendarFragment extends Fragment {
                 else {
                     expandButton.setSelected(true);
                     expandableLayout.expand();
+                    fabSpeedDial.setVisibility(View.VISIBLE);
+                    Display mdisp = getActivity().getWindowManager().getDefaultDisplay();
+                    Point mdispSize = new Point();
+                    mdisp.getSize(mdispSize);
+                    int maxX = mdispSize.x;
+                    int maxY = mdispSize.y;
+//                    fabSpeedDial.setX(maxX);
+//                    fabSpeedDial.setY(maxY);
                     selectedItem = position;
+
                 }
 
             }
@@ -195,6 +242,15 @@ public class CalendarFragment extends Fragment {
                 Log.d("ExpandableLayout", "State: " + state);
                 if (state == ExpandableLayout.State.EXPANDING) {
                     recyclerView.smoothScrollToPosition(getAdapterPosition());
+//                    Button button = yolo.findViewById(R.id.task_activity);
+//                    button.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View view) {
+//                            startTaskActivity();
+//                        }
+//                    });
+//                    button.callOnClick();
+                    Log.d("ButtonCheck", button.getText().toString());
                 }
             }
         }

@@ -1,3 +1,5 @@
+
+
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,30 +8,70 @@
     android:layout_height="match_parent"
     tools:context="com.hfad.mytimetracker.CalendarFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="150dp"
         >
-        <CalendarView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="vertical"
-            android:id="@+id/simpleCalendarView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            />
+
+    <CalendarView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:id="@+id/simpleCalendarView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        />
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="200dp"
+        >
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        >
+    <!-- TODO: Update blank fragment layout -->
+
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_gravity="bottom|end"
             android:layout_weight="1"
             android:layoutAnimation="@anim/layout_animation_fall_down"
             />
 
+
     </LinearLayout>
+
+        <io.github.yavski.fabspeeddial.FabSpeedDial
+            android:id="@+id/calendar_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="end|top"
+            app:fabGravity="bottom_end"
+            app:fabMenu="@menu/taskfabmenu"
+            app:miniFabBackgroundTint="@android:color/white"
+            app:miniFabDrawableTint="?attr/colorPrimaryDark"
+            app:miniFabTitleTextColor="?attr/colorPrimaryDark" />
+
+
+
+
+    </FrameLayout>
+    </LinearLayout>
+
 
 
 </android.support.v4.widget.NestedScrollView>
