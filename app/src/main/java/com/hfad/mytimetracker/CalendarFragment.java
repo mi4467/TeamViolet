@@ -35,6 +35,7 @@ public class CalendarFragment extends Fragment  {
     private ExpandableLayout expandableLayout0;
     private ExpandableLayout expandableLayout1;
     SQLiteDatabase readableDatabase;
+    SQLiteDatabase writableDatabase;
     Button button;
     View yolo;
     String currentDate;
@@ -45,38 +46,33 @@ public class CalendarFragment extends Fragment  {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //use the cachapa library to make the list view of tasks
         final View layout = inflater.inflate(R.layout.fragment_calendar, container, false);
-
         NestedScrollView C = layout.findViewById(R.id.nested_scroll_view);
         C.smoothScrollTo(0,0);
         CalendarView view = layout.findViewById(R.id.simpleCalendarView);
-
         view.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
                 TimeTrackerDataBaseHelper dataBaseHelper = new TimeTrackerDataBaseHelper(getActivity());
-                SQLiteDatabase database = dataBaseHelper.getReadableDatabase();
                 currentDate = TaskCreatorFragment.constructDateStr(i, i1, i2);
-                Cursor stats = database.rawQuery("SELECT * FROM TASK_STATS", null);
+                Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
                 Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
-                Cursor data = database.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
+                Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
                 Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
                 RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                 recyclerView.setAdapter(new CalendarFragment.SimpleAdapter(recyclerView, data, stats));
             }
         });
-
         Calendar today = Calendar.getInstance();
         Integer cday = today.get(Calendar.DAY_OF_MONTH);
         Integer cmonth = today.get(Calendar.MONTH);
         Integer cyear = today.get(Calendar.YEAR);
-
         RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         TimeTrackerDataBaseHelper dataBaseHelper = new TimeTrackerDataBaseHelper(getActivity());
-         readableDatabase = dataBaseHelper.getReadableDatabase();
+        readableDatabase = dataBaseHelper.getReadableDatabase();
+        writableDatabase = dataBaseHelper.getWritableDatabase();
         String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
         currentDate = date;
         Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
@@ -85,8 +81,6 @@ public class CalendarFragment extends Fragment  {
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
         int resId = R.anim.layout_animation_fall_down;
         recyclerView.setAdapter(new SimpleAdapter(recyclerView, data, stats));       //pass in a cursor, then use this cursor to bind in data
-
-
         return layout;
     }
 
@@ -94,16 +88,14 @@ public class CalendarFragment extends Fragment  {
         ContentValues completeValue = new ContentValues();
         completeValue.put("COMPLETED", 1);
         completeValue.put("NOT_COMPLETED", 0);
-        SQLiteDatabase db = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
-        db.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
+        writableDatabase = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
+        writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
 
     }
 
     private void deleteTask(int id){
-        SQLiteDatabase db = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
-        db.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
-        db.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
-        CalendarView view = getView().findViewById(R.id.simpleCalendarView);
+        writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
+        writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
         Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
         Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
@@ -168,9 +160,7 @@ public class CalendarFragment extends Fragment  {
             public void bind() {
                 int position = getAdapterPosition();
                 boolean isSelected = position == selectedItem;
-                //This is where you want to connect the data
                 expandButton.setText(data.getString(1));
-
                 currentId = data.getInt(0);
                 data.moveToNext();
                 expandButton.setSelected(isSelected);
@@ -178,12 +168,6 @@ public class CalendarFragment extends Fragment  {
                 ((Button)expandableLayout.findViewById(R.id.task_activity)).setTag(R.id.Button_ID, currentId);
                 ((Button)expandableLayout.findViewById(R.id.task_complete_button)).setTag(R.id.Button_ID, currentId);
                 ((Button)expandableLayout.findViewById(R.id.task_delete_button)).setTag(R.id.Button_ID, currentId);
-            }
-
-            public int getColor(String name){
-               Cursor innerj = readableDatabase.rawQuery("SELECT * FROM TASK_STATS INNER JOIN TASK_INFORMATION ON TASK_STATS.TASK_NAME = TASK_INFORMATION.TASK_NAME", null);
-               Log.d("ColorDebug", DatabaseUtils.dumpCursorToString(innerj));
-               return Color.DKGRAY;
             }
 
             @Override
@@ -219,7 +203,6 @@ public class CalendarFragment extends Fragment  {
                         }
                     });
                     selectedItem = position;
-
                 }
 
             }
