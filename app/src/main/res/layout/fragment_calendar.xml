@@ -52,24 +52,13 @@
 
     </LinearLayout>
 
-        <io.github.yavski.fabspeeddial.FabSpeedDial
-            android:id="@+id/calendar_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_gravity="end|top"
-            app:fabGravity="bottom_end"
-            app:fabMenu="@menu/taskfabmenu"
-            app:miniFabBackgroundTint="@android:color/white"
-            app:miniFabDrawableTint="?attr/colorPrimaryDark"
-            app:miniFabTitleTextColor="?attr/colorPrimaryDark" />
+
 
 
 
 
     </FrameLayout>
+
     </LinearLayout>
 
 

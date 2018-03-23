@@ -24,7 +24,14 @@
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme"></activity>
-        <activity android:name=".TaskActivity"></activity>
+        <activity
+            android:name=".TaskActivity"
+            android:label="TaskActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme"
+            >
+
+        </activity>
     </application>
 
 </manifest>
