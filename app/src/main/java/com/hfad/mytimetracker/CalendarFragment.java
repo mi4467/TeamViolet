@@ -91,11 +91,23 @@ public class CalendarFragment extends Fragment  {
         writableDatabase = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
         writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
 
+        //we have to check to see if it's on time or not, mark those values in TASK_STATS
+        //Then iterate through category information and update the values for the categories the task belongs to
+
     }
 
     private void deleteTask(int id){
         writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
         writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
+
+
+        //Now we have to iterate through all the categories it has 1's in and decrement the respective total count in the category stats, and if neccessary, the completed, not completed, on time, and not on time values
+
+
+
+
+
+
         Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
         Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
@@ -103,6 +115,8 @@ public class CalendarFragment extends Fragment  {
         RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new CalendarFragment.SimpleAdapter(recyclerView, data, stats));
+
+
     }
 
     private void startTaskActivity(int id){
