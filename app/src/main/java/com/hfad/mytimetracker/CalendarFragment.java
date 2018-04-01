@@ -36,8 +36,6 @@ import java.util.Calendar;
  */
 public class CalendarFragment extends Fragment  {
     private int currentId;
-    private ExpandableLayout expandableLayout0;
-    private ExpandableLayout expandableLayout1;
     SQLiteDatabase readableDatabase;
     SQLiteDatabase writableDatabase;
     Button button;
@@ -242,18 +240,13 @@ public class CalendarFragment extends Fragment  {
         writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
         writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
         Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
-        Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
         Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
-        Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
         RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new CalendarFragment.SimpleAdapter(recyclerView, data, stats));
-
-
     }
 
     private void startTaskActivity(int id){
-        Log.d("TaskActivity", "Should Direct to an activity");
         Intent intent = new Intent(getContext(), TaskActivity.class);
         intent.putExtra("TASK_ID", id);
         startActivity(intent);

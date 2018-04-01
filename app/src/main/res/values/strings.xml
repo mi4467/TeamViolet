@@ -43,4 +43,21 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- For tasks list Fragment -->
+
+    <string name="category_filter">Choose Categories</string>
+    <string name="completion_filter">Choose Completion Status</string>
+    <string name="on_time_filter">Choose On-Time Status</string>
+    <string name="enter_filter">Filter</string>
+
+    <string-array name="completion_list">
+        <item>Completed</item>
+        <item>Not Completed</item>
+    </string-array>
+
+    <string-array name="on_time_list">
+        <item>On Time</item>
+        <item>Not On Time</item>
+    </string-array>
 </resources>
