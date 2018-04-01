@@ -332,11 +332,17 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                    taskStatsParams.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
                    taskStatsParams.put("CATEGORY_GENERAL", "1");
                    taskStatsParams.put("NOT_COMPLETED", "1");
+                   taskStatsParams.put("NOT_ON_TIME", "0");
+                   taskStatsParams.put("ON_TIME", "0");
                    taskStatsParams.put("TASK_ID", id.getString(0));
                    taskStatsParams.put("COMPLETED", "0");
                    taskStatsParams.put("DUE_DATE", dueDate);
                    for(int i =0; i<TaskCreatorFragment.categoriesReocc.length; i++){
                        taskStatsParams.put(TaskCreatorFragment.categoriesReocc[i].toString(), "1");
+                       write.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                               "SET NOT_COMPLETED = NOT_COMPLETED + 1 " +
+                               "WHERE CATEGORY_NAME = \"" +
+                               TaskCreatorFragment.categoriesReocc[i] + "\"");
                    }
                    write.insert("TASK_STATS", null, taskStatsParams);      //issue here
                }
@@ -402,10 +408,14 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
             return;
         }
         else{
-            write.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + cat.toUpperCase() + " BOOLEAN;");
+            write.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + cat + " BOOLEAN;");
             ContentValues entry = new ContentValues();
             entry.put("CATEGORY_NAME", cat);
             entry.put("COLOR", color);
+            entry.put("COMPLETED", 0);
+            entry.put("NOT_COMPLETED", 0);
+            entry.put("NOT_ON_TIME", 0);
+            entry.put("ON_TIME", 0);
             write.insert("TASK_CATEGORY_INFO", null, entry);
             Log.d("CategorySQL", "We put in DB");
             Toast.makeText(getActivity(), "The Category " + TaskCreatorFragment.categoryName+ " was made", Toast.LENGTH_SHORT).show();
@@ -445,11 +455,19 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         recordParamaterstwo.put("TASK_ID", id.getString(0));
         recordParamaterstwo.put("NOT_COMPLETED", "1");
         recordParamaterstwo.put("COMPLETED", "0");
+        recordParamaterstwo.put("ON_TIME", "0");
+        recordParamaterstwo.put("NOT_ON_TIME", "0");
         recordParamaterstwo.put("DUE_DATE", dueDate);
         Log.d("TestAddTask", TaskCreatorFragment.taskCategoryNames.length + "");
         for(int i =0; i<TaskCreatorFragment.taskCategoryNames.length; i++){
             Log.d("TestAddTask", TaskCreatorFragment.taskCategoryNames[i].toString());
             recordParamaterstwo.put(TaskCreatorFragment.taskCategoryNames[i].toString(), "1");
+            write.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                    "SET NOT_COMPLETED = NOT_COMPLETED + 1 " +
+                    "WHERE CATEGORY_NAME = \"" +
+                    TaskCreatorFragment.taskCategoryNames[i] + "\"");
+
+           // write.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_COMPLETED = NOT_COMPLETED + 1 WHERE CATEGORY_NAME = " + "\"Jul\"");
         }
         write.insert("TASK_STATS", null, recordParamaterstwo);      //issue here
         Log.d("InsertTaskTest", "it worked");

@@ -66,7 +66,7 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
     private void addTaskCategory(SQLiteDatabase sqLiteDatabase, String category){
         category = category.trim();
         category = category.replace(" ", "_");
-        category = category.toUpperCase();
+        //category = category.toUpperCase();
         sqLiteDatabase.execSQL("ALTER TABLE TASK_INFORMATION ADD COLUMN " + category + " BOOLEAN;");
         sqLiteDatabase.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + category + " BOOLEAN;");
     }

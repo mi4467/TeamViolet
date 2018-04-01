@@ -1,6 +1,7 @@
 package com.hfad.mytimetracker;
 
 
+import android.arch.persistence.room.Database;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -21,9 +22,12 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Calendar;
 
 
@@ -85,29 +89,158 @@ public class CalendarFragment extends Fragment  {
     }
 
     private void markComplete(int id){
+        //ADD a check for the general category
         ContentValues completeValue = new ContentValues();
         completeValue.put("COMPLETED", 1);
         completeValue.put("NOT_COMPLETED", 0);
-        writableDatabase = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
-        writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
-
+        //writableDatabase = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
+        Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
+        temp.moveToFirst();
         //we have to check to see if it's on time or not, mark those values in TASK_STATS
+        Log.d("MarkCompleteDebug", "Is it on time: " + verifyOnTime(id));
+        if(verifyOnTime(id)){
+            completeValue.put("ON_TIME", 1);
+            completeValue.put("NOT_ON_TIME", 0);
+            writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
+            for(int i =9; i<temp.getColumnCount(); i++){
+                //UPDATE THE ONTIME AND COMPLETED FOR THAT CATEGORY
+                Log.d("MarkCompleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
+                if(temp.getInt(i)==1){
+                    Log.d("MarkCompleteDebug", "We are entering data for: " + temp.getColumnName(i));
+                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                            "SET COMPLETED = COMPLETED + 1 " +
+                            "WHERE CATEGORY_NAME = \"" +
+                            temp.getColumnName(i) + "\"");      //Mark it complete
+
+                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
+                            "WHERE CATEGORY_NAME = \"" +
+                            temp.getColumnName(i) + "\"");
+
+                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                            "SET ON_TIME = ON_TIME + 1 " +
+                            "WHERE CATEGORY_NAME = \"" +
+                            temp.getColumnName(i) + "\"");
+                }
+            }
+        }
+        else{
+            completeValue.put("ON_TIME", 0);
+            completeValue.put("NOT_ON_TIME", 1);
+            writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
+            for(int i =9; i<temp.getColumnCount(); i++){
+                //UPDATE THE NOT_ONTIME AND COMPLETED FOR THAT CATEGORY
+                Log.d("MarkCompleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
+                if(temp.getInt(i)==1){
+                    Log.d("MarkCompleteDebug", "We are entering data for: " + temp.getColumnName(i));
+                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                            "SET COMPLETED = COMPLETED + 1 " +
+                            "WHERE CATEGORY_NAME = \"" +
+                            temp.getColumnName(i) + "\"");      //Mark it complete
+
+                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
+                            "WHERE CATEGORY_NAME = \"" +
+                            temp.getColumnName(i) + "\"");
+
+                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                            "SET NOT_ON_TIME = NOT_ON_TIME + 1 " +
+                            "WHERE CATEGORY_NAME = \"" +
+                            temp.getColumnName(i) + "\"");
+                }
+            }
+        }
         //Then iterate through category information and update the values for the categories the task belongs to
 
     }
 
+    private boolean verifyOnTime(int id){
+        Cursor check = readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " +id, null);
+        check.moveToFirst();
+        String[] dueDate = check.getString(2).split("-");
+        int dueYear = Integer.parseInt(dueDate[0]);
+        int dueDay = Integer.parseInt(dueDate[2]);
+        int dueMonth = Integer.parseInt(dueDate[1]);
+        String[] dueTime = check.getString(4).split("-");
+        int dueHour = Integer.parseInt(dueTime[0]);
+        int dueMin = Integer.parseInt(dueTime[1]);
+        Log.d("MarkCompleteDebug", Arrays.toString(dueDate));
+        Log.d("MarkCompleteDebug", Arrays.toString(dueTime));
+        Calendar today = Calendar.getInstance();
+        int current_hour = today.get(Calendar.HOUR);
+        int current_minute = today.get(Calendar.MINUTE);
+        int cday = today.get(Calendar.DAY_OF_MONTH);
+        int cmonth = today.get(Calendar.MONTH)+1;
+        int cyear = today.get(Calendar.YEAR);
+        Log.d("MarkCompleteDebug" , "Year: " + cyear + " Month: " + cmonth + " Day: " + cday);
+        Log.d("MarkCompleteDebug" , " DUE DATE IS: Year: " + dueYear + " Month: " + dueMonth + " Day: " + dueDay);
+        Log.d("MarkCompleteDebug", ((dueYear==cyear))  +"");
+        Log.d("MarkCompleteDebug", ((dueMonth==cmonth))  +"");
+        Log.d("MarkCompleteDebug", ((dueDay<cday))  +"");
+
+
+        Log.d("MarkCompleteDebug", ((dueYear==cyear && dueMonth==cmonth && dueDay<cday))  +"");
+        if(dueYear<cyear ||  (dueYear==cyear && dueMonth<cmonth) || (dueYear==cyear && dueMonth==cmonth && dueDay<cday) ){
+            return false;
+        }
+        else{
+            if(dueDay>cday){
+                return true;
+            }
+            if(current_hour<dueHour || (current_hour==dueHour && current_minute<dueMin)){
+                //Toast.makeText(getActivity(), "This Time is Invalid! Make End Time After Start Time", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+    }
+
+
     private void deleteTask(int id){
+        Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
+        temp.moveToFirst();
+        boolean completed = temp.getInt(4)==1;
+        boolean matters = !(temp.getInt(7) == temp.getInt(8));
+        boolean ontime = temp.getInt(8)==1;
+        Log.d("DeleteDebug", temp.getColumnCount()+"");
+        Log.d("DeleteDebug", completed+" " + matters + " " + ontime);
+        for(int i =9; i<temp.getColumnCount(); i++){
+            Log.d("DeleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
+            Log.d("DeleteDebug", temp.getPosition() + " out of " + temp.getColumnCount());
+            Log.d("DeleteDebug", DatabaseUtils.dumpCursorToString(temp));
+            if(temp.getInt(i)==1){
+                if(completed){
+                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                            "SET COMPLETED = COMPLETED - 1 " +
+                            "WHERE CATEGORY_NAME = \"" +
+                            temp.getColumnName(i) + "\"");
+                }
+                else {
+                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
+                            "WHERE CATEGORY_NAME = \"" +
+                            temp.getColumnName(i) + "\"");
+                }
+                if(matters){
+                    if(ontime){
+                        writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                                "SET ON_TIME = ON_TIME - 1 " +
+                                "WHERE CATEGORY_NAME = \"" +
+                                temp.getColumnName(i) + "\"");
+                    }
+                    else{
+                        writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                                "SET NOT_ON_TIME = NOT_ON_TIME - 1 " +
+                                "WHERE CATEGORY_NAME = \"" +
+                                temp.getColumnName(i) + "\"");
+                    }
+                }
+            }
+        }
         writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
         writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
-
-
-        //Now we have to iterate through all the categories it has 1's in and decrement the respective total count in the category stats, and if neccessary, the completed, not completed, on time, and not on time values
-
-
-
-
-
-
         Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
         Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
