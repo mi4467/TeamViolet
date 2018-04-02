@@ -121,6 +121,14 @@ public class TasksListFragment extends Fragment {
     }
 
     private Cursor constructCommand(){
+        if(completed==false && notCompleted==false){
+            completed = true;
+            notCompleted = true;
+        }
+        if(onTime == false && notOnTime == false){
+            onTime = true;
+            notCompleted = true;
+        }
         StringBuilder cmd = new StringBuilder();
         cmd.append("SELECT * FROM TASK_STATS WHERE ( ");
         for(int i = 0; i<taskCategoryNames.length-1; i++){
