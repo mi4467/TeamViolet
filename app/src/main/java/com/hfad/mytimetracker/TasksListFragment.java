@@ -40,6 +40,7 @@ public class TasksListFragment extends Fragment {
     private boolean notCompleted;
     private boolean onTime;
     private boolean notOnTime;
+    private String sqlCommand;
 
 
     public TasksListFragment() {
@@ -49,7 +50,7 @@ public class TasksListFragment extends Fragment {
     @SuppressLint("RestrictedAPI")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View layout = inflater.inflate(R.layout.fragment_tasks_list, container, false);
+        final View layout = inflater.inflate(R.layout.fragment_tasks_list, container, false);
         RecyclerView recyclerView = layout.findViewById(R.id.recycler_view_task_list_viewer);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         TimeTrackerDataBaseHelper dataBaseHelper = new TimeTrackerDataBaseHelper(getActivity());
@@ -60,7 +61,7 @@ public class TasksListFragment extends Fragment {
         Cursor data = readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION", null);
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
         int resId = R.anim.layout_animation_fall_down;
-        recyclerView.setAdapter(new TasksListFragment.SimpleAdapter(recyclerView, data, stats));
+        recyclerView.setAdapter(new TasksListFragment.SimpleAdapter(recyclerView,stats));
 
         //button listener setup
 
@@ -95,11 +96,65 @@ public class TasksListFragment extends Fragment {
         enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(taskCategoryNames==null){
+                    Toast.makeText(getActivity(), "Choose Categories", Toast.LENGTH_LONG);
+                    return;
+                }
                 Log.d("ButtonDebug", "We entered");
+                Cursor next = constructCommand();
+                resetFilters();
+                RecyclerView recyclerView = layout.findViewById(R.id.recycler_view_task_list_viewer);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                recyclerView.setAdapter(new TasksListFragment.SimpleAdapter(recyclerView,next));
             }
         });
 
         return layout;
+    }
+
+    private void resetFilters(){
+        taskCategoryNames = null;
+        completed = false;
+        notOnTime = false;
+        onTime = false;
+        notOnTime = false;
+    }
+
+    private Cursor constructCommand(){
+        StringBuilder cmd = new StringBuilder();
+        cmd.append("SELECT * FROM TASK_STATS WHERE ( ");
+        for(int i = 0; i<taskCategoryNames.length-1; i++){
+            cmd.append(taskCategoryNames[i].toString() + " = 1 OR");
+        }
+        cmd.append(" " + taskCategoryNames[taskCategoryNames.length-1] + "=1 ) ");
+        if(completed){
+            cmd.append("AND ( COMPLETED = 1 ");
+        }
+        else{
+            cmd.append("AND ( COMPLETED = 0 ");
+        }
+        if(notCompleted){
+            cmd.append(" OR NOT_COMPLETED = 1 ) ");
+        }
+        else{
+            cmd.append("OR NOT_COMPLETED = 0 ) ");
+        }
+        if(onTime){
+            cmd.append("AND ( ON_TIME = 1 ");
+        }
+        else{
+            cmd.append("AND ( ON_TIME = 0 ");
+        }
+        if(notOnTime){
+            cmd.append(" OR NOT_ON_TIME = 1 )");
+        }
+        else{
+            cmd.append("OR NOT_ON_TIME = 0 )");
+        }
+        sqlCommand = new String(cmd);
+        Cursor result = readableDatabase.rawQuery(sqlCommand, null);
+        Log.d("FilterDebug", sqlCommand);
+        return result;
     }
 
     public void showCategorySelectionDialog(){
@@ -110,6 +165,7 @@ public class TasksListFragment extends Fragment {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         TasksListFragment.taskCategoryNames =  text;
+                        Log.d("MaterialDebug", Arrays.toString(TasksListFragment.taskCategoryNames));
                         return true;
                     }
                 })
@@ -132,9 +188,16 @@ public class TasksListFragment extends Fragment {
                         if(choices.contains("Completed")){
                             completed = true;
                         }
+                        else{
+                            completed = false;
+                        }
                         if(choices.contains("Not Completed")){
                             notCompleted = true;
                         }
+                        else{
+                            notCompleted = false;
+                        }
+                        Log.d("MaterialDebug", completed + ""+ notCompleted);
                         return true;
                     }
                 })
@@ -157,9 +220,16 @@ public class TasksListFragment extends Fragment {
                         if(choices.contains("On Time")){
                             onTime = true;
                         }
+                        else{
+                            onTime = false;
+                        }
                         if(choices.contains("Not On Time")){
                             notOnTime = true;
                         }
+                        else{
+                            notOnTime = false;
+                        }
+                        Log.d("MaterialDebug", onTime + ""+ notOnTime);
                         return true;
                     }
                 })
@@ -231,12 +301,12 @@ public class TasksListFragment extends Fragment {
         }
         writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
         writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
-        Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
+        Cursor stats = readableDatabase.rawQuery(sqlCommand, null);
         //Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
         Cursor data = readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION", null);
-        RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = getView().findViewById(R.id.recycler_view_task_list_viewer);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TasksListFragment.SimpleAdapter(recyclerView, data, stats));
+        recyclerView.setAdapter(new TasksListFragment.SimpleAdapter(recyclerView,stats));
     }
 
     private void markComplete(int id){
@@ -359,10 +429,10 @@ public class TasksListFragment extends Fragment {
         private Cursor stats;
         private int selectedItem = UNSELECTED;
 
-        public SimpleAdapter(RecyclerView recyclerView, Cursor data, Cursor stats) {
+        public SimpleAdapter(RecyclerView recyclerView, Cursor stats) {
             this.recyclerView = recyclerView;
-            this.data = data;
-            data.moveToFirst();
+            this.stats = stats;
+            this.stats.moveToFirst();
         }
 
         @Override
@@ -378,7 +448,7 @@ public class TasksListFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return data.getCount();
+            return stats.getCount();
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, ExpandableLayout.OnExpansionUpdateListener {
@@ -398,9 +468,9 @@ public class TasksListFragment extends Fragment {
             public void bind() {
                 int position = getAdapterPosition();
                 boolean isSelected = position == selectedItem;
-                expandButton.setText(data.getString(1));
-                currentId = data.getInt(0);
-                data.moveToNext();
+                expandButton.setText(stats.getString(1));
+                currentId = stats.getInt(2);
+                stats.moveToNext();
                 expandButton.setSelected(isSelected);
                 expandableLayout.setExpanded(isSelected, false);
                 ((Button)expandableLayout.findViewById(R.id.task_activity)).setTag(R.id.Button_ID, currentId);
@@ -442,7 +512,6 @@ public class TasksListFragment extends Fragment {
                     });
                     selectedItem = position;
                 }
-
             }
 
             @Override
