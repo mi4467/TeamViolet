@@ -12,13 +12,24 @@ import static android.content.ContentValues.TAG;
  */
 
 public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
+    //Singleton design pattern
 
     private static final String DB_NAME = "starbuzz"; // the name of our database
     private static final int DB_VERSION = 1;
+    private static TimeTrackerDataBaseHelper singleton;     //we make this class a singleton
 
     public TimeTrackerDataBaseHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
     }
+
+    public static TimeTrackerDataBaseHelper getInstance(Context c){
+        if(singleton==null){
+            singleton = new TimeTrackerDataBaseHelper(c);
+        }
+        return singleton;
+    }
+
+
 
 
     @Override

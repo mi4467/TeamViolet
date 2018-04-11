@@ -3,6 +3,7 @@ package com.hfad.mytimetracker;
 
 import android.arch.persistence.room.Database;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -55,7 +56,7 @@ public class CalendarFragment extends Fragment  {
         view.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
-                TimeTrackerDataBaseHelper dataBaseHelper = new TimeTrackerDataBaseHelper(getActivity());
+                TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
                 currentDate = TaskCreatorFragment.constructDateStr(i, i1, i2);
                 Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
                 Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
@@ -72,7 +73,7 @@ public class CalendarFragment extends Fragment  {
         Integer cyear = today.get(Calendar.YEAR);
         RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        TimeTrackerDataBaseHelper dataBaseHelper = new TimeTrackerDataBaseHelper(getActivity());
+        TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
         readableDatabase = dataBaseHelper.getReadableDatabase();
         writableDatabase = dataBaseHelper.getWritableDatabase();
         String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);

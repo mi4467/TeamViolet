@@ -53,7 +53,7 @@ public class TasksListFragment extends Fragment {
         final View layout = inflater.inflate(R.layout.fragment_tasks_list, container, false);
         RecyclerView recyclerView = layout.findViewById(R.id.recycler_view_task_list_viewer);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        TimeTrackerDataBaseHelper dataBaseHelper = new TimeTrackerDataBaseHelper(getActivity());
+        TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
         readableDatabase = dataBaseHelper.getReadableDatabase();
         writableDatabase = dataBaseHelper.getWritableDatabase();
         Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
@@ -247,7 +247,7 @@ public class TasksListFragment extends Fragment {
     }
 
     public String[] getCategoryList(){
-        TimeTrackerDataBaseHelper db = new TimeTrackerDataBaseHelper(getContext());
+        TimeTrackerDataBaseHelper db = TimeTrackerDataBaseHelper.getInstance(getContext());
         SQLiteDatabase read = db.getWritableDatabase();
         Cursor categories = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null, null);
         String[] result = new String[categories.getCount()];

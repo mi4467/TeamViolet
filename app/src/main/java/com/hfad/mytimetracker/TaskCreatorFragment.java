@@ -215,7 +215,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
     public String[] getCategoryList(){
-        TimeTrackerDataBaseHelper db = new TimeTrackerDataBaseHelper(getContext());
+        TimeTrackerDataBaseHelper db = TimeTrackerDataBaseHelper.getInstance(getContext());
         SQLiteDatabase read = db.getWritableDatabase();
         Cursor categories = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null, null);
         String[] result = new String[categories.getCount()];
@@ -298,7 +298,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         Log.d("ReoccTest", startDate + " " + endDate);
 
         Toast.makeText(getActivity(), startDate + " " + endDate, Toast.LENGTH_LONG).show();
-        TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
+        TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(getContext());
         SQLiteDatabase write = categoryHelper.getWritableDatabase();
         SQLiteDatabase read = categoryHelper.getReadableDatabase();
         HashSet<Integer> days = new HashSet<Integer>();
