@@ -88,67 +88,70 @@ public class CalendarFragment extends Fragment  {
     }
 
     private void markComplete(int id){
-        //ADD a check for the general category
-        ContentValues completeValue = new ContentValues();
-        completeValue.put("COMPLETED", 1);
-        completeValue.put("NOT_COMPLETED", 0);
-        //writableDatabase = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
-        Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
-        temp.moveToFirst();
-        //we have to check to see if it's on time or not, mark those values in TASK_STATS
-        Log.d("MarkCompleteDebug", "Is it on time: " + verifyOnTime(id));
-        if(verifyOnTime(id)){
-            completeValue.put("ON_TIME", 1);
-            completeValue.put("NOT_ON_TIME", 0);
-            writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
-            for(int i =9; i<temp.getColumnCount(); i++){
-                //UPDATE THE ONTIME AND COMPLETED FOR THAT CATEGORY
-                Log.d("MarkCompleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
-                if(temp.getInt(i)==1){
-                    Log.d("MarkCompleteDebug", "We are entering data for: " + temp.getColumnName(i));
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET COMPLETED = COMPLETED + 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");      //Mark it complete
+//        //ADD a check for the general category
+//        ContentValues completeValue = new ContentValues();
+//        completeValue.put("COMPLETED", 1);
+//        completeValue.put("NOT_COMPLETED", 0);
+//        //writableDatabase = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
+//        Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
+//        temp.moveToFirst();
+//        //we have to check to see if it's on time or not, mark those values in TASK_STATS
+//        Log.d("MarkCompleteDebug", "Is it on time: " + verifyOnTime(id));
+//        if(verifyOnTime(id)){
+//            completeValue.put("ON_TIME", 1);
+//            completeValue.put("NOT_ON_TIME", 0);
+//            writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
+//            for(int i =9; i<temp.getColumnCount(); i++){
+//                //UPDATE THE ONTIME AND COMPLETED FOR THAT CATEGORY
+//                Log.d("MarkCompleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
+//                if(temp.getInt(i)==1){
+//                    Log.d("MarkCompleteDebug", "We are entering data for: " + temp.getColumnName(i));
+//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                            "SET COMPLETED = COMPLETED + 1 " +
+//                            "WHERE CATEGORY_NAME = \"" +
+//                            temp.getColumnName(i) + "\"");      //Mark it complete
+//
+//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
+//                            "WHERE CATEGORY_NAME = \"" +
+//                            temp.getColumnName(i) + "\"");
+//
+//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                            "SET ON_TIME = ON_TIME + 1 " +
+//                            "WHERE CATEGORY_NAME = \"" +
+//                            temp.getColumnName(i) + "\"");
+//                }
+//            }
+//        }
+//        else{
+//            completeValue.put("ON_TIME", 0);
+//            completeValue.put("NOT_ON_TIME", 1);
+//            writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
+//            for(int i =9; i<temp.getColumnCount(); i++){
+//                //UPDATE THE NOT_ONTIME AND COMPLETED FOR THAT CATEGORY
+//                Log.d("MarkCompleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
+//                if(temp.getInt(i)==1){
+//                    Log.d("MarkCompleteDebug", "We are entering data for: " + temp.getColumnName(i));
+//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                            "SET COMPLETED = COMPLETED + 1 " +
+//                            "WHERE CATEGORY_NAME = \"" +
+//                            temp.getColumnName(i) + "\"");      //Mark it complete
+//
+//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
+//                            "WHERE CATEGORY_NAME = \"" +
+//                            temp.getColumnName(i) + "\"");
+//
+//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                            "SET NOT_ON_TIME = NOT_ON_TIME + 1 " +
+//                            "WHERE CATEGORY_NAME = \"" +
+//                            temp.getColumnName(i) + "\"");
+//                }
+//            }
+//        }
+        verifyOnTime(id);
 
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");
-
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET ON_TIME = ON_TIME + 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");
-                }
-            }
-        }
-        else{
-            completeValue.put("ON_TIME", 0);
-            completeValue.put("NOT_ON_TIME", 1);
-            writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
-            for(int i =9; i<temp.getColumnCount(); i++){
-                //UPDATE THE NOT_ONTIME AND COMPLETED FOR THAT CATEGORY
-                Log.d("MarkCompleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
-                if(temp.getInt(i)==1){
-                    Log.d("MarkCompleteDebug", "We are entering data for: " + temp.getColumnName(i));
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET COMPLETED = COMPLETED + 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");      //Mark it complete
-
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");
-
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET NOT_ON_TIME = NOT_ON_TIME + 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");
-                }
-            }
-        }
+        SQLfunctionHelper.markComplete(id, readableDatabase, writableDatabase, verifyOnTime(id));
         //Then iterate through category information and update the values for the categories the task belongs to
 
     }
@@ -198,48 +201,49 @@ public class CalendarFragment extends Fragment  {
 
 
     private void deleteTask(int id){
-        Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
-        temp.moveToFirst();
-        boolean completed = temp.getInt(4)==1;
-        boolean matters = !(temp.getInt(7) == temp.getInt(8));
-        boolean ontime = temp.getInt(8)==1;
-        Log.d("DeleteDebug", temp.getColumnCount()+"");
-        Log.d("DeleteDebug", completed+" " + matters + " " + ontime);
-        for(int i =9; i<temp.getColumnCount(); i++){
-            Log.d("DeleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
-            Log.d("DeleteDebug", temp.getPosition() + " out of " + temp.getColumnCount());
-            Log.d("DeleteDebug", DatabaseUtils.dumpCursorToString(temp));
-            if(temp.getInt(i)==1){
-                if(completed){
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET COMPLETED = COMPLETED - 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");
-                }
-                else {
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");
-                }
-                if(matters){
-                    if(ontime){
-                        writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                                "SET ON_TIME = ON_TIME - 1 " +
-                                "WHERE CATEGORY_NAME = \"" +
-                                temp.getColumnName(i) + "\"");
-                    }
-                    else{
-                        writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                                "SET NOT_ON_TIME = NOT_ON_TIME - 1 " +
-                                "WHERE CATEGORY_NAME = \"" +
-                                temp.getColumnName(i) + "\"");
-                    }
-                }
-            }
-        }
-        writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
-        writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
+//        Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
+//        temp.moveToFirst();
+//        boolean completed = temp.getInt(4)==1;
+//        boolean matters = !(temp.getInt(7) == temp.getInt(8));
+//        boolean ontime = temp.getInt(8)==1;
+//        Log.d("DeleteDebug", temp.getColumnCount()+"");
+//        Log.d("DeleteDebug", completed+" " + matters + " " + ontime);
+//        for(int i =9; i<temp.getColumnCount(); i++){
+//            Log.d("DeleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
+//            Log.d("DeleteDebug", temp.getPosition() + " out of " + temp.getColumnCount());
+//            Log.d("DeleteDebug", DatabaseUtils.dumpCursorToString(temp));
+//            if(temp.getInt(i)==1){
+//                if(completed){
+//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                            "SET COMPLETED = COMPLETED - 1 " +
+//                            "WHERE CATEGORY_NAME = \"" +
+//                            temp.getColumnName(i) + "\"");
+//                }
+//                else {
+//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
+//                            "WHERE CATEGORY_NAME = \"" +
+//                            temp.getColumnName(i) + "\"");
+//                }
+//                if(matters){
+//                    if(ontime){
+//                        writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                                "SET ON_TIME = ON_TIME - 1 " +
+//                                "WHERE CATEGORY_NAME = \"" +
+//                                temp.getColumnName(i) + "\"");
+//                    }
+//                    else{
+//                        writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                                "SET NOT_ON_TIME = NOT_ON_TIME - 1 " +
+//                                "WHERE CATEGORY_NAME = \"" +
+//                                temp.getColumnName(i) + "\"");
+//                    }
+//                }
+//            }
+//        }
+//        writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
+//        writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
+        SQLfunctionHelper.deleteTask(id, readableDatabase, writableDatabase);
         Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
         Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
         RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);

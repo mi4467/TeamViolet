@@ -215,17 +215,18 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
     public String[] getCategoryList(){
-        TimeTrackerDataBaseHelper db = TimeTrackerDataBaseHelper.getInstance(getContext());
-        SQLiteDatabase read = db.getWritableDatabase();
-        Cursor categories = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null, null);
-        String[] result = new String[categories.getCount()];
-        categories.moveToFirst();
-        for(int i =0; i<categories.getCount(); i++){
-            String name = categories.getString(0);
-            result[i] = name;
-            categories.moveToNext();
-        }
-        return result;
+//        TimeTrackerDataBaseHelper db = TimeTrackerDataBaseHelper.getInstance(getContext());
+//        SQLiteDatabase read = db.getWritableDatabase();
+//        Cursor categories = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null, null);
+//        String[] result = new String[categories.getCount()];
+//        categories.moveToFirst();
+//        for(int i =0; i<categories.getCount(); i++){
+//            String name = categories.getString(0);
+//            result[i] = name;
+//            categories.moveToNext();
+//        }
+//        return result;
+        return SQLfunctionHelper.getCategoryList(getContext());
     }
 
     @Override
@@ -287,71 +288,73 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
     private void enterReoccTasksInDB()  {
-        TaskCreatorFragment.reoccTaskName = ((EditText) getActivity().findViewById(R.id.reocc_task_name)).getText().toString();
-        if(!checkValidityOfReoccTask()){
-            return;
-        }
-        String startDate = constructDateStr(TaskCreatorFragment.startYear, TaskCreatorFragment.startMonth, TaskCreatorFragment.startDate);
-        String endDate = constructDateStr(TaskCreatorFragment.endYear, TaskCreatorFragment.endMonth, TaskCreatorFragment.endDay);
-        String startTime = TaskCreatorFragment.startHourReocc + "-" + TaskCreatorFragment.startMinuteReocc + "-00";
-        String endTime = TaskCreatorFragment.endHourReocc + "-" + TaskCreatorFragment.endMinuteReocc + "-00";
-        Log.d("ReoccTest", startDate + " " + endDate);
-
-        Toast.makeText(getActivity(), startDate + " " + endDate, Toast.LENGTH_LONG).show();
-        TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(getContext());
-        SQLiteDatabase write = categoryHelper.getWritableDatabase();
-        SQLiteDatabase read = categoryHelper.getReadableDatabase();
-        HashSet<Integer> days = new HashSet<Integer>();
-        for(int i=0; i< TaskCreatorFragment.days.length; i++){
-            days.add(TaskCreatorFragment.days[i]+1);
-        }
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");      //year.month.day
-            Date start = sdf.parse(startDate);
-            Date end = sdf.parse(endDate);
-
-            GregorianCalendar gcal = new GregorianCalendar();
-            gcal.setTime(start);
-            while (!gcal.getTime().after(end)) {
-               if(days.contains(gcal.get(Calendar.DAY_OF_WEEK))){
-                   //We want to put in the task in task info
-                   String dueDate = constructDateStr(gcal.get(Calendar.YEAR), gcal.get(Calendar.MONTH), gcal.get(Calendar.DAY_OF_MONTH));
-                   ContentValues recordParamaters = new ContentValues();                   //insert task info, insert task stats
-                   recordParamaters.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
-                   recordParamaters.put("DUE_DATE", dueDate);
-                   recordParamaters.put("START_TIME", startTime);
-                   recordParamaters.put("END_TIME", endTime);
-                   //construct date value, start time value, end time value
-                   write.insert("TASK_INFORMATION", null, recordParamaters);
-
-                   Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
-                   id.moveToFirst();
-
-                   //We want to put in the task in task stats
-                   ContentValues taskStatsParams = new ContentValues();
-                   taskStatsParams.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
-                   taskStatsParams.put("CATEGORY_GENERAL", "1");
-                   taskStatsParams.put("NOT_COMPLETED", "1");
-                   taskStatsParams.put("NOT_ON_TIME", "0");
-                   taskStatsParams.put("ON_TIME", "0");
-                   taskStatsParams.put("TASK_ID", id.getString(0));
-                   taskStatsParams.put("COMPLETED", "0");
-                   taskStatsParams.put("DUE_DATE", dueDate);
-                   for(int i =0; i<TaskCreatorFragment.categoriesReocc.length; i++){
-                       taskStatsParams.put(TaskCreatorFragment.categoriesReocc[i].toString(), "1");
-                       write.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                               "SET NOT_COMPLETED = NOT_COMPLETED + 1 " +
-                               "WHERE CATEGORY_NAME = \"" +
-                               TaskCreatorFragment.categoriesReocc[i] + "\"");
-                   }
-                   write.insert("TASK_STATS", null, taskStatsParams);      //issue here
-               }
-                gcal.add(Calendar.DATE, 1);
-            }
-        }
-        catch (Exception e){
-            Log.d("ReoccTest", "Did not work");
-        }
+          TaskCreatorFragment.reoccTaskName = ((EditText) getActivity().findViewById(R.id.reocc_task_name)).getText().toString();
+          if(!checkValidityOfReoccTask()){
+              return;
+          }
+          SQLfunctionHelper.enterReoccTasksInDB(getContext(), startYear, startMonth, startDate, endYear, endMonth, endDay, startHourReocc, startMinuteReocc,
+                  endHourReocc, endMinuteReocc, days, reoccTaskName, categoriesReocc);
+//        String startDate = constructDateStr(TaskCreatorFragment.startYear, TaskCreatorFragment.startMonth, TaskCreatorFragment.startDate);
+//        String endDate = constructDateStr(TaskCreatorFragment.endYear, TaskCreatorFragment.endMonth, TaskCreatorFragment.endDay);
+//        String startTime = TaskCreatorFragment.startHourReocc + "-" + TaskCreatorFragment.startMinuteReocc + "-00";
+//        String endTime = TaskCreatorFragment.endHourReocc + "-" + TaskCreatorFragment.endMinuteReocc + "-00";
+//        Log.d("ReoccTest", startDate + " " + endDate);
+//
+//        Toast.makeText(getActivity(), startDate + " " + endDate, Toast.LENGTH_LONG).show();
+//        TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(getContext());
+//        SQLiteDatabase write = categoryHelper.getWritableDatabase();
+//        SQLiteDatabase read = categoryHelper.getReadableDatabase();
+//        HashSet<Integer> days = new HashSet<Integer>();
+//        for(int i=0; i< TaskCreatorFragment.days.length; i++){
+//            days.add(TaskCreatorFragment.days[i]+1);
+//        }
+//        try {
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");      //year.month.day
+//            Date start = sdf.parse(startDate);
+//            Date end = sdf.parse(endDate);
+//
+//            GregorianCalendar gcal = new GregorianCalendar();
+//            gcal.setTime(start);
+//            while (!gcal.getTime().after(end)) {
+//               if(days.contains(gcal.get(Calendar.DAY_OF_WEEK))){
+//                   //We want to put in the task in task info
+//                   String dueDate = constructDateStr(gcal.get(Calendar.YEAR), gcal.get(Calendar.MONTH), gcal.get(Calendar.DAY_OF_MONTH));
+//                   ContentValues recordParamaters = new ContentValues();                   //insert task info, insert task stats
+//                   recordParamaters.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
+//                   recordParamaters.put("DUE_DATE", dueDate);
+//                   recordParamaters.put("START_TIME", startTime);
+//                   recordParamaters.put("END_TIME", endTime);
+//                   //construct date value, start time value, end time value
+//                   write.insert("TASK_INFORMATION", null, recordParamaters);
+//
+//                   Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
+//                   id.moveToFirst();
+//
+//                   //We want to put in the task in task stats
+//                   ContentValues taskStatsParams = new ContentValues();
+//                   taskStatsParams.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
+//                   taskStatsParams.put("CATEGORY_GENERAL", "1");
+//                   taskStatsParams.put("NOT_COMPLETED", "1");
+//                   taskStatsParams.put("NOT_ON_TIME", "0");
+//                   taskStatsParams.put("ON_TIME", "0");
+//                   taskStatsParams.put("TASK_ID", id.getString(0));
+//                   taskStatsParams.put("COMPLETED", "0");
+//                   taskStatsParams.put("DUE_DATE", dueDate);
+//                   for(int i =0; i<TaskCreatorFragment.categoriesReocc.length; i++){
+//                       taskStatsParams.put(TaskCreatorFragment.categoriesReocc[i].toString(), "1");
+//                       write.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                               "SET NOT_COMPLETED = NOT_COMPLETED + 1 " +
+//                               "WHERE CATEGORY_NAME = \"" +
+//                               TaskCreatorFragment.categoriesReocc[i] + "\"");
+//                   }
+//                   write.insert("TASK_STATS", null, taskStatsParams);      //issue here
+//               }
+//                gcal.add(Calendar.DATE, 1);
+//            }
+//        }
+//        catch (Exception e){
+//            Log.d("ReoccTest", "Did not work");
+//        }
         cleanUpCardViewThree();
     }
 
@@ -371,11 +374,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
     private void enterCatInDB() {
-        TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
-        SQLiteDatabase read = categoryHelper.getReadableDatabase();
-        SQLiteDatabase write = categoryHelper.getWritableDatabase();
         EditText txt = (EditText) getActivity().findViewById(R.id.cat_name);
-
         String cat = txt.getText().toString();      //paramaters
         TaskCreatorFragment.categoryName=cat;
         Integer color = this.color;
@@ -389,39 +388,47 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
             Toast.makeText(getActivity(), "This Category Needs a Name!", Toast.LENGTH_SHORT).show();
             return;
         }
-        Cursor check = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null);
-        boolean exists = false;
-        check.moveToFirst();
-        for(int i =0; i<check.getCount(); i++){
-            String name = check.getString(0);
-            Log.d("CategorySQL", name);
-            if(name.equalsIgnoreCase(cat)){
-                //break and send toast or some shit
-                Toast.makeText(getActivity(), "This Category Already Exists!", Toast.LENGTH_SHORT).show();
-                Log.d("CategorySQL", "It was in DB already");
-                exists = true;
-                break;
-            }
-            check.moveToNext();
-        }
-        if(exists){
-            return;
-        }
-        else{
-            write.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + cat + " BOOLEAN;");
-            ContentValues entry = new ContentValues();
-            entry.put("CATEGORY_NAME", cat);
-            entry.put("COLOR", color);
-            entry.put("COMPLETED", 0);
-            entry.put("NOT_COMPLETED", 0);
-            entry.put("NOT_ON_TIME", 0);
-            entry.put("ON_TIME", 0);
-            write.insert("TASK_CATEGORY_INFO", null, entry);
-            Log.d("CategorySQL", "We put in DB");
-            Toast.makeText(getActivity(), "The Category " + TaskCreatorFragment.categoryName+ " was made", Toast.LENGTH_SHORT).show();
+        TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
+        SQLiteDatabase read = categoryHelper.getReadableDatabase();
+        SQLiteDatabase write = categoryHelper.getWritableDatabase();
+        if(SQLfunctionHelper.enterCatInDB(getActivity(), read, write, cat, categoryName, color)){
             TaskCreatorFragment.categoryName = null;
             TaskCreatorFragment.color = null;
         }
+//        Cursor check = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null);
+//        boolean exists = false;
+//        check.moveToFirst();
+//        for(int i =0; i<check.getCount(); i++){
+//            String name = check.getString(0);
+//            Log.d("CategorySQL", name);
+//            if(name.equalsIgnoreCase(cat)){
+//                //break and send toast or some shit
+//                Toast.makeText(getActivity(), "This Category Already Exists!", Toast.LENGTH_SHORT).show();
+//                Log.d("CategorySQL", "It was in DB already");
+//                exists = true;
+//                break;
+//            }
+//            check.moveToNext();
+//        }
+//        if(exists){
+//            return;
+//        }
+//        else{
+//            write.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + cat + " BOOLEAN;");
+//            ContentValues entry = new ContentValues();
+//            entry.put("CATEGORY_NAME", cat);
+//            entry.put("COLOR", color);
+//            entry.put("COMPLETED", 0);
+//            entry.put("NOT_COMPLETED", 0);
+//            entry.put("NOT_ON_TIME", 0);
+//            entry.put("ON_TIME", 0);
+//            write.insert("TASK_CATEGORY_INFO", null, entry);
+//            Log.d("CategorySQL", "We put in DB");
+//            Toast.makeText(getActivity(), "The Category " + TaskCreatorFragment.categoryName+ " was made", Toast.LENGTH_SHORT).show();
+//            TaskCreatorFragment.categoryName = null;
+//            TaskCreatorFragment.color = null;
+//        }
+
     }
 
     private void enterTaskInDB() {
@@ -436,41 +443,42 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
         SQLiteDatabase write = categoryHelper.getWritableDatabase();
         SQLiteDatabase read = categoryHelper.getReadableDatabase();
+        SQLfunctionHelper.enterTaskInDB(getActivity(), taskName, dueDate, startTime, endTime, taskCategoryNames);
 
-        ContentValues recordParamaters = new ContentValues();                   //insert task info, insert task stats
-        recordParamaters.put("TASK_NAME", TaskCreatorFragment.taskName);
-        //recordParamaters.put("TASK_CATEGORY", TaskCreatorFragment.taskCategoryName);
-        recordParamaters.put("DUE_DATE", dueDate);
-        recordParamaters.put("START_TIME", startTime);
-        recordParamaters.put("END_TIME", endTime);
-        //construct date value, start time value, end time value
-        write.insert("TASK_INFORMATION", null, recordParamaters);
-        Log.d("InsertTaskTest", "it worked");
-
-        Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
-        id.moveToFirst();
-        ContentValues recordParamaterstwo = new ContentValues();
-        recordParamaterstwo.put("TASK_NAME", TaskCreatorFragment.taskName);
-        recordParamaterstwo.put("CATEGORY_GENERAL", "1");
-        recordParamaterstwo.put("TASK_ID", id.getString(0));
-        recordParamaterstwo.put("NOT_COMPLETED", "1");
-        recordParamaterstwo.put("COMPLETED", "0");
-        recordParamaterstwo.put("ON_TIME", "0");
-        recordParamaterstwo.put("NOT_ON_TIME", "0");
-        recordParamaterstwo.put("DUE_DATE", dueDate);
-        Log.d("TestAddTask", TaskCreatorFragment.taskCategoryNames.length + "");
-        for(int i =0; i<TaskCreatorFragment.taskCategoryNames.length; i++){
-            Log.d("TestAddTask", TaskCreatorFragment.taskCategoryNames[i].toString());
-            recordParamaterstwo.put(TaskCreatorFragment.taskCategoryNames[i].toString(), "1");
-            write.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                    "SET NOT_COMPLETED = NOT_COMPLETED + 1 " +
-                    "WHERE CATEGORY_NAME = \"" +
-                    TaskCreatorFragment.taskCategoryNames[i] + "\"");
-
-           // write.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_COMPLETED = NOT_COMPLETED + 1 WHERE CATEGORY_NAME = " + "\"Jul\"");
-        }
-        write.insert("TASK_STATS", null, recordParamaterstwo);      //issue here
-        Log.d("InsertTaskTest", "it worked");
+//        ContentValues recordParamaters = new ContentValues();                   //insert task info, insert task stats
+//        recordParamaters.put("TASK_NAME", TaskCreatorFragment.taskName);
+//        //recordParamaters.put("TASK_CATEGORY", TaskCreatorFragment.taskCategoryName);
+//        recordParamaters.put("DUE_DATE", dueDate);
+//        recordParamaters.put("START_TIME", startTime);
+//        recordParamaters.put("END_TIME", endTime);
+//        //construct date value, start time value, end time value
+//        write.insert("TASK_INFORMATION", null, recordParamaters);
+//        Log.d("InsertTaskTest", "it worked");
+//
+//        Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
+//        id.moveToFirst();
+//        ContentValues recordParamaterstwo = new ContentValues();
+//        recordParamaterstwo.put("TASK_NAME", TaskCreatorFragment.taskName);
+//        recordParamaterstwo.put("CATEGORY_GENERAL", "1");
+//        recordParamaterstwo.put("TASK_ID", id.getString(0));
+//        recordParamaterstwo.put("NOT_COMPLETED", "1");
+//        recordParamaterstwo.put("COMPLETED", "0");
+//        recordParamaterstwo.put("ON_TIME", "0");
+//        recordParamaterstwo.put("NOT_ON_TIME", "0");
+//        recordParamaterstwo.put("DUE_DATE", dueDate);
+//        Log.d("TestAddTask", TaskCreatorFragment.taskCategoryNames.length + "");
+//        for(int i =0; i<TaskCreatorFragment.taskCategoryNames.length; i++){
+//            Log.d("TestAddTask", TaskCreatorFragment.taskCategoryNames[i].toString());
+//            recordParamaterstwo.put(TaskCreatorFragment.taskCategoryNames[i].toString(), "1");
+//            write.execSQL("UPDATE TASK_CATEGORY_INFO " +
+//                    "SET NOT_COMPLETED = NOT_COMPLETED + 1 " +
+//                    "WHERE CATEGORY_NAME = \"" +
+//                    TaskCreatorFragment.taskCategoryNames[i] + "\"");
+//
+//           // write.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_COMPLETED = NOT_COMPLETED + 1 WHERE CATEGORY_NAME = " + "\"Jul\"");
+//        }
+//        write.insert("TASK_STATS", null, recordParamaterstwo);      //issue here
+//        Log.d("InsertTaskTest", "it worked");
         cleanUpCardViewTwo();
     }
 
