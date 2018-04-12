@@ -1,5 +1,6 @@
 package com.hfad.mytimetracker;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -35,96 +36,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SQLiteDatabase mydatabase = openOrCreateDatabase("MyTimeTrackerDB",MODE_PRIVATE,null);
-        TimeTrackerDataBaseHelper yo = new TimeTrackerDataBaseHelper(this);
-        //yo.getReadableDatabase();
 
-        Stetho.initialize(Stetho.newInitializerBuilder(this)
-                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-                .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
-                .build());
-        Cursor c = null;
-
-        try{
-            c = mydatabase.query("TASK_CATEGORY_INFO", null, null, null, null, null, null);
-            Log.d("TableTest", "Table exists");
-        }
-        catch(Exception e ){
-            Log.d("TableTest", " shit is broke");
-        }
-        Log.d("yolo", mydatabase.isOpen() + " hello " + DebugDB.getAddressLog());
-        final BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
-        BottomNavigationHelper.removeShiftMode(bottomNavigationView);
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener(){
-
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        ViewPager viewPager = findViewById(R.id.pager);
-                        switch(item.getItemId()) {
-                            case R.id.task_calendar:
-                                viewPager.setCurrentItem(0);
-                                Log.d("Manual Selection", "Task Calender");
-                                break;
-                            case R.id.task_viewer:
-                                viewPager.setCurrentItem(1);
-                                Log.d("Manual Selection", "Task Viewer");
-                                break;
-                            case R.id.home:
-                                viewPager.setCurrentItem(2);
-                                Log.d("Manual Selection", "Home");
-                                break;
-                            case R.id.task_creator:
-                                viewPager.setCurrentItem(3);
-                                Log.d("Manual Selection", "Task Creator");
-                                break;
-                            case R.id.stats_viewer:
-                                viewPager.setCurrentItem(4);
-                                Log.d("Manual Selection", "Stats Viewer");
-                                break;
-                        }
-                        return true;
-                    }
-                }
-        );
-        toolBarSetUp();
-
-        SectionsPagerAdapter pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if (prevMenuItem != null) {
-                    prevMenuItem.setChecked(false);
-                }
-                else
-                {
-                    bottomNavigationView.getMenu().getItem(0).setChecked(false);
-                }
-
-                bottomNavigationView.getMenu().getItem(position).setChecked(true);
-                prevMenuItem = bottomNavigationView.getMenu().getItem(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-        pager.setAdapter(pagerAdapter);
+        InitalizerHelper helper = new InitalizerHelper();
+        helper.initalizeDatabase(this);
+        helper.initalizeBottomNavagationBar();
+        helper.initalizeToolBar();
     }
-
-    private void toolBarSetUp(){
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -153,9 +70,112 @@ public class MainActivity extends AppCompatActivity {
 //        ft.addToBackStack(null);
 //        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 //        ft.commit();
-       // return  super.onOptionsItemSelected(item);
+        // return  super.onOptionsItemSelected(item);
     }
 
+
+    private class InitalizerHelper {
+        public InitalizerHelper() {
+
+        }
+
+        public void initalizeDatabase (Context context) {
+            SQLiteDatabase mydatabase = openOrCreateDatabase("MyTimeTrackerDB",MODE_PRIVATE,null);
+            TimeTrackerDataBaseHelper yo = new TimeTrackerDataBaseHelper(context);
+            //yo.getReadableDatabase();
+
+            Stetho.initialize(Stetho.newInitializerBuilder(context)
+                    .enableDumpapp(Stetho.defaultDumperPluginsProvider(context))
+                    .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(context))
+                    .build());
+            Cursor c = null;
+
+            try{
+                c = mydatabase.query("TASK_CATEGORY_INFO", null, null, null, null, null, null);
+                Log.d("TableTest", "Table exists");
+            }
+            catch(Exception e ){
+                Log.d("TableTest", " shit is broke");
+            }
+            Log.d("yolo", mydatabase.isOpen() + " hello " + DebugDB.getAddressLog());
+        }
+
+        public void initalizeBottomNavagationBar() {
+            final BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+            BottomNavigationHelper.removeShiftMode(bottomNavigationView);
+            bottomNavigationView.setOnNavigationItemSelectedListener(
+                    new BottomNavigationView.OnNavigationItemSelectedListener(){
+
+                        @Override
+                        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                            ViewPager viewPager = findViewById(R.id.pager);
+                            switch(item.getItemId()) {
+                                case R.id.task_calendar:
+                                    viewPager.setCurrentItem(0);
+                                    Log.d("Manual Selection", "Task Calender");
+                                    break;
+                                case R.id.task_viewer:
+                                    viewPager.setCurrentItem(1);
+                                    Log.d("Manual Selection", "Task Viewer");
+                                    break;
+                                case R.id.home:
+                                    viewPager.setCurrentItem(2);
+                                    Log.d("Manual Selection", "Home");
+                                    break;
+                                case R.id.task_creator:
+                                    viewPager.setCurrentItem(3);
+                                    Log.d("Manual Selection", "Task Creator");
+                                    break;
+                                case R.id.stats_viewer:
+                                    viewPager.setCurrentItem(4);
+                                    Log.d("Manual Selection", "Stats Viewer");
+                                    break;
+                            }
+                            return true;
+                        }
+                    }
+            );
+
+            SectionsPagerAdapter pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+            ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    if (prevMenuItem != null) {
+                        prevMenuItem.setChecked(false);
+                    }
+                    else
+                    {
+                        bottomNavigationView.getMenu().getItem(0).setChecked(false);
+                    }
+
+                    bottomNavigationView.getMenu().getItem(position).setChecked(true);
+                    prevMenuItem = bottomNavigationView.getMenu().getItem(position);
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
+            pager.setAdapter(pagerAdapter);
+        }
+
+        public void initalizeToolBar(){
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+
+        }
+
+        public void initalizePagerAdapter(BottomNavigationView bottomNavigationView) {
+        }
+
+    }
 
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -164,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-           return 5;
+            return 5;
         }
 
         @Override
@@ -175,17 +195,17 @@ public class MainActivity extends AppCompatActivity {
                     //bottomNavigationView.getItem(R.id.task_calendar);
                     return new CalendarFragment();
                 case 1:
-                   // bottomNavigationView.setSelectedItemId(R.id.task_viewer);
+                    // bottomNavigationView.setSelectedItemId(R.id.task_viewer);
                     return new TasksListFragment();
                 case 2:
-                   // bottomNavigationView.setSelectedItemId(R.id.home);
+                    // bottomNavigationView.setSelectedItemId(R.id.home);
                     return new HomeFragment();
                 case 3:
-                   // bottomNavigationView.setSelectedItemId(R.id.task_creator);
+                    // bottomNavigationView.setSelectedItemId(R.id.task_creator);
                     bottomNavigationView.getMenu().findItem(R.id.stats_viewer).setChecked(false);
                     return new TaskCreatorFragment();
                 case 4:
-                   // bottomNavigationView.setSelectedItemId(R.id.stats_viewer);
+                    // bottomNavigationView.setSelectedItemId(R.id.stats_viewer);
                     bottomNavigationView.getMenu().findItem(R.id.stats_viewer).setChecked(true);
                     return new StatsFragment();
             }
