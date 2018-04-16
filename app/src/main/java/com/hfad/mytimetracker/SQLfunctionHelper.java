@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -282,6 +283,38 @@ public class SQLfunctionHelper {
         }
         write.insert("TASK_STATS", null, recordParamaterstwo);      //issue here
         Log.d("InsertTaskTest", "it worked");
+    }
+
+    public ArrayList<StatsFragment.CategoryStats> getFiveBestCompleteCategories(){
+
+    }
+
+    public ArrayList<StatsFragment.CategoryStats> getFiveWorstCompleteCategories(){
+
+    }
+
+    public ArrayList<StatsFragment.CategoryStats> getFiveBestCompleteCategories(){
+
+    }
+
+    public ArrayList<StatsFragment.CategoryStats> getFiveWorstCompleteCategories(){
+
+    }
+
+    public ArrayList<StatsFragment.DayStats> getWeekOnTimeTasks(){
+
+    }
+
+    public ArrayList<StatsFragment.DayStats> getWeekCompleteTasks(){
+
+    }
+
+    public ArrayList<StatsFragment.PieSlice> getLateTasks(){
+
+    }
+
+    public ArrayList<StatsFragment.PieSlice> getInCompleteTasks(){
+
     }
 
 }

@@ -235,6 +235,17 @@ public class StatsFragment extends Fragment {
         mPieCharttwo.addPieSlice(new PieModel("Eating", 9, Color.parseColor("#FED70E")));
     }
 
+    public class PieSlice {
+
+    }
+
+    public class CategoryStats {
+
+    }
+
+    public class DayStats {
+
+    }
 
 
 }
