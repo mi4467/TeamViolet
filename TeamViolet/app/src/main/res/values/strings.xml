@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">MyTimeTracker</string>
+
+    <!-- This is for the bottom navigation menu -->
+    <string name="home">Home</string>
+    <string name="stats_viewer">Stats</string>
+    <string name="calendar_viewer">Calendar</string>
+    <string name="task_creator">Add Task</string>
+    <string name="task_viewer">Tasks</string>
+
+
+    <!-- This is for the Toolbar -->
+    <string name="settings">Settings</string>
+
+    <!-- String Values for adding tasks -->
+    <string name="cat">Select Category</string>
+    <string name="create_cat">Create Category</string>
+    <string name="cat_name">Category Name:</string>
+    <string name="cat_color">Category Color:</string>
+
+    <string name="pick_cat">Pick Category:</string>
+    <string name="task_creator_single">One time</string>
+    <string name="task_creator_reoccuring">Reoccuring</string>
+    <string name="task_creator_next">Next</string>
+
+    <string name="create_task">Name Task</string>
+    <string name="str_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="due_date">Due Date</string>
+
+    <string name="task_creator_newreoccurringtask">New Reoccurring Task Settings</string>
+    <string name="task_creator_newtask">New Task Settings</string>
+    <string name="task_creator_taskName">Task Name</string>
+
+    <string name="add_rtask">Add Reoccurring Task</string>
+    <string name="days">Days</string>
+
+    <string name="days_dialog_title">Days of the Week</string>
+    <string-array name="days_list">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
+
+    <!-- For Calendar Fragment-->
+
+    <item type="id" name="Button_ID"/>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- For tasks list Fragment -->
+
+    <string name="category_filter">Choose Categories</string>
+    <string name="completion_filter">Choose Completion Status</string>
+    <string name="on_time_filter">Choose On-Time Status</string>
+    <string name="enter_filter">Filter...</string>
+
+    <string-array name="completion_list">
+        <item>Completed</item>
+        <item>Not Completed</item>
+    </string-array>
+
+    <string-array name="on_time_list">
+        <item>On Time</item>
+        <item>Not On Time</item>
+    </string-array>
+</resources>

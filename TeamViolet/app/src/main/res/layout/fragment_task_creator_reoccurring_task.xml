@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="100dp"
+    tools:context="com.hfad.mytimetracker.taskcreator.TaskCreatorReoccurringTaskFragment">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/task_creator_newreoccurringtask"
+        android:textSize="32sp" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="30dp"
+        android:columnCount="2"
+        android:orientation="horizontal"
+        android:rowCount="6">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="Start Time" />
+
+        <EditText
+            android:id="@+id/edittext_reoccurringtask_starttime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="@string/str_time" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:ems="7"
+            android:text="End Time" />
+
+        <EditText
+            android:id="@+id/edittext_reoccurringtask_endtime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="@string/end_time" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:ems="7"
+            android:text="Days" />
+
+        <EditText
+            android:id="@+id/edittext_reoccurringtask_days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="@string/days" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:ems="7"
+            android:text="Start Date" />
+
+        <EditText
+            android:id="@+id/edittext_reoccurringtask_startdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="Start Date" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:ems="7"
+            android:text="End Date" />
+
+        <EditText
+            android:id="@+id/edittext_reoccurringtask_enddate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="End Date" />
+
+    </GridLayout>
+
+    <Button
+        android:id="@+id/submit_reoccurringtask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit!" />
+
+</LinearLayout>
