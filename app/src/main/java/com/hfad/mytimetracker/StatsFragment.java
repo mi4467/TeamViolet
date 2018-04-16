@@ -6,37 +6,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.internal.BottomNavigationItemView;
-import android.support.design.internal.BottomNavigationMenuView;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.db.chart.model.Bar;
-import com.db.chart.model.BarSet;
-import com.db.chart.view.BarChartView;
-import com.github.mikephil.charting.charts.BarChart;
-//import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-//import com.github.mikephil.charting.charts.BarChart;
-//import com.github.mikephil.charting.data.BarData;
-//import com.github.mikephil.charting.data.BarDataSet;
-//import com.github.mikephil.charting.data.BarEntry;
-
 import org.eazegraph.lib.charts.PieChart;
 import org.eazegraph.lib.models.PieModel;
 
@@ -236,14 +215,57 @@ public class StatsFragment extends Fragment {
     }
 
     public class PieSlice {
+        String name;
+        int percentage;
+        int color;
+
+        public PieSlice(String s, int perc, int col){
+            name = s;
+            percentage = perc;
+            color = col;
+        }
 
     }
 
     public class CategoryStats {
+        String name;
+        int complete;
+        int incomplete;
+        int totalTasksWithCompleteStatus;
+        int onTime;
+        int late;
+        int totalTasksWithOnTimeStatus;
+
+        public CategoryStats(String n, int c, int i, int ttwcs, int o, int l, int ttwots){
+            name = n;
+            complete = c;
+            incomplete =i;
+            totalTasksWithCompleteStatus = ttwcs;
+            onTime = o;
+            late = l;
+            totalTasksWithOnTimeStatus = ttwots;
+        }
 
     }
 
     public class DayStats {
+        String date;
+        int complete;
+        int incomplete;
+        int totalTasksWithCompleteStatus;
+        int onTime;
+        int late;
+        int totalTasksWithOnTimeStatus;
+
+        public DayStats(String n, int c, int i, int ttwcs, int o, int l, int ttwots){
+            date = n;
+            complete = c;
+            incomplete =i;
+            totalTasksWithCompleteStatus = ttwcs;
+            onTime = o;
+            late = l;
+            totalTasksWithOnTimeStatus = ttwots;
+        }
 
     }
 
