@@ -55,5 +55,6 @@ dependencies {
     compile 'com.jjoe64:graphview:4.2.1'
     compile 'com.github.blackfizz:eazegraph:1.2.2@aar'
     compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.github.alamkanak:android-week-view:1.2.6'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.3'
 }

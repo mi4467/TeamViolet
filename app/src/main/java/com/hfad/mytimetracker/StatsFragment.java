@@ -19,10 +19,6 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import org.eazegraph.lib.charts.PieChart;
 import org.eazegraph.lib.models.PieModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class StatsFragment extends Fragment {
 
 
@@ -202,7 +198,6 @@ public class StatsFragment extends Fragment {
         mPieChart.addPieSlice(new PieModel("Sleep", 25, Color.parseColor("#56B7F1")));
         mPieChart.addPieSlice(new PieModel("Work", 35, Color.parseColor("#CDA67F")));
         mPieChart.addPieSlice(new PieModel("Eating", 9, Color.parseColor("#FED70E")));
-
 
     }
 
