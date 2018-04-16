@@ -287,34 +287,35 @@ public class SQLfunctionHelper {
 
     public ArrayList<StatsFragment.CategoryStats> getFiveBestCompleteCategories(){
 
+        return null;
     }
 
     public ArrayList<StatsFragment.CategoryStats> getFiveWorstCompleteCategories(){
-
+        return null;
     }
 
-    public ArrayList<StatsFragment.CategoryStats> getFiveBestCompleteCategories(){
-
+    public ArrayList<StatsFragment.CategoryStats> getFiveBestOnTimeCategories(){
+        return null;
     }
 
-    public ArrayList<StatsFragment.CategoryStats> getFiveWorstCompleteCategories(){
-
+    public ArrayList<StatsFragment.CategoryStats> getFiveWorstOnTimeCategories(){
+        return null;
     }
 
     public ArrayList<StatsFragment.DayStats> getWeekOnTimeTasks(){
-
+        return null;
     }
 
     public ArrayList<StatsFragment.DayStats> getWeekCompleteTasks(){
-
+        return null;
     }
 
     public ArrayList<StatsFragment.PieSlice> getLateTasks(){
-
+        return null;
     }
 
     public ArrayList<StatsFragment.PieSlice> getInCompleteTasks(){
-
+        return null;
     }
 
 }
