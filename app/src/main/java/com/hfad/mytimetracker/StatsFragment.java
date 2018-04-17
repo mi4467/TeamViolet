@@ -152,48 +152,84 @@ public class StatsFragment extends Fragment {
     }
 
     public void initCompleteLineChart(View layout){
-        SQLfunctionHelper.getWeekOnTimeTasks(getContext(), this);
-        LineGraphSeries<DataPoint> s1 = new LineGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, 5),
-                new DataPoint(1, 6),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 7)
+//        SQLfunctionHelper.getWeekOnTimeTasks(getContext(), this);
+//        LineGraphSeries<DataPoint> s1 = new LineGraphSeries<>(new DataPoint[] {
+//                new DataPoint(0, 5),
+//                new DataPoint(1, 6),
+//                new DataPoint(2, 3),
+//                new DataPoint(3, 2),
+//                new DataPoint(4, 7)
+//
+//        });
+//        LineGraphSeries<DataPoint> s2 = new LineGraphSeries<>(new DataPoint[] {
+//                new DataPoint(0, -1),
+//                new DataPoint(1, 5),
+//                new DataPoint(2, 3),
+//                new DataPoint(3, 2),
+//                new DataPoint(4, 6)
+//        });
+        ArrayList<DayStats> data = SQLfunctionHelper.getWeekOnTimeTasks(getContext(), this);
+        DataPoint[] total = new DataPoint[7];
+        for(int i = 0; i<7; i++){
+            total[i] = new DataPoint(i, data.get(total.length-i-1).totalTasksWithCompleteStatus);
+        }
+        DataPoint[] complete = new DataPoint[7];
+        for(int i = 0; i<7; i++){
+            complete[i] = new DataPoint(i, data.get(total.length-i-1).complete);
+        }
+        DataPoint[] incomplete = new DataPoint[7];
+        for(int i = 0; i<7; i++){
+            incomplete[i] = new DataPoint(i, data.get(total.length-i-1).incomplete);
+        }
 
-        });
-        LineGraphSeries<DataPoint> s2 = new LineGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, -1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
-        GraphView completeWeek = layout.findViewById(R.id.task_complete_week_graph);
-        completeWeek.addSeries(s1);
-        completeWeek.addSeries(s2);
-        completeWeek.setTitle("Completion Stats Over Past Week");
+        GraphView onTimeWeek = layout.findViewById(R.id.task_onTime_week_graph);
+        onTimeWeek.addSeries(new LineGraphSeries<DataPoint>(total));
+        onTimeWeek.addSeries(new LineGraphSeries<DataPoint>(complete));
+        onTimeWeek.addSeries(new LineGraphSeries<DataPoint>(incomplete));
+        onTimeWeek.setTitle("On-Time Stats Over Past Week");
     }
 
     public void initOnTimeLineChart(View layout){
-        SQLfunctionHelper.getWeekOnTimeTasks(getContext(), this);
-        LineGraphSeries<DataPoint> s1 = new LineGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, 5),
-                new DataPoint(1, 6),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 7)
+//        LineGraphSeries<DataPoint> s1 = new LineGraphSeries<>(new DataPoint[] {
+//                new DataPoint(0, 5),
+//                new DataPoint(1, 6),
+//                new DataPoint(2, 3),
+//                new DataPoint(3, 2),
+//                new DataPoint(4, 7)
+//
+//        });
+//        LineGraphSeries<DataPoint> s2 = new LineGraphSeries<>(new DataPoint[] {
+//                new DataPoint(0, -1),
+//                new DataPoint(1, 5),
+//                new DataPoint(2, 3),
+//                new DataPoint(3, 2),
+//                new DataPoint(4, 6)
+//        });
+//        LineGraphSeries<DataPoint> s2 = new LineGraphSeries<>(new DataPoint[] {
+//                new DataPoint(0, -1),
+//                new DataPoint(1, 5),
+//                new DataPoint(2, 3),
+//                new DataPoint(3, 2),
+//                new DataPoint(4, 6)
+//        });
+        ArrayList<DayStats> data = SQLfunctionHelper.getWeekOnTimeTasks(getContext(), this);
+        DataPoint[] total = new DataPoint[7];
+        for(int i = 0; i<7; i++){
+            total[i] = new DataPoint(i, data.get(total.length-i-1).totalTasksWithOnTimeStatus);
+        }
+        DataPoint[] ontime = new DataPoint[7];
+        for(int i = 0; i<7; i++){
+            ontime[i] = new DataPoint(i, data.get(total.length-i-1).onTime);
+        }
+        DataPoint[] late = new DataPoint[7];
+        for(int i = 0; i<7; i++){
+            late[i] = new DataPoint(i, data.get(total.length-i-1).late);
+        }
 
-        });
-        LineGraphSeries<DataPoint> s2 = new LineGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, -1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
         GraphView onTimeWeek = layout.findViewById(R.id.task_onTime_week_graph);
-        onTimeWeek.addSeries(s1);
-        onTimeWeek.addSeries(s2);
+        onTimeWeek.addSeries(new LineGraphSeries<DataPoint>(total));
+        onTimeWeek.addSeries(new LineGraphSeries<DataPoint>(ontime));
+        onTimeWeek.addSeries(new LineGraphSeries<DataPoint>(late));
         onTimeWeek.setTitle("On-Time Stats Over Past Week");
     }
 
