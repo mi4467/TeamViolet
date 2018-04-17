@@ -19,6 +19,8 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import org.eazegraph.lib.charts.PieChart;
 import org.eazegraph.lib.models.PieModel;
 
+import java.util.ArrayList;
+
 public class StatsFragment extends Fragment {
 
 
@@ -48,6 +50,7 @@ public class StatsFragment extends Fragment {
     }
 
     public void initBestCompleteBar(View layout){
+        ArrayList<CategoryStats> categories = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), this);
         GraphView completionG = layout.findViewById(R.id.task_completion_total_graph_best);
         BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
                 new DataPoint(0, -1),
@@ -149,6 +152,7 @@ public class StatsFragment extends Fragment {
     }
 
     public void initCompleteLineChart(View layout){
+        SQLfunctionHelper.getWeekOnTimeTasks(getContext(), this);
         LineGraphSeries<DataPoint> s1 = new LineGraphSeries<>(new DataPoint[] {
                 new DataPoint(0, 5),
                 new DataPoint(1, 6),
@@ -171,6 +175,7 @@ public class StatsFragment extends Fragment {
     }
 
     public void initOnTimeLineChart(View layout){
+        SQLfunctionHelper.getWeekOnTimeTasks(getContext(), this);
         LineGraphSeries<DataPoint> s1 = new LineGraphSeries<>(new DataPoint[] {
                 new DataPoint(0, 5),
                 new DataPoint(1, 6),
@@ -224,6 +229,7 @@ public class StatsFragment extends Fragment {
 
     public class CategoryStats {
         String name;
+        int color;
         int complete;
         int incomplete;
         int totalTasksWithCompleteStatus;
@@ -231,14 +237,25 @@ public class StatsFragment extends Fragment {
         int late;
         int totalTasksWithOnTimeStatus;
 
-        public CategoryStats(String n, int c, int i, int ttwcs, int o, int l, int ttwots){
+        public CategoryStats(String n, int color, int c, int i, int o, int l){
             name = n;
+            this.color = color;
             complete = c;
             incomplete =i;
-            totalTasksWithCompleteStatus = ttwcs;
+            totalTasksWithCompleteStatus = c+i;
             onTime = o;
             late = l;
-            totalTasksWithOnTimeStatus = ttwots;
+            totalTasksWithOnTimeStatus = o+l;
+        }
+
+        @Override
+        public String toString(){
+            return "NAME = " + this.name + "\n" +
+                    "COLOR = " + this.color + "\n" +
+                    "Complete # = " + this.complete + "\n" +
+                    "InComplete # = " + this.incomplete + "\n" +
+                    "onTime # = " + this.onTime + "\n" +
+                    "Late # = " + this.late + "\n";
         }
 
     }
@@ -252,14 +269,23 @@ public class StatsFragment extends Fragment {
         int late;
         int totalTasksWithOnTimeStatus;
 
-        public DayStats(String n, int c, int i, int ttwcs, int o, int l, int ttwots){
+        public DayStats(String n, int c, int i, int o, int l){
             date = n;
             complete = c;
             incomplete =i;
-            totalTasksWithCompleteStatus = ttwcs;
+            totalTasksWithCompleteStatus = c+i;
             onTime = o;
             late = l;
-            totalTasksWithOnTimeStatus = ttwots;
+            totalTasksWithOnTimeStatus = l+o;
+        }
+
+        @Override
+        public String toString(){
+            return "DATE = " + this.date + "\n" +
+                    "Complete # = " + this.complete + "\n" +
+                    "InComplete # = " + this.incomplete + "\n" +
+                    "onTime # = " + this.onTime + "\n" +
+                    "Late # = " + this.late + "\n";
         }
 
     }
