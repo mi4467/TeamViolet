@@ -25,6 +25,38 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dip"
                     android:id="@+id/task_completion_total_graph_best" />
+                <android.support.v7.widget.CardView
+                    android:layout_margin="5dp"
+                    card_view:cardCornerRadius="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding = "10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="3"
+                        >
+                        <TextView
+                            android:text="LEGEND"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="Completed Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/completed_key_best"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="Incomplete Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/not_completed_key_best"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -42,6 +74,38 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dip"
                     android:id="@+id/task_onTime_total_graph_best" />
+                <android.support.v7.widget.CardView
+                    android:layout_margin="5dp"
+                    card_view:cardCornerRadius="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding = "10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="3"
+                        >
+                        <TextView
+                            android:text="LEGEND"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="On-Time Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/onTime_key_best"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="Late Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/late_key_best"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -59,6 +123,38 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dip"
                     android:id="@+id/task_completion_total_graph_worst" />
+                <android.support.v7.widget.CardView
+                    android:layout_margin="5dp"
+                    card_view:cardCornerRadius="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding = "10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="3"
+                        >
+                        <TextView
+                            android:text="LEGEND"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="Completed Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/completed_key_worst"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="Incomplete Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/not_completed_key_worst"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -76,6 +172,38 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dip"
                     android:id="@+id/task_onTime_total_graph_worst" />
+                <android.support.v7.widget.CardView
+                    android:layout_margin="5dp"
+                    card_view:cardCornerRadius="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding = "10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="3"
+                        >
+                        <TextView
+                            android:text="LEGEND"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="On-Time Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/onTime_key_worst"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="Late Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/late_key_worst"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -83,6 +211,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
+            android:padding = "10dp"
             card_view:cardCornerRadius="4dp"
             >
             <LinearLayout
@@ -93,6 +222,45 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dip"
                     android:id="@+id/task_complete_week_graph" />
+                <android.support.v7.widget.CardView
+                    android:layout_margin="5dp"
+                    card_view:cardCornerRadius="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:weightSum="3"
+                        >
+                        <TextView
+                            android:text="LEGEND"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="Total Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/total_complete_key"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:layout_weight="1"
+                            android:textAlignment="center"
+                            android:text="Complete Tasks"
+                            android:id="@+id/complete_key"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:layout_weight="1"
+                            android:textAlignment="center"
+                            android:text="Incomplete Tasks"
+                            android:id="@+id/incomplete_key"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -110,6 +278,45 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dip"
                     android:id="@+id/task_onTime_week_graph" />
+                <android.support.v7.widget.CardView
+                    android:layout_margin="5dp"
+                    card_view:cardCornerRadius="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding = "10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="3"
+                        >
+                        <TextView
+                            android:text="LEGEND"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="Total Tasks"
+                            android:textAlignment="center"
+                            android:layout_weight="1"
+                            android:id="@+id/total_onTime_key"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:layout_weight="1"
+                            android:textAlignment="center"
+                            android:text="On-Time Tasks"
+                            android:id="@+id/onTime_key"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:layout_weight="1"
+                            android:textAlignment="center"
+                            android:text="Late Tasks"
+                            android:id="@+id/late_onTime_key"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -117,6 +324,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
+
             card_view:cardCornerRadius="4dp"
             >
             <LinearLayout
