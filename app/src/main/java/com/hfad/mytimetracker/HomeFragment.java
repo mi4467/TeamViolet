@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,7 @@ import org.eazegraph.lib.charts.PieChart;
 import org.eazegraph.lib.models.PieModel;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 
 public class HomeFragment extends Fragment {
@@ -57,54 +59,55 @@ public class HomeFragment extends Fragment {
     public void initBestCompleteBar(View layout){
         ArrayList<StatsFragment.CategoryStats> categories = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), new StatsFragment());
         final GraphView completionG = layout.findViewById(R.id.task_completion_total_graph_best);
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, -1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
-
-        completionG.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter(){
-
-            @Override
-            public String formatLabel(double value, boolean isValueX){
-                String result = "";
-                if(isValueX){
-                    //return "pizza";             //use this to create x axis as category labels
-                    return super.formatLabel(value, isValueX);
-                }
-                else{
-                    return super.formatLabel(value, isValueX);
-                }
-            }
-        });
-
-        completionG.addSeries(series);
-        completionG.getViewport().setScrollable(true);
-        completionG.getViewport().setScalable(true);
-        completionG.setTitle("Best Task Completion Total");
-        series.setSpacing(50);
-        completionG.getViewport().setMaxX(3);
-        completionG.getGridLabelRenderer().setHorizontalAxisTitle("Category");
-        //completionG.getGridLabelRenderer().setVerticalAxisTitle("Number of Tasks");
-
-        TextView onTimeKey = layout.findViewById(R.id.completed_key_best);
-        onTimeKey.setBackgroundColor(Color.GREEN);
-
-        TextView lateKey = layout.findViewById(R.id.not_completed_key_best);
-        lateKey.setBackgroundColor(Color.RED);
-
-//        Button left = layout.findViewById(R.id.scroll_left_complete_best);
-//        Button right = layout.findViewById(R.id.scroll_right_complete_best);
+        //for()
+//        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
+//                new DataPoint(0, -1),
+//                new DataPoint(1, 5),
+//                new DataPoint(2, 3),
+//                new DataPoint(3, 2),
+//                new DataPoint(4, 6)
+//        });
 //
-//        left.setOnClickListener(new View.OnClickListener() {
+//        completionG.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter(){
+//
 //            @Override
-//            public void onClick(View view) {
-//                completionG.getViewport().scrollToEnd();
-//                completionG.getViewport().
+//            public String formatLabel(double value, boolean isValueX){
+//                String result = "";
+//                if(isValueX){
+//                    //return "pizza";             //use this to create x axis as category labels
+//                    return super.formatLabel(value, isValueX);
+//                }
+//                else{
+//                    return super.formatLabel(value, isValueX);
+//                }
 //            }
 //        });
+//
+//        completionG.addSeries(series);
+//        completionG.getViewport().setScrollable(true);
+//        completionG.getViewport().setScalable(true);
+//        completionG.setTitle("Best Task Completion Total");
+//        series.setSpacing(50);
+//        completionG.getViewport().setMaxX(3);
+//        completionG.getGridLabelRenderer().setHorizontalAxisTitle("Category");
+//        //completionG.getGridLabelRenderer().setVerticalAxisTitle("Number of Tasks");
+//
+//        TextView onTimeKey = layout.findViewById(R.id.completed_key_best);
+//        onTimeKey.setBackgroundColor(Color.GREEN);
+//
+//        TextView lateKey = layout.findViewById(R.id.not_completed_key_best);
+//        lateKey.setBackgroundColor(Color.RED);
+//
+////        Button left = layout.findViewById(R.id.scroll_left_complete_best);
+////        Button right = layout.findViewById(R.id.scroll_right_complete_best);
+////
+////        left.setOnClickListener(new View.OnClickListener() {
+////            @Override
+////            public void onClick(View view) {
+////                completionG.getViewport().scrollToEnd();
+////                completionG.getViewport().
+////            }
+////        });
 
 
     }
@@ -322,22 +325,87 @@ public class HomeFragment extends Fragment {
 
     }
 
-//    public void initIncompletePieChart(View layout){
-//        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), new StatsFragment());
-//        PieChart mPieChart = (PieChart) layout.findViewById(R.id.notCompleted_piechart);
-//        for(StatsFragment.CategoryStats curr : data){
-//            mPieChart.addPieSlice(new PieModel(curr.name, curr.incomplete, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
-//        }
-//
-//    }
-//
-//    public void initLatePieChart(View layout){
-//        PieChart mPieCharttwo = (PieChart) layout.findViewById(R.id.late_piechart);
-//        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), new StatsFragment());
-//        for(StatsFragment.CategoryStats curr : data){
-//            mPieCharttwo.addPieSlice(new PieModel(curr.name, curr.late, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
-//        }
-//    }
+    public class BestCompletionComparator implements Comparator<StatsFragment.CategoryStats> {
+
+
+        @Override
+        public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
+            if(t1.totalTasksWithCompleteStatus<5){
+                return -1;
+            }
+            if(categoryStats.totalTasksWithCompleteStatus<5){
+                return 1;
+            }
+            if(categoryStats.complete/categoryStats.totalTasksWithCompleteStatus > t1.complete/t1.totalTasksWithCompleteStatus){
+                return 1;
+            }
+            else{
+                return -1;
+            }
+        }
+    }
+
+    public class WorstCompletionComparator implements Comparator<StatsFragment.CategoryStats> {
+
+
+        @Override
+        public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
+            if(t1.totalTasksWithCompleteStatus<5){
+                return -1;
+            }
+            if(categoryStats.totalTasksWithCompleteStatus<5){
+                return 1;
+            }
+            if(categoryStats.complete/categoryStats.totalTasksWithCompleteStatus < t1.complete/t1.totalTasksWithCompleteStatus){
+                return 1;
+            }
+            else{
+                return -1;
+            }
+        }
+    }
+
+    public class BestOnTimeComparator implements Comparator<StatsFragment.CategoryStats> {
+
+
+        @Override
+        public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
+            if(t1.totalTasksWithOnTimeStatus<5){
+                return -1;
+            }
+            if(categoryStats.totalTasksWithOnTimeStatus<5){
+                return 1;
+            }
+            if(categoryStats.onTime/categoryStats.totalTasksWithOnTimeStatus > t1.onTime/t1.totalTasksWithOnTimeStatus){
+                return 1;
+            }
+            else{
+                return -1;
+            }
+        }
+    }
+
+    public class WorstOnTimeComparator implements Comparator<StatsFragment.CategoryStats> {
+
+
+        @Override
+        public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
+            if(t1.totalTasksWithOnTimeStatus<5){
+                return -1;
+            }
+            if(categoryStats.totalTasksWithOnTimeStatus<5){
+                return 1;
+            }
+            if(categoryStats.onTime/categoryStats.totalTasksWithOnTimeStatus < t1.onTime/t1.totalTasksWithOnTimeStatus){
+                return 1;
+            }
+            else{
+                return -1;
+            }
+        }
+    }
+
+
 
 
 }

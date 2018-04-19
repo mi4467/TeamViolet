@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -23,6 +24,8 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.db.chart.model.Bar;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.PieDataSet;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
@@ -37,6 +40,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import im.dacer.androidcharts.PieHelper;
+import im.dacer.androidcharts.PieView;
 
 public class StatsFragment extends Fragment {
 
@@ -53,6 +59,7 @@ public class StatsFragment extends Fragment {
     private static ArrayList<DayStats> completedLineData = null;
     private static ArrayList<DayStats> onTimeLineData = null;
     private static ArrayList<CategoryStats> completedBarData = null;
+    private static ArrayList<CategoryStats> onTimeBarData = null;
 
     public StatsFragment() {
         // Required empty public constructor
@@ -77,10 +84,40 @@ public class StatsFragment extends Fragment {
         initLatePieChart(layout);
         initListeners(layout);
         initField();
+        initLayout(layout);
         setUpCompletionWeekLineGraph(layout);
         setUpOnTimeWeekLineGraph(layout);
+//        PieView pieView = (PieView)layout.findViewById(R.id.late_pie_view);
+//        ArrayList<PieHelper> pieHelperArrayList = new ArrayList<PieHelper>();
+//        pieHelperArrayList.add(new PieHelper(45, Color.YELLOW));
+//        pieHelperArrayList.add(new PieHelper(50, Color.BLUE));
+//        pieView.setDate(pieHelperArrayList);
+//        pieView.selectedPie(2); //optional
+//        //pieView.setOnPieClickListener(listener) //optional
+//        pieView.showPercentLabel(true); //optional
+//
+//        pieView = layout.findViewById(R.id.incomplete_pie_view);
+//        pieView.setDate(pieHelperArrayList);
+//        pieView.showPercentLabel(true);
+
+    //    initIncompletePieChart(layout);
+
+        //PieChart mChart = layout.findViewById(R.id.chart1);
+
 
         return layout;
+    }
+
+    public void initLayout(View layout){
+        TextView completeBar = layout.findViewById(R.id.completed_key_pick_three);
+        completeBar.setBackgroundColor(Color.GREEN);
+        TextView incompleteBar = layout.findViewById(R.id.not_completed_key_pick_three);
+        incompleteBar.setBackgroundColor(Color.RED);
+
+        TextView onTimeBar = layout.findViewById(R.id.onTime_key_pick_three);
+        onTimeBar.setBackgroundColor(Color.GREEN);
+        TextView lateBar = layout.findViewById(R.id.late_key_pick_three);
+        lateBar.setBackgroundColor(Color.RED);
     }
 
     public void initListeners(final View layout){
@@ -106,6 +143,14 @@ public class StatsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 showOnTimeTaskCatSelection();
+            }
+        });
+
+        Button onTimeFilterBarEnter = layout.findViewById(R.id.filterOnTimeButtonEnter);
+        onTimeFilterBarEnter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setUpOnTimeBarGraph(layout);
             }
         });
 
@@ -195,17 +240,41 @@ public class StatsFragment extends Fragment {
         }
         BarGraphSeries<DataPoint> incompleteSeries = new BarGraphSeries<>(incomplete);
         incompleteSeries.setColor(Color.RED);
-
+        incompleteSeries.setDataWidth(.8);
+        completedSeries.setDataWidth(.8);
 
         barFilterComplete.addSeries(completedSeries);
         barFilterComplete.addSeries(incompleteSeries);
+        barFilterComplete.getViewport().setMinY(0.0);
+        barFilterComplete.getViewport().setMinX(-1.0);
+        barFilterComplete.getViewport().setMaxX(3.0);
 
+        for(int i =0; i< incomplete.length; i++){
+            Log.d("StatsBarDebug", "Name: " + data.get(i).name + " X-Value: " + i + " Complete#: " + data.get(i).complete + " InComplete#: " + data.get(i).incomplete);
+        }
+        //barFilterComplete.
+        barFilterComplete.getGridLabelRenderer().setNumHorizontalLabels(data.size()+2);
         barFilterComplete.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter() {
+
+
             @Override
             public String formatLabel(double value, boolean isValueX){
-                String label = "";
+                String label = null;
                 if(isValueX){
-                    label = completedBarData.get((int) value).name;
+//                    if(value<completedBarData.size()) {
+//                        Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
+//                        label = completedBarData.get(((int) value)).name;
+//                    }
+                    //Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
+                    if(value==0 && value<completedBarData.size()){
+                        label = completedBarData.get(((int) value)).name;
+                    }
+                    if(value==1 && value<completedBarData.size()){
+                        label = completedBarData.get(((int) value)).name;
+                    }
+                    if(value==2 && value<completedBarData.size()){
+                        label = completedBarData.get(((int) value)).name;
+                    }
                     return label;
                 }
                 else{
@@ -251,7 +320,70 @@ public class StatsFragment extends Fragment {
 //        });
     }
 
-    public void setUpOnTimeBarGraph(){
+    public void setUpOnTimeBarGraph(View layout){
+        ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesOnTime, getContext(), this);
+        if(data.size()==0){
+            return;
+        }
+        onTimeBarData = data;
+        GraphView barFilterComplete = layout.findViewById(R.id.task_onTime_total_graph_pick_three);
+        barFilterComplete.removeAllSeries();
+        DataPoint[] onTime = new DataPoint[data.size()];
+        for(int i =0; i< onTime.length; i++){
+            onTime[i] = new DataPoint(i, data.get(i).onTime);
+        }
+        BarGraphSeries<DataPoint> onTimeSeries = new BarGraphSeries<>(onTime);
+        onTimeSeries.setColor(Color.GREEN);
+
+        DataPoint[] late = new DataPoint[data.size()];
+        for(int i =0; i< late.length; i++){
+            late[i] = new DataPoint(i, data.get(i).late);
+        }
+        BarGraphSeries<DataPoint> lateSeries = new BarGraphSeries<>(late);
+        lateSeries.setColor(Color.RED);
+        lateSeries.setDataWidth(.8);
+        onTimeSeries.setDataWidth(.8);
+
+        barFilterComplete.addSeries(onTimeSeries);
+        barFilterComplete.addSeries(lateSeries);
+        barFilterComplete.getViewport().setMinY(0.0);
+        barFilterComplete.getViewport().setMinX(-1.0);
+        barFilterComplete.getViewport().setMaxX(3.0);
+
+        for(int i =0; i< late.length; i++){
+            Log.d("StatsBarDebug", "Name: " + data.get(i).name + " X-Value: " + i + " Complete#: " + data.get(i).complete + " InComplete#: " + data.get(i).incomplete);
+        }
+        //barFilterComplete.
+        barFilterComplete.getGridLabelRenderer().setNumHorizontalLabels(data.size()+2);
+        barFilterComplete.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter() {
+
+
+            @Override
+            public String formatLabel(double value, boolean isValueX){
+                String label = null;
+                if(isValueX){
+//                    if(value<completedBarData.size()) {
+//                        Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
+//                        label = completedBarData.get(((int) value)).name;
+//                    }
+                    //Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
+                    if(value==0 && value<onTimeBarData.size() ){
+                        label = onTimeBarData.get(((int) value)).name;
+                    }
+                    if(value==1 && value<onTimeBarData.size()){
+                        label = onTimeBarData.get(((int) value)).name;
+                    }
+                    if(value==2 && value<onTimeBarData.size()){
+                        label = onTimeBarData.get(((int) value)).name;
+                    }
+                    return label;
+                }
+                else{
+                    return  super.formatLabel(value, isValueX);
+                }
+
+            }
+        });
 
     }
 
@@ -299,9 +431,9 @@ public class StatsFragment extends Fragment {
 
             @Override
             public String formatLabel(double value, boolean isValueX){
-                String result = "";
+                String result = null;
                 if(isValueX){
-                    if(value<7) {
+                    if(value<7 ) {
                         //return data.get((int)value).date;             //use this to create x axis as category labels
                         String[] date = StatsFragment.completedLineData.get(completedLineData.size()-1-((int) value)).date.split("-");
                         return date[1] + "/" + date[2];
@@ -665,11 +797,12 @@ public class StatsFragment extends Fragment {
 //
 //    }
 //
+
     public void initIncompletePieChart(View layout){
+        PieChart mPieCharttwo = (PieChart) layout.findViewById(R.id.notCompleted_piechart);
         ArrayList<CategoryStats> data = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), this);
-        PieChart mPieChart = (PieChart) layout.findViewById(R.id.notCompleted_piechart);
         for(CategoryStats curr : data){
-            mPieChart.addPieSlice(new PieModel(curr.name, curr.incomplete, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
+            mPieCharttwo.addPieSlice(new PieModel(curr.name, curr.incomplete, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
         }
 
     }

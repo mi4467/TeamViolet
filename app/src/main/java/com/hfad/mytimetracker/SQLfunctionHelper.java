@@ -445,7 +445,7 @@ public class SQLfunctionHelper {
         Log.d("StatsBarDebug", command);
         TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
         SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
+        Cursor categoryStats = read.rawQuery(command, null);
         categoryStats.moveToFirst();
         ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
         for(int i =0; i< categoryStats.getCount(); i++){
