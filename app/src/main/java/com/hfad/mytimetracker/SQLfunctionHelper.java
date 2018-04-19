@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -384,6 +386,74 @@ public class SQLfunctionHelper {
             gcal.add(Calendar.DATE, -1);
         }
         Log.d("StatsCatDateDebug", data.toString());
+        return data;
+    }
+
+    public static ArrayList<StatsFragment.DayStats> getWeekOnTimeTasksFilter(Context c, StatsFragment frag, String d){
+        GregorianCalendar gcal = new GregorianCalendar();
+        DateFormat formatter = new SimpleDateFormat("yy-MM-dd");
+        Date endDate = null;
+        try {
+            endDate = formatter.parse(d);
+        } catch (ParseException e) {
+            Log.d("StatsLineFilter", "We have a fucking exception");
+            endDate = Calendar.getInstance().getTime();
+        }
+        Log.d("StatsLineFilter", endDate.toString());
+        gcal.setTime(endDate);
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase read = helper.getReadableDatabase();
+        ArrayList<StatsFragment.DayStats> data = new ArrayList<>();
+        Map<String, Integer> monthMapper = new HashMap<>();
+        monthMapper.put("Jan", 0);
+        monthMapper.put("Feb", 1);
+        monthMapper.put("Mar", 2);
+        monthMapper.put("Apr", 3);
+        monthMapper.put("May", 4);
+        monthMapper.put("Jun", 5);
+        monthMapper.put("Jul", 6);
+        monthMapper.put("Aug", 7);
+        monthMapper.put("Sep", 8);
+        monthMapper.put("Oct", 9);
+        monthMapper.put("Nov", 10);
+        monthMapper.put("Dec", 11);
+        for(int i =0; i<7; i++){
+            Log.d("StatsTimeDebug", gcal.getTime().toString());     //split into word array, then collect indexes 1,2,5 month/day/year into 5,1,2 for sql
+            String[] daterep = gcal.getTime().toString().split(" ");
+            String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+            Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1", null);
+            int completed = dayQuery.getCount();
+            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1", null);
+            int incompleted = dayQuery.getCount();
+            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1", null);
+            int onTime = dayQuery.getCount();
+            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1", null);
+            int late = dayQuery.getCount();
+            data.add(frag.new DayStats(date, completed, incompleted, onTime, late));
+            gcal.add(Calendar.DATE, -1);
+        }
+        Log.d("StatsCatDateDebug", data.toString());
+        return data;
+    }
+
+    public static ArrayList<StatsFragment.CategoryStats> filterBarGraph(CharSequence[] categories, Context c, StatsFragment frag){
+        String command = "SELECT * FROM TASK_CATEGORY_INFO WHERE ";
+        for(int i =0; i<categories.length; i++){
+            command += "CATEGORY_NAME = '" + categories[i].toString() + "' OR ";
+        }
+        command = command.substring(0, command.length()-3);
+        Log.d("StatsBarDebug", command);
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase read = helper.getReadableDatabase();
+        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
+        categoryStats.moveToFirst();
+        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
+        for(int i =0; i< categoryStats.getCount(); i++){
+            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
+            data.add(temp);
+            categoryStats.moveToNext();
+        }
+        Log.d("StatsBarDebug", data.toString());     //we return the correct data, but do not sort it
         return data;
     }
 
