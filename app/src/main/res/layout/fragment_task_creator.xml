@@ -1,9 +1,9 @@
-<android.support.v4.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.hfad.mytimetracker.TaskCreatorFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
-    >
+    android:fillViewport="true">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,123 +12,141 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingBottom="100dp"
-        tools:context="com.hfad.mytimetracker.TaskCreatorFragment">
+      >
 
         <!-- TODO: Update blank fragment layout -->
         <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
+            android:layout_margin="5dp"
+            card_view:cardCornerRadius="4dp"
             android:layout_height="wrap_content">
 
 
 
 
-            <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+            <LinearLayout
                 android:id="@+id/GridLayout1"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:rowCount="3"
-                android:orientation="horizontal"
-                tools:context=".GridXMLActivity" >
+                android:padding="10dp"
+                android:orientation="vertical"
+                 >
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/create_cat"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_rtask"
-                    android:visibility="invisible"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/cat_name"
-                    />
-
-                <EditText
-                    android:id="@+id/cat_name"
-                    android:layout_width="284dp"
-                    android:layout_height="wrap_content" />
-
-                <Button
-                    android:id="@+id/color_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/cat_color"/>
-
-                <TextView
-                    android:id="@+id/colorbox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="The Color You Chose"/>
+                    android:text="@string/create_cat"
+                    android:textAlignment="center"
+                    />
 
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cat_name"
+                        />
+
+                    <EditText
+                        android:id="@+id/cat_name"
+                        android:layout_width="284dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:padding="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/color_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/cat_color"/>
+
+                        <TextView
+                            android:id="@+id/colorbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="The Color You Chose"/>
+                </LinearLayout>
                 <Button
                     android:id="@+id/submit_cat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:text="submit"
                     />
-            </GridLayout>
+            </LinearLayout>
 
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
+            android:layout_margin="5dp"
+            card_view:cardCornerRadius="4dp"
             android:layout_height="wrap_content"
             >
 
 
-            <GridLayout
+            <LinearLayout
                 android:id="@+id/GridLayout2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2"
+                android:padding="10dp"
+                android:orientation="vertical"
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create Task"
+                    android:textAlignment="center"
+                    />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/pick_cat_task_adder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pick_cat" />
+
+                    <EditText
+                        android:id="@+id/cat_name_task_adder"
+                        android:layout_width="284dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+            <LinearLayout
                 android:orientation="horizontal"
-                android:rowCount="3"
-                tools:context=".GridXMLActivity">
+                android:layout_width="match_parent"
+                android:padding="10dp"
+                android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/create_task" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/create_task"
-                    />
+                    <EditText
+                        android:id="@+id/task_name_task_adder"
+                        android:layout_width="203dp"
+                        android:layout_height="wrap_content" />
+            </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_rtask"
-                    android:visibility="invisible"
-                    />
-
-                <Button
-                    android:id="@+id/pick_cat_task_adder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/pick_cat" />
-
-                <EditText
-                    android:id="@+id/cat_name_task_adder"
-                    android:layout_width="284dp"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/create_task" />
-
-                <EditText
-                    android:id="@+id/task_name_task_adder"
-                    android:layout_width="203dp"
-                    android:layout_height="wrap_content" />
-
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:padding="10dp"
+                android:layout_height="wrap_content">
                 <Button
                     android:id="@+id/start_time_taskadder"
                     android:layout_width="wrap_content"
@@ -138,7 +156,13 @@
                 <EditText
                     android:layout_width="242dp"
                     android:layout_height="wrap_content" />
+            </LinearLayout>
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:padding="10dp"
+                android:layout_height="wrap_content">
                 <Button
                     android:id="@+id/end_time_taskadder"
                     android:layout_width="wrap_content"
@@ -148,7 +172,13 @@
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
+            </LinearLayout>
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:padding="10dp"
+                android:layout_height="wrap_content">
                 <Button
                     android:id="@+id/add_task_date_picker"
                     android:layout_width="wrap_content"
@@ -158,108 +188,149 @@
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-
+            </LinearLayout>
                 <Button
                     android:id="@+id/submit_task"
+                    android:layout_gravity="center_horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="submit" />
-            </GridLayout>
-
+            </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
+            android:layout_margin="5dp"
+            card_view:cardCornerRadius="4dp"
             android:layout_height="wrap_content">
 
 
-            <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/GridLayout3"
-                android:layout_width="wrap_content"
+                android:padding="10dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:rowCount="3"
-                android:orientation="horizontal"
-                tools:context=".GridXMLActivity" >
+                android:orientation="vertical"
+                 >
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_rtask"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_rtask"
-                    android:visibility="invisible"
-                    />
-
-                <Button
-                    android:id="@+id/reocc_cat_list"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/create_cat"
-                    />
-
-                <EditText
-                    android:layout_width="284dp"
-                    android:layout_height="wrap_content"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/create_task"/>
-
-                <EditText
-                    android:id="@+id/reocc_task_name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <Button
-                    android:id="@+id/start_time_reocc_picker"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/str_time"
-                    android:clickable="true"
+                    android:text="@string/add_rtask"
+                    android:textAlignment="center"
                     />
 
-                <EditText
-                    android:layout_width="284dp"
-                    android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/reocc_cat_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/create_cat"
+                        />
 
-                <Button
-                    android:id="@+id/end_time_reocc_picker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/end_time"
-                    />
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        />
+                </LinearLayout>
 
-                <EditText
-                    android:layout_width="284dp"
-                    android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/create_task"/>
 
-                <Button
-                    android:id="@+id/date_picker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/days"
-                    />
+                    <EditText
+                        android:id="@+id/reocc_task_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
 
-                <EditText
-                    android:layout_width="284dp"
-                    android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/start_time_reocc_picker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/str_time"
+                        android:clickable="true"
+                        />
 
-                <Button
-                    android:id="@+id/start_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Start_Date"
-                    />
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
 
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/end_time_reocc_picker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/end_time"
+                        />
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/date_picker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/days"
+                        />
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/start_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Start_Date"
+                        />
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:padding="10dp"
+                android:layout_height="wrap_content">
                 <Button
                     android:id="@+id/end_date"
                     android:layout_width="wrap_content"
@@ -267,14 +338,19 @@
                     android:text="End_Date"
                     />
 
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
                 <Button
                     android:id="@+id/submit_reocc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="submit"
+                    android:layout_gravity="center_horizontal"
                     />
-
-            </GridLayout>
+            </LinearLayout>
 
         </android.support.v7.widget.CardView>
 

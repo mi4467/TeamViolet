@@ -389,6 +389,15 @@ public class SQLfunctionHelper {
         return data;
     }
 
+    public static Cursor getTasksGivenDate(Context c, String date){
+        //Cursor data = SQLfunctionHelper.getTasksGivenDate(getContext(), TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2])));
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase read = helper.getReadableDatabase();
+        Cursor result;
+        result = read.query("TASK_STATS", new String[] {"TASK_NAME", "COMPLETED", "NOT_COMPLETED"}, "DUE_DATE = ?", new String[] {date}, null, null, null);
+        return result;
+    }
+
     public static ArrayList<StatsFragment.DayStats> getWeekOnTimeTasksFilter(Context c, StatsFragment frag, String d){
         GregorianCalendar gcal = new GregorianCalendar();
         DateFormat formatter = new SimpleDateFormat("yy-MM-dd");

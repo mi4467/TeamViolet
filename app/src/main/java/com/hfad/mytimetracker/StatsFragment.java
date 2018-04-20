@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -103,8 +105,6 @@ public class StatsFragment extends Fragment {
     //    initIncompletePieChart(layout);
 
         //PieChart mChart = layout.findViewById(R.id.chart1);
-
-
         return layout;
     }
 
@@ -261,11 +261,6 @@ public class StatsFragment extends Fragment {
             public String formatLabel(double value, boolean isValueX){
                 String label = null;
                 if(isValueX){
-//                    if(value<completedBarData.size()) {
-//                        Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
-//                        label = completedBarData.get(((int) value)).name;
-//                    }
-                    //Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
                     if(value==0 && value<completedBarData.size()){
                         label = completedBarData.get(((int) value)).name;
                     }
@@ -283,41 +278,6 @@ public class StatsFragment extends Fragment {
 
             }
         });
-
-//        GraphView onTimeG = layout.findViewById(R.id.task_onTime_total_graph_best);
-//        BarGraphSeries<DataPoint> seriestwo = new BarGraphSeries<>(new DataPoint[] {
-//                new DataPoint(0, 7),
-//                new DataPoint(1, 7),
-//                new DataPoint(2, 7),
-//                new DataPoint(3, 7),
-//                new DataPoint(4, 7)
-//        });
-//        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-//                new DataPoint(0, -1),
-//                new DataPoint(1, 5),
-//                new DataPoint(2, 3),
-//                new DataPoint(3, 2),
-//                new DataPoint(4, 6)
-//        });
-//        onTimeG.addSeries(series);
-//        onTimeG.addSeries(seriestwo);
-//        onTimeG.setTitle("Best Task On-Time Total");
-//        seriestwo.setSpacing(50);
-
-//        completionG.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter(){
-//
-//            @Override
-//            public String formatLabel(double value, boolean isValueX){
-//                String result = "";
-//                if(isValueX){
-//                    //return "pizza";             //use this to create x axis as category labels
-//                    return super.formatLabel(value, isValueX);
-//                }
-//                else{
-//                    return super.formatLabel(value, isValueX);
-//                }
-//            }
-//        });
     }
 
     public void setUpOnTimeBarGraph(View layout){
