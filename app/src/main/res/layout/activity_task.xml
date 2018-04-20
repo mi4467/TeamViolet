@@ -78,7 +78,7 @@
                                     android:layout_height="wrap_content" />
                                 <TextView
                                     android:id="@+id/due_date_record"
-                                    android:text="\nDue Date: "
+                                    android:text="\nDue Date:   "
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content" />
                                 <TextView
@@ -87,7 +87,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content" />
                                 <TextView
-                                    android:text="\nEnd Time: "
+                                    android:text="\nEnd Time:   "
                                     android:id="@+id/endt_time_record"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content" />
@@ -167,7 +167,7 @@
                                     android:layout_height="wrap_content" />
                                 <TextView
                                     android:id="@+id/completed_record"
-                                    android:text="\nCompleted: "
+                                    android:text="\nCompleted:        "
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content" />
                                 <TextView
@@ -200,7 +200,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content" />
                                 <TextView
-                                    android:text="\nLate: "
+                                    android:text="\nLate:        "
                                     android:id="@+id/late_record"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content" />
@@ -244,6 +244,7 @@
                                 android:layout_height="wrap_content">
                                 <TextView
                                     android:text="Organization Settings"
+                                    android:padding="10dp"
                                     android:textAlignment="center"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content" />
@@ -254,12 +255,14 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content">
                                         <Button
+                                            android:id="@+id/task_act_addCat"
                                             android:text="Add Category"
                                             android:layout_gravity="center"
                                             android:layout_weight="3"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content" />
                                         <Button
+                                            android:id="@+id/task_act_removeCat"
                                             android:text="Remove Category"
                                             android:layout_gravity="center"
                                             android:layout_weight="4"
@@ -280,6 +283,7 @@
                                 android:layout_height="wrap_content">
                                 <TextView
                                     android:text="Management Settings"
+                                    android:padding="10dp"
                                     android:textAlignment="center"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content" />
@@ -289,17 +293,20 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content">
                                     <Button
+                                        android:id="@+id/task_act_mark_complete"
                                         android:text="Mark Complete"
                                         android:layout_gravity="center"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content" />
                                     <Button
+                                        android:id="@+id/task_act_delete"
                                         android:text="Delete"
                                         android:layout_gravity="center"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content" />
 
                                     <ToggleButton
+                                        android:id="@+id/task_act_notification_toggle"
                                         android:layout_width="match_parent"
                                         android:textOff="Notification Off"
                                         android:textOn="Notification On"
@@ -332,21 +339,25 @@
                                 android:weightSum="4"
                                 android:layout_height="wrap_content">
                                 <Button
+                                    android:id="@+id/task_act_start_time"
                                     android:text="Start Time"
                                     android:layout_weight="1"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content" />
                                 <Button
+                                    android:id="@+id/task_act_end_time"
                                     android:text="End Time"
                                     android:layout_weight="1"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content" />
                                 <Button
+                                    android:id="@+id/task_act_due_date"
                                     android:text="Due Date"
                                     android:layout_weight="1"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content" />
                                 <Button
+                                    android:id="@+id/task_act_date_enter"
                                     android:text="Enter"
                                     android:layout_weight="1"
                                     android:layout_width="wrap_content"

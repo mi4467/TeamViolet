@@ -37,6 +37,7 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
        initTaskInfoTable(sqLiteDatabase);
        initTaskStatsTable(sqLiteDatabase);
        initTaskCatStatsTable(sqLiteDatabase);
+       initUserStatsTable(sqLiteDatabase);
        Log.d(TAG, "onCreate: we made the database");
     }
 
@@ -71,7 +72,16 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
                 + "TASK_NAME TEXT, "
                 + "DUE_DATE DATE, "
                 + "START_TIME TIME, "
+                + "NOTIFICATION BOOLEAN,"
                 + "END_TIME TIME);");
+    }
+
+    private void initUserStatsTable(SQLiteDatabase sqLiteDatabase){
+        sqLiteDatabase.execSQL("CREATE TABLE USER_STATS ("
+                                +"CURRENT_STREAK INTEGER,"
+                                +"TOTAL_STREAK INTEGER,"
+                                +"TODAY_SCORE INTEGER,"
+                                +"TOTAL_SCORE INTEGER);");
     }
 
     private void addTaskCategory(SQLiteDatabase sqLiteDatabase, String category){

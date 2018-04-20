@@ -534,4 +534,30 @@ public class SQLfunctionHelper {
         return data;
     }
 
+    public static Cursor getTaskInfo(Context c, int id){
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase read = helper.getReadableDatabase();
+        return read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id, null);
+    }
+
+    public static Cursor getTaskStats(Context c, int id){
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase read = helper.getReadableDatabase();
+        return read.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
+    }
+
+    public static void changeNotification(Context c, int id, boolean state){
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);            //test
+        SQLiteDatabase write = helper.getReadableDatabase();
+        Integer val;
+        if(state){
+            val = 1;
+        }
+        else{
+            val = 0;
+        }
+        write.execSQL("UPDATE TASK_INFORMATION SET NOTIFICATION = " + val + " WHERE _ID = " + id);
+        return;
+    }
+
 }
