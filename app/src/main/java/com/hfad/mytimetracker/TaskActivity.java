@@ -342,7 +342,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d("TaskListenerDebug", "Due Date Was Clicked");
                 break;
             case R.id.task_act_date_enter:
-                changeTaskDate();
+                //changeTaskDate();
                 Log.d("TaskListenerDebug", "Enter Was Clicked");
                 break;
         }
@@ -350,22 +350,22 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    public void changeTaskDate(){           //not finished
-        //Log.d("TaskActivityDebug", "What We Entered: Year = " + year + " Month =  ")
-        //this is where we check all of the information, and if valid, change the properties, and the respective fields
-        String dueDate = TaskCreatorFragment.constructDateStr(year, month, date);
-        String startTime = startHour + "-" + startMinute + "-00";
-        String endTime = endHour + "-" + endMinute + "-00";
-        //TaskCreatorFragment.categoryName = ((EditText) getActivity().findViewById(R.id.cat_name_task_adder)).getText().toString().toUpperCase();
-        //TaskCreatorFragment.taskName = ((EditText) getActivity().findViewById(R.id.task_name_task_adder)).getText().toString();
-        if(!checkValidityOfTask()){
-            return;
-        }
-        TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
-        SQLiteDatabase write = categoryHelper.getWritableDatabase();
-        SQLiteDatabase read = categoryHelper.getReadableDatabase();
-        SQLfunctionHelper.enterTaskInDB(this, taskName, dueDate, startTime, endTime, taskCategoryNames);
-    }
+//    public void changeTaskDate(){           //not finished
+//        //Log.d("TaskActivityDebug", "What We Entered: Year = " + year + " Month =  ")
+//        //this is where we check all of the information, and if valid, change the properties, and the respective fields
+//        String dueDate = TaskCreatorFragment.constructDateStr(year, month, date);
+//        String startTime = startHour + "-" + startMinute + "-00";
+//        String endTime = endHour + "-" + endMinute + "-00";
+//        //TaskCreatorFragment.categoryName = ((EditText) getActivity().findViewById(R.id.cat_name_task_adder)).getText().toString().toUpperCase();
+//        //TaskCreatorFragment.taskName = ((EditText) getActivity().findViewById(R.id.task_name_task_adder)).getText().toString();
+//        if(!checkValidityOfTask()){
+//            return;
+//        }
+//        TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
+//        SQLiteDatabase write = categoryHelper.getWritableDatabase();
+//        SQLiteDatabase read = categoryHelper.getReadableDatabase();
+//        SQLfunctionHelper.enterTaskInDB(this, taskName, dueDate, startTime, endTime, taskCategoryNames);
+//    }
 
     public void markTaskComplete(){
         TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(this);
