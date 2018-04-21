@@ -57,6 +57,7 @@ public class TasksListFragment extends Fragment {
         readableDatabase = dataBaseHelper.getReadableDatabase();
         writableDatabase = dataBaseHelper.getWritableDatabase();
         Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
+        sqlCommand = "SELECT * FROM TASK_STATS";
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
         Cursor data = readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION", null);
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));

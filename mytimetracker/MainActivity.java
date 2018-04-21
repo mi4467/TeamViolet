@@ -27,6 +27,8 @@ import android.widget.Toast;
 import com.amitshekhar.DebugDB;
 import com.facebook.stetho.Stetho;
 
+import junit.framework.Test;
+
 import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
             case R.id.settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
+                Intent intent = new Intent(this, TestMapScroll.class);
                 startActivity(intent);
                 return true;
             default:
@@ -216,7 +218,3 @@ public class MainActivity extends AppCompatActivity {
 
 
 }
-
-
-
-
