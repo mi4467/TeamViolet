@@ -60,7 +60,7 @@
         <GridLayout
             android:id="@+id/GridLayout2"
             android:layout_width="match_parent"
-            android:layout_height="76dp"
+            android:layout_height="72dp"
             android:columnCount="2"
             android:orientation="horizontal"
             android:rowCount="3"
@@ -81,7 +81,7 @@
             <Spinner
                 android:id="@+id/cat_selector"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="46dp" />
         </GridLayout>
 
         <GridLayout
