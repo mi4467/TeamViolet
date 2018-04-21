@@ -79,6 +79,7 @@ public class SQLfunctionHelper {
                 }
             }
         }
+        //deleteNotif(c);
         writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
         writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
     }
@@ -181,11 +182,17 @@ public class SQLfunctionHelper {
                     recordParamaters.put("DUE_DATE", dueDate);
                     recordParamaters.put("START_TIME", startTime);
                     recordParamaters.put("END_TIME", endTime);
+                    recordParamaters.put("NOTIFICATION", 1);
                     //construct date value, start time value, end time value
                     write.insert("TASK_INFORMATION", null, recordParamaters);
 
+//                    Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
+//                    id.moveToFirst();
+
                     Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
                     id.moveToFirst();
+                    Cursor notifCursor = read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id.getInt(0), null);
+                    createNotif(c, notifCursor);
 
                     //We want to put in the task in task stats
                     ContentValues taskStatsParams = new ContentValues();
@@ -262,11 +269,17 @@ public class SQLfunctionHelper {
         recordParamaters.put("DUE_DATE", dueDate);
         recordParamaters.put("START_TIME", startTime);
         recordParamaters.put("END_TIME", endTime);
+        recordParamaters.put("NOTIFICATION", 1);
+
         //construct date value, start time value, end time value
         write.insert("TASK_INFORMATION", null, recordParamaters);
         Log.d("InsertTaskTest", "it worked");
 
         Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
+        id.moveToFirst();
+        Cursor notifCursor = read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id.getInt(0), null);
+        createNotif(c, notifCursor);
+
         id.moveToFirst();
         ContentValues recordParamaterstwo = new ContentValues();
         recordParamaterstwo.put("TASK_NAME", taskName);
@@ -558,6 +571,15 @@ public class SQLfunctionHelper {
         }
         write.execSQL("UPDATE TASK_INFORMATION SET NOTIFICATION = " + val + " WHERE _ID = " + id);
         return;
+    }
+
+    public static void createNotif(Context c, Cursor id){
+        NotificationHelper.createTaskNotif(c, id);
+
+    }
+
+    public static void deleteNotif(Context c, Cursor id){
+
     }
 
 }
