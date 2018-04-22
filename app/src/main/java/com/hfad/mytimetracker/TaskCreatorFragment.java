@@ -215,17 +215,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
     public String[] getCategoryList(){
-//        TimeTrackerDataBaseHelper db = TimeTrackerDataBaseHelper.getInstance(getContext());
-//        SQLiteDatabase read = db.getWritableDatabase();
-//        Cursor categories = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null, null);
-//        String[] result = new String[categories.getCount()];
-//        categories.moveToFirst();
-//        for(int i =0; i<categories.getCount(); i++){
-//            String name = categories.getString(0);
-//            result[i] = name;
-//            categories.moveToNext();
-//        }
-//        return result;
         return SQLfunctionHelper.getCategoryList(getContext());
     }
 
@@ -286,6 +275,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
 
         }
     }
+
 
     private void enterReoccTasksInDB()  {
           TaskCreatorFragment.reoccTaskName = ((EditText) getActivity().findViewById(R.id.reocc_task_name)).getText().toString();
@@ -391,7 +381,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
         SQLiteDatabase read = categoryHelper.getReadableDatabase();
         SQLiteDatabase write = categoryHelper.getWritableDatabase();
-        if(SQLfunctionHelper.enterCatInDB(getActivity(), read, write, cat, categoryName, color)){
+        if(SQLfunctionHelper.enterCatInDB(getActivity(), categoryName, color)){
             TaskCreatorFragment.categoryName = null;
             TaskCreatorFragment.color = null;
         }
@@ -605,6 +595,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         }
         return true;
     }
+
 
     public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 

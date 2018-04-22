@@ -243,7 +243,7 @@ public class CalendarFragment extends Fragment  {
 //        }
 //        writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
 //        writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
-        SQLfunctionHelper.deleteTask(id, readableDatabase, writableDatabase);
+        SQLfunctionHelper.deleteTask(id, getContext());
         Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
         Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
         RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);

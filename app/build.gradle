@@ -61,5 +61,8 @@ dependencies {
     compile 'im.dacer:AndroidCharts:1.0.4'
     compile 'com.github.khacpv:Calendar-Day-View:master-SNAPSHOT'
     compile 'com.github.lecho:hellocharts-android:v1.5.8'
+    androidTestCompile 'com.21buttons:fragment-test-rule:1.0.0'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    testCompile 'org.robolectric:robolectric:3.0'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.3'
 }

@@ -375,7 +375,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
     public void deleteTask(){                               //test
         TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(this);
-        SQLfunctionHelper.deleteTask(taskID, helper.getReadableDatabase(), helper.getWritableDatabase());
+        SQLfunctionHelper.deleteTask(taskID, this);
         return;
     }
 

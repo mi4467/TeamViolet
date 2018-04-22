@@ -760,7 +760,7 @@ public class StatsFragment extends Fragment {
 
     public void initIncompletePieChart(View layout){
         PieChart mPieCharttwo = (PieChart) layout.findViewById(R.id.notCompleted_piechart);
-        ArrayList<CategoryStats> data = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), this);
+        ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
         for(CategoryStats curr : data){
             mPieCharttwo.addPieSlice(new PieModel(curr.name, curr.incomplete, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
         }
@@ -769,7 +769,7 @@ public class StatsFragment extends Fragment {
 
     public void initLatePieChart(View layout){
         PieChart mPieCharttwo = (PieChart) layout.findViewById(R.id.late_piechart);
-        ArrayList<CategoryStats> data = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), this);
+        ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
         for(CategoryStats curr : data){
             mPieCharttwo.addPieSlice(new PieModel(curr.name, curr.late, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
         }

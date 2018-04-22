@@ -64,8 +64,8 @@ public class HomeFragment extends Fragment {
 //        initWorstCompleteBar(layout);
           initTaskListView(layout);
 //        initWorstOnTimeBar(layout);
-//        initCompleteLineChart(layout);
-//        initOnTimeLineChart(layout);
+        initCompleteLineChart(layout);
+        initOnTimeLineChart(layout);
 //        initIncompletePieChart(layout);
 //        initLatePieChart(layout);
 
@@ -233,7 +233,7 @@ public class HomeFragment extends Fragment {
 //
 //    public void initWorstCompleteBar(View layout){
 //        GraphView completionWG = layout.findViewById(R.id.task_completion_total_graph_worst);
-//        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), new StatsFragment());
+//        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), new StatsFragment(), SQLfunctionHelper.getCategoryList(getContext());
 //        for(int i =0; i<data.size(); i++){
 //            if(data.get(i).totalTasksWithCompleteStatus<5){
 //                data.remove(data.get(i));
@@ -370,7 +370,26 @@ public class HomeFragment extends Fragment {
 //    }
 
     public void initCompleteLineChart(View layout){
-        final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasks(getContext(), new StatsFragment());
+        GregorianCalendar gcal = new GregorianCalendar();
+        gcal.setTime(Calendar.getInstance().getTime());
+
+        Map<String, Integer> monthMapper = new HashMap<>();
+        monthMapper.put("Jan", 0);
+        monthMapper.put("Feb", 1);
+        monthMapper.put("Mar", 2);
+        monthMapper.put("Apr", 3);
+        monthMapper.put("May", 4);
+        monthMapper.put("Jun", 5);
+        monthMapper.put("Jul", 6);
+        monthMapper.put("Aug", 7);
+        monthMapper.put("Sep", 8);
+        monthMapper.put("Oct", 9);
+        monthMapper.put("Nov", 10);
+        monthMapper.put("Dec", 11);
+
+        String[] daterep = gcal.getTime().toString().split(" ");
+        String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+        final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
         DataPoint[] total = new DataPoint[7];
         for(int i = 0; i<7; i++){
             total[i] = new DataPoint(i, data.get(total.length-i-1).totalTasksWithCompleteStatus);
@@ -434,7 +453,26 @@ public class HomeFragment extends Fragment {
     }
 
     public void initOnTimeLineChart(View layout){
-        final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasks(getContext(), new StatsFragment());
+        GregorianCalendar gcal = new GregorianCalendar();
+        gcal.setTime(Calendar.getInstance().getTime());
+
+        Map<String, Integer> monthMapper = new HashMap<>();
+        monthMapper.put("Jan", 0);
+        monthMapper.put("Feb", 1);
+        monthMapper.put("Mar", 2);
+        monthMapper.put("Apr", 3);
+        monthMapper.put("May", 4);
+        monthMapper.put("Jun", 5);
+        monthMapper.put("Jul", 6);
+        monthMapper.put("Aug", 7);
+        monthMapper.put("Sep", 8);
+        monthMapper.put("Oct", 9);
+        monthMapper.put("Nov", 10);
+        monthMapper.put("Dec", 11);
+
+        String[] daterep = gcal.getTime().toString().split(" ");
+        String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+        final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
         DataPoint[] total = new DataPoint[7];
         for(int i = 0; i<7; i++){
             total[i] = new DataPoint(i, data.get(total.length-i-1).totalTasksWithOnTimeStatus);

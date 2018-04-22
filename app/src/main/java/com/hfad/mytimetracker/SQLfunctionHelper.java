@@ -38,7 +38,10 @@ public class SQLfunctionHelper {
         return result;
     }
 
-    public static void deleteTask(int id, SQLiteDatabase readableDatabase, SQLiteDatabase writableDatabase){
+    public static void deleteTask(int id, Context c){
+        TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase writableDatabase = categoryHelper.getWritableDatabase();
+        SQLiteDatabase readableDatabase = categoryHelper.getReadableDatabase();
         Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
         temp.moveToFirst();
         boolean completed = temp.getInt(4)==1;
@@ -79,12 +82,13 @@ public class SQLfunctionHelper {
                 }
             }
         }
-        //deleteNotif(c);
+        deleteNotif(c, readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id, null));
         writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
         writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
     }
 
     public static void markComplete(int id, SQLiteDatabase readableDatabase, SQLiteDatabase writableDatabase, boolean onTime){
+        //Something here is broken
         //ADD a check for the general category
         ContentValues completeValue = new ContentValues();
         completeValue.put("COMPLETED", 1);
@@ -221,16 +225,19 @@ public class SQLfunctionHelper {
         }
     }
 
-    public static  boolean enterCatInDB(Context c, SQLiteDatabase read, SQLiteDatabase write, String cat, String categoryName, Integer color) {
+    public static  boolean enterCatInDB(Context c, String categoryName, Integer color) {
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase read = helper.getReadableDatabase();
+        SQLiteDatabase write = helper.getWritableDatabase();
         Cursor check = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null);
         boolean exists = false;
         check.moveToFirst();
         for(int i =0; i<check.getCount(); i++){
             String name = check.getString(0);
             Log.d("CategorySQL", name);
-            if(name.equalsIgnoreCase(cat)){
+            if(name.equalsIgnoreCase(categoryName)){
                 //break and send toast or some shit
-                Toast.makeText(c, "This Category Already Exists!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(c, "This Category Already Exists!", Toast.LENGTH_SHORT).show();
                 Log.d("CategorySQL", "It was in DB already");
                 exists = true;
                 break;
@@ -241,9 +248,9 @@ public class SQLfunctionHelper {
             return false;
         }
         else{
-            write.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + cat + " BOOLEAN;");
+            write.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + categoryName + " BOOLEAN;");
             ContentValues entry = new ContentValues();
-            entry.put("CATEGORY_NAME", cat);
+            entry.put("CATEGORY_NAME", categoryName);
             entry.put("COLOR", color);
             entry.put("COMPLETED", 0);
             entry.put("NOT_COMPLETED", 0);
@@ -251,7 +258,7 @@ public class SQLfunctionHelper {
             entry.put("ON_TIME", 0);
             write.insert("TASK_CATEGORY_INFO", null, entry);
             Log.d("CategorySQL", "We put in DB");
-            Toast.makeText(c, "The Category " + categoryName+ " was made", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(c, "The Category " + categoryName+ " was made", Toast.LENGTH_SHORT).show();
             return true;
             //TaskCreatorFragment.categoryName = null;
             //TaskCreatorFragment.color = null;
@@ -302,104 +309,6 @@ public class SQLfunctionHelper {
         }
         write.insert("TASK_STATS", null, recordParamaterstwo);      //issue here
         Log.d("InsertTaskTest", "it worked");
-    }
-
-    public static ArrayList<StatsFragment.CategoryStats> getFiveBestCompleteCategories(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.CategoryStats> getFiveWorstCompleteCategories(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.CategoryStats> getFiveBestOnTimeCategories(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.CategoryStats> getFiveWorstOnTimeCategories(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data, but do not sort it
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.DayStats> getWeekOnTimeTasks(Context c, StatsFragment frag){
-        GregorianCalendar gcal = new GregorianCalendar();
-        gcal.setTime(Calendar.getInstance().getTime());
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        ArrayList<StatsFragment.DayStats> data = new ArrayList<>();
-        Map<String, Integer> monthMapper = new HashMap<>();
-        monthMapper.put("Jan", 0);
-        monthMapper.put("Feb", 1);
-        monthMapper.put("Mar", 2);
-        monthMapper.put("Apr", 3);
-        monthMapper.put("May", 4);
-        monthMapper.put("Jun", 5);
-        monthMapper.put("Jul", 6);
-        monthMapper.put("Aug", 7);
-        monthMapper.put("Sep", 8);
-        monthMapper.put("Oct", 9);
-        monthMapper.put("Nov", 10);
-        monthMapper.put("Dec", 11);
-        for(int i =0; i<7; i++){
-            Log.d("StatsTimeDebug", gcal.getTime().toString());     //split into word array, then collect indexes 1,2,5 month/day/year into 5,1,2 for sql
-            String[] daterep = gcal.getTime().toString().split(" ");
-            String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
-            Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1", null);
-            int completed = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1", null);
-            int incompleted = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1", null);
-            int onTime = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1", null);
-            int late = dayQuery.getCount();
-            data.add(frag.new DayStats(date, completed, incompleted, onTime, late));
-            gcal.add(Calendar.DATE, -1);
-        }
-        Log.d("StatsCatDateDebug", data.toString());
-        return data;
     }
 
     public static Cursor getTasksGivenDate(Context c, String date){
@@ -476,74 +385,6 @@ public class SQLfunctionHelper {
             categoryStats.moveToNext();
         }
         Log.d("StatsBarDebug", data.toString());     //we return the correct data, but do not sort it
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.DayStats> getWeekCompleteTasks(Context c, StatsFragment frag){
-        GregorianCalendar gcal = new GregorianCalendar();
-        gcal.setTime(Calendar.getInstance().getTime());
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        ArrayList<StatsFragment.DayStats> data = new ArrayList<>();
-        Map<String, Integer> monthMapper = new HashMap<>();
-        monthMapper.put("Jan", 0);
-        monthMapper.put("Feb", 1);
-        monthMapper.put("Mar", 2);
-        monthMapper.put("Apr", 3);
-        monthMapper.put("May", 4);
-        monthMapper.put("Jun", 5);
-        monthMapper.put("Jul", 6);
-        monthMapper.put("Aug", 7);
-        monthMapper.put("Sep", 8);
-        monthMapper.put("Oct", 9);
-        monthMapper.put("Nov", 10);
-        monthMapper.put("Dec", 11);
-        for(int i =0; i<7; i++){
-            Log.d("StatsTimeDebug", gcal.getTime().toString());     //split into word array, then collect indexes 1,2,5 month/day/year into 5,1,2 for sql
-            String[] daterep = gcal.getTime().toString().split(" ");
-            String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
-            Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1", null);
-            int completed = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1", null);
-            int incompleted = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1", null);
-            int onTime = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1", null);
-            int late = dayQuery.getCount();
-            data.add(frag.new DayStats(date, completed, incompleted, onTime, late));
-            gcal.add(Calendar.DATE, -1);
-        }
-        Log.d("StatsCatDateDebug", data.toString());
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.CategoryStats> getLateTasks(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data, but do not sort it
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.CategoryStats> getInCompleteTasks(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data, but do not sort it
         return data;
     }
 

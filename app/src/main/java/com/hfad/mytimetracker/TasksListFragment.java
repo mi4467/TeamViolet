@@ -269,7 +269,7 @@ public class TasksListFragment extends Fragment {
     }
 
     private void deleteTask(int id){
-        SQLfunctionHelper.deleteTask(id, readableDatabase, writableDatabase);
+        SQLfunctionHelper.deleteTask(id, getContext());
         Cursor stats = readableDatabase.rawQuery(sqlCommand, null);
         //Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
         Cursor data = readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION", null);
