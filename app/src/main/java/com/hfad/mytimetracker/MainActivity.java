@@ -43,7 +43,11 @@ public class MainActivity extends AppCompatActivity {
         helper.initalizeDatabase(this);
         helper.initalizeBottomNavagationBar();
         helper.initalizeToolBar();
+        ViewPager viewPager = findViewById(R.id.pager);
+        viewPager.setCurrentItem(2);
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){

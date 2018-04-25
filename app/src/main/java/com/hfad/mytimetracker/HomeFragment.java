@@ -64,12 +64,24 @@ public class HomeFragment extends Fragment {
 //        initWorstCompleteBar(layout);
           initTaskListView(layout);
 //        initWorstOnTimeBar(layout);
-        initCompleteLineChart(layout);
-        initOnTimeLineChart(layout);
+          initCompleteLineChart(layout);
+          initOnTimeLineChart(layout);
 //        initIncompletePieChart(layout);
 //        initLatePieChart(layout);
 
         return layout;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && getView()!=null) {
+            // Do your stuff here
+            initTaskListView(getView());
+            initCompleteLineChart(getView());
+            initOnTimeLineChart(getView());
+        }
+
     }
 
     public void initTaskListView(View layout){
@@ -390,6 +402,7 @@ public class HomeFragment extends Fragment {
         String[] daterep = gcal.getTime().toString().split(" ");
         String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
         final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
+        Log.d("HomeDebug", data.toString());
         DataPoint[] total = new DataPoint[7];
         for(int i = 0; i<7; i++){
             total[i] = new DataPoint(i, data.get(total.length-i-1).totalTasksWithCompleteStatus);

@@ -14,6 +14,7 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
             android:layout_margin="5dp"
             card_view:cardCornerRadius="4dp"
             >
@@ -32,6 +33,7 @@
                     <android.support.v7.widget.CardView
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="4dp"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent">
                         <LinearLayout
@@ -64,6 +66,7 @@
                     <android.support.v7.widget.CardView
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="4dp"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
                         <LinearLayout
@@ -102,6 +105,7 @@
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
             card_view:cardCornerRadius="4dp"
@@ -116,12 +120,13 @@
                     android:id="@+id/task_onTime_total_graph_pick_three" />
                 <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <android.support.v7.widget.CardView
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="4dp"
                         android:layout_width="wrap_content"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
                         android:layout_height="match_parent">
                         <LinearLayout
                             android:orientation="vertical"
@@ -153,6 +158,7 @@
                     <android.support.v7.widget.CardView
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="4dp"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
                         <LinearLayout
@@ -167,16 +173,19 @@
                             <LinearLayout
                                 android:orientation="horizontal"
                                 android:layout_width="wrap_content"
+                                android:weightSum="3"
                                 android:layout_height="wrap_content">
                                 <Button
                                     android:text="Choose Category"
                                     android:id="@+id/filterOnTimeButton"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="2"
                                     android:layout_height="wrap_content" />
                                 <Button
                                     android:text="Enter"
                                     android:id="@+id/filterOnTimeButtonEnter"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
                                     android:layout_height="wrap_content" />
                             </LinearLayout>
                         </LinearLayout>
@@ -188,6 +197,7 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
             android:layout_margin="5dp"
             android:padding = "10dp"
             card_view:cardCornerRadius="4dp"
@@ -202,12 +212,13 @@
                     android:id="@+id/task_complete_week_graph_filter" />
                 <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <android.support.v7.widget.CardView
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="4dp"
                         android:layout_width="wrap_content"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
                         android:layout_height="wrap_content">
                         <LinearLayout
                             android:orientation="vertical"
@@ -247,6 +258,7 @@
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="4dp"
                         android:layout_width="match_parent"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
                         android:layout_height="match_parent">
                         <LinearLayout
                             android:orientation="vertical"
@@ -281,6 +293,7 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
             android:layout_margin="5dp"
             android:padding = "10dp"
             card_view:cardCornerRadius="4dp"
@@ -295,11 +308,12 @@
                     android:id="@+id/onTime_week_graph_filter" />
                 <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <android.support.v7.widget.CardView
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="4dp"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
                         <LinearLayout
@@ -340,12 +354,13 @@
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="4dp"
                         android:layout_width="match_parent"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
                         android:layout_height="match_parent">
                         <LinearLayout
                             android:orientation="vertical"
                             android:padding = "10dp"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
+                            android:layout_height="match_parent">
                             <TextView
                                 android:text="FILTER"
                                 android:layout_width="wrap_content"
@@ -372,50 +387,50 @@
         </android.support.v7.widget.CardView>
 
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="5dp"
+        <!--<android.support.v7.widget.CardView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_margin="5dp"-->
 
-            card_view:cardCornerRadius="4dp"
-            >
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <org.eazegraph.lib.charts.PieChart
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/notCompleted_piechart"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:padding="8dp"
-                    app:egLegendTextSize="18sp"
-                    app:egUsePieRotation="true"
-                    app:egValueTextSize="36sp"/>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+            <!--card_view:cardCornerRadius="4dp"-->
+            <!--&gt;-->
+            <!--<LinearLayout-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+                <!--<org.eazegraph.lib.charts.PieChart-->
+                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                    <!--android:id="@+id/notCompleted_piechart"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="300dp"-->
+                    <!--android:padding="8dp"-->
+                    <!--app:egLegendTextSize="18sp"-->
+                    <!--app:egUsePieRotation="true"-->
+                    <!--app:egValueTextSize="36sp"/>-->
+            <!--</LinearLayout>-->
+        <!--</android.support.v7.widget.CardView>-->
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="5dp"
-            card_view:cardCornerRadius="4dp"
-            >
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <org.eazegraph.lib.charts.PieChart
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/late_piechart"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:padding="8dp"
-                    app:egLegendTextSize="18sp"
-                    app:egUsePieRotation="true"
-                    app:egValueTextSize="36sp"/>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+        <!--<android.support.v7.widget.CardView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_margin="5dp"-->
+            <!--card_view:cardCornerRadius="4dp"-->
+            <!--&gt;-->
+            <!--<LinearLayout-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+                <!--<org.eazegraph.lib.charts.PieChart-->
+                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                    <!--android:id="@+id/late_piechart"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="300dp"-->
+                    <!--android:padding="8dp"-->
+                    <!--app:egLegendTextSize="18sp"-->
+                    <!--app:egUsePieRotation="true"-->
+                    <!--app:egValueTextSize="36sp"/>-->
+            <!--</LinearLayout>-->
+        <!--</android.support.v7.widget.CardView>-->
 
     </LinearLayout>
 

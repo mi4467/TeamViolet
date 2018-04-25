@@ -82,8 +82,6 @@ public class StatsFragment extends Fragment {
 //        initWorstOnTimeBar(layout);
 //        initCompleteLineChart(layout);
 //        initOnTimeLineChart(layout);
-        initIncompletePieChart(layout);
-        initLatePieChart(layout);
         initListeners(layout);
         initField();
         initLayout(layout);
@@ -106,6 +104,21 @@ public class StatsFragment extends Fragment {
 
         //PieChart mChart = layout.findViewById(R.id.chart1);
         return layout;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && getView()!=null) {
+            // Do your stuff here
+            View layout = getView();
+            initListeners(layout);
+            initField();
+            initLayout(layout);
+            setUpCompletionWeekLineGraph(layout);
+            setUpOnTimeWeekLineGraph(layout);
+        }
+
     }
 
     public void initLayout(View layout){
@@ -168,6 +181,9 @@ public class StatsFragment extends Fragment {
         completionWeekEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("Penis", "It should be cleared");
+//                GraphView completeWeek = layout.findViewById(R.id.task_complete_week_graph_filter);
+//                completeWeek.removeAllSeries();
                 setUpCompletionWeekLineGraph(layout);
             }
         });
@@ -370,6 +386,7 @@ public class StatsFragment extends Fragment {
         }
 
         GraphView completeWeek = layout.findViewById(R.id.task_complete_week_graph_filter);
+        //completeWeek.rese
         completeWeek.addSeries(new LineGraphSeries<DataPoint>(total));
         completeWeek.addSeries(new LineGraphSeries<DataPoint>(complete));
         completeWeek.addSeries(new LineGraphSeries<DataPoint>(incomplete));
@@ -405,7 +422,7 @@ public class StatsFragment extends Fragment {
                 }
             }
         });
-        completeWeek.setTitle("On-Time Stats Over Past Week");
+        completeWeek.setTitle("Complete Stats Over Past Week");
 
         TextView totalKey = layout.findViewById(R.id.total_complete_key_filter);
         totalKey.setBackgroundColor(Color.YELLOW);
@@ -757,23 +774,23 @@ public class StatsFragment extends Fragment {
 //
 //    }
 //
-
-    public void initIncompletePieChart(View layout){
-        PieChart mPieCharttwo = (PieChart) layout.findViewById(R.id.notCompleted_piechart);
-        ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
-        for(CategoryStats curr : data){
-            mPieCharttwo.addPieSlice(new PieModel(curr.name, curr.incomplete, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
-        }
-
-    }
-
-    public void initLatePieChart(View layout){
-        PieChart mPieCharttwo = (PieChart) layout.findViewById(R.id.late_piechart);
-        ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
-        for(CategoryStats curr : data){
-            mPieCharttwo.addPieSlice(new PieModel(curr.name, curr.late, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
-        }
-    }
+//
+//    public void initIncompletePieChart(View layout){
+//        PieChart mPieCharttwo = (PieChart) layout.findViewById(R.id.notCompleted_piechart);
+//        ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
+//        for(CategoryStats curr : data){
+//            mPieCharttwo.addPieSlice(new PieModel(curr.name, curr.incomplete, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
+//        }
+//
+//    }
+//
+//    public void initLatePieChart(View layout){
+//        PieChart mPieCharttwo = (PieChart) layout.findViewById(R.id.late_piechart);
+//        ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
+//        for(CategoryStats curr : data){
+//            mPieCharttwo.addPieSlice(new PieModel(curr.name, curr.late, Color.parseColor(String.format("#%06X", (0xFFFFFF & curr.color)))));
+//        }
+//    }
 
     public void showCompleteTaskCatSelection(){
         new MaterialDialog.Builder(getContext())
@@ -912,8 +929,10 @@ public class StatsFragment extends Fragment {
             return "DATE = " + this.date + "\n" +
                     "Complete # = " + this.complete + "\n" +
                     "InComplete # = " + this.incomplete + "\n" +
+                    "TotalWithComplete # = " + this.totalTasksWithCompleteStatus + "\n" +
                     "onTime # = " + this.onTime + "\n" +
-                    "Late # = " + this.late + "\n";
+                    "Late # = " + this.late + "\n" +
+                    "TotalWithPunct # = " + this.totalTasksWithOnTimeStatus;
         }
 
     }

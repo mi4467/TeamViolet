@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -97,20 +98,48 @@ public class TasksListFragment extends Fragment {
         enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("ButtonDebug", "We entered to submit a task");
                 if(taskCategoryNames==null){
-                    Toast.makeText(getActivity(), "Choose Categories", Toast.LENGTH_LONG);
+                    Log.d("ButtonDebug", "We are returning");
+                    Toast.makeText(getActivity(), "Choose Categories", Toast.LENGTH_LONG).show();
                     return;
                 }
-                Log.d("ButtonDebug", "We entered");
                 Cursor next = constructCommand();
                 resetFilters();
                 RecyclerView recyclerView = layout.findViewById(R.id.recycler_view_task_list_viewer);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                 recyclerView.setAdapter(new TasksListFragment.SimpleAdapter(recyclerView,next));
+                resetFilters();
             }
         });
-
+        resetFilters();
         return layout;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        RecyclerView recyclerView = getView().findViewById(R.id.recycler_view_task_list_viewer);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
+        readableDatabase = dataBaseHelper.getReadableDatabase();
+        writableDatabase = dataBaseHelper.getWritableDatabase();
+        Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
+        sqlCommand = "SELECT * FROM TASK_STATS";
+        Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
+        Cursor data = readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION", null);
+        Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
+        int resId = R.anim.layout_animation_fall_down;
+        recyclerView.setAdapter(new TasksListFragment.SimpleAdapter(recyclerView,stats));
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && getView()!=null) {
+            // Do your stuff here
+            this.onResume();
+        }
     }
 
     private void resetFilters(){
@@ -122,14 +151,17 @@ public class TasksListFragment extends Fragment {
     }
 
     private Cursor constructCommand(){
+        Log.d("TaskFilterDebug", "Before - Complete: " + completed + " Incomplete: " + notCompleted + " On-Time: " + onTime + " Late: " + notOnTime);
+        Log.d("TaskFilterDebug", "We entered constructCommand");
         if(completed==false && notCompleted==false){
             completed = true;
             notCompleted = true;
         }
         if(onTime == false && notOnTime == false){
             onTime = true;
-            notCompleted = true;
+            notOnTime = true;
         }
+        Log.d("TaskFilterDebug", "After - Complete: " + completed + " Incomplete: " + notCompleted + " On-Time: " + onTime + " Late: " + notOnTime);
         StringBuilder cmd = new StringBuilder();
         cmd.append("SELECT * FROM TASK_STATS WHERE ( ");
         for(int i = 0; i<taskCategoryNames.length-1; i++){
@@ -148,17 +180,17 @@ public class TasksListFragment extends Fragment {
         else{
             cmd.append("OR NOT_COMPLETED = 0 ) ");
         }
-        if(onTime){
-            cmd.append("AND ( ON_TIME = 1 ");
-        }
-        else{
-            cmd.append("AND ( ON_TIME = 0 ");
-        }
-        if(notOnTime){
-            cmd.append(" OR NOT_ON_TIME = 1 )");
-        }
-        else{
-            cmd.append("OR NOT_ON_TIME = 0 )");
+        if(!(onTime && notOnTime)) {            //since both can have zeroes at the same time
+            if (onTime) {
+                cmd.append("AND ( ON_TIME = 1 ");
+            } else {
+                cmd.append("AND ( ON_TIME = 0 ");
+            }
+            if (notOnTime) {
+                cmd.append(" OR NOT_ON_TIME = 1 )");
+            } else {
+                cmd.append("OR NOT_ON_TIME = 0 )");
+            }
         }
         sqlCommand = new String(cmd);
         Cursor result = readableDatabase.rawQuery(sqlCommand, null);
@@ -180,6 +212,7 @@ public class TasksListFragment extends Fragment {
                 })
                 .positiveText("confirm")
                 .negativeText("cancel")
+                .backgroundColor(Color.parseColor("#263238"))
                 .show();
     }
 
@@ -212,6 +245,7 @@ public class TasksListFragment extends Fragment {
                 })
                 .positiveText("confirm")
                 .negativeText("cancel")
+                .backgroundColor(Color.parseColor("#263238"))
                 .show();
     }
 
@@ -244,6 +278,7 @@ public class TasksListFragment extends Fragment {
                 })
                 .positiveText("confirm")
                 .negativeText("cancel")
+                .backgroundColor(Color.parseColor("#263238"))
                 .show();
     }
 
@@ -342,7 +377,7 @@ public class TasksListFragment extends Fragment {
 //        }
         verifyOnTime(id);
 
-        SQLfunctionHelper.markComplete(id, readableDatabase, writableDatabase, verifyOnTime(id));
+        SQLfunctionHelper.markComplete(id, TimeTrackerDataBaseHelper.getInstance(getContext()), verifyOnTime(id));
         //Then iterate through category information and update the values for the categories the task belongs to
 
     }
@@ -354,7 +389,7 @@ public class TasksListFragment extends Fragment {
         int dueYear = Integer.parseInt(dueDate[0]);
         int dueDay = Integer.parseInt(dueDate[2]);
         int dueMonth = Integer.parseInt(dueDate[1]);
-        String[] dueTime = check.getString(4).split("-");
+        String[] dueTime = check.getString(5).split("-");
         int dueHour = Integer.parseInt(dueTime[0]);
         int dueMin = Integer.parseInt(dueTime[1]);
         Log.d("MarkCompleteDebug", Arrays.toString(dueDate));

@@ -87,6 +87,53 @@ public class CalendarFragment extends Fragment  {
         return layout;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        Calendar today = Calendar.getInstance();
+        Integer cday = today.get(Calendar.DAY_OF_MONTH);
+        Integer cmonth = today.get(Calendar.MONTH);
+        Integer cyear = today.get(Calendar.YEAR);
+        RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
+        readableDatabase = dataBaseHelper.getReadableDatabase();
+        writableDatabase = dataBaseHelper.getWritableDatabase();
+        String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
+        currentDate = date;
+        Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
+        Log.d("CursorDebug", date);
+        Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
+        Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
+        int resId = R.anim.layout_animation_fall_down;
+        recyclerView.setAdapter(new SimpleAdapter(recyclerView, data, stats));       //pass in a cursor, then use this cursor to bind in data
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && getView()!=null) {
+            Calendar today = Calendar.getInstance();
+            Integer cday = today.get(Calendar.DAY_OF_MONTH);
+            Integer cmonth = today.get(Calendar.MONTH);
+            Integer cyear = today.get(Calendar.YEAR);
+            RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
+            readableDatabase = dataBaseHelper.getReadableDatabase();
+            writableDatabase = dataBaseHelper.getWritableDatabase();
+            String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
+            currentDate = date;
+            Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
+            Log.d("CursorDebug", date);
+            Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
+            Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
+            int resId = R.anim.layout_animation_fall_down;
+            recyclerView.setAdapter(new SimpleAdapter(recyclerView, data, stats));
+        }
+    }
+
+
     private void markComplete(int id){
 //        //ADD a check for the general category
 //        ContentValues completeValue = new ContentValues();
@@ -151,7 +198,7 @@ public class CalendarFragment extends Fragment  {
 //        }
         verifyOnTime(id);
 
-        SQLfunctionHelper.markComplete(id, readableDatabase, writableDatabase, verifyOnTime(id));
+        SQLfunctionHelper.markComplete(id, TimeTrackerDataBaseHelper.getInstance(getContext()), verifyOnTime(id));
         //Then iterate through category information and update the values for the categories the task belongs to
 
     }
@@ -163,7 +210,7 @@ public class CalendarFragment extends Fragment  {
         int dueYear = Integer.parseInt(dueDate[0]);
         int dueDay = Integer.parseInt(dueDate[2]);
         int dueMonth = Integer.parseInt(dueDate[1]);
-        String[] dueTime = check.getString(4).split("-");
+        String[] dueTime = check.getString(5).split("-");
         int dueHour = Integer.parseInt(dueTime[0]);
         int dueMin = Integer.parseInt(dueTime[1]);
         Log.d("MarkCompleteDebug", Arrays.toString(dueDate));

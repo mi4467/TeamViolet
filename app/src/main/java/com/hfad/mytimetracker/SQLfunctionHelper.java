@@ -87,7 +87,9 @@ public class SQLfunctionHelper {
         writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
     }
 
-    public static void markComplete(int id, SQLiteDatabase readableDatabase, SQLiteDatabase writableDatabase, boolean onTime){
+    public static void markComplete(int id, TimeTrackerDataBaseHelper helper, boolean onTime){
+        SQLiteDatabase readableDatabase = helper.getReadableDatabase();
+        SQLiteDatabase writableDatabase = helper.getWritableDatabase();
         //Something here is broken
         //ADD a check for the general category
         ContentValues completeValue = new ContentValues();
@@ -352,13 +354,17 @@ public class SQLfunctionHelper {
             Log.d("StatsTimeDebug", gcal.getTime().toString());     //split into word array, then collect indexes 1,2,5 month/day/year into 5,1,2 for sql
             String[] daterep = gcal.getTime().toString().split(" ");
             String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+            Log.d("DayStatsDebug","SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1" );
+            Log.d("DayStatsDebug","SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1");
+            Log.d("DayStatsDebug","SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1");
+            Log.d("DayStatsDebug", "SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1");
             Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1", null);
             int completed = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1", null);
+            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = '" + date + "' AND NOT_COMPLETED = 1", null);
             int incompleted = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1", null);
+            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = '" + date + "' AND ON_TIME = 1", null);
             int onTime = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1", null);
+            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = '" + date + "' AND NOT_ON_TIME = 1", null);
             int late = dayQuery.getCount();
             data.add(frag.new DayStats(date, completed, incompleted, onTime, late));
             gcal.add(Calendar.DATE, -1);
@@ -415,7 +421,7 @@ public class SQLfunctionHelper {
     }
 
     public static void createNotif(Context c, Cursor id){
-        NotificationHelper.createTaskNotif(c, id);
+       // NotificationHelper.createTaskNotif(c, id);
 
     }
 
