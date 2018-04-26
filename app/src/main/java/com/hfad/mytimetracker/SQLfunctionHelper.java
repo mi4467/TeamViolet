@@ -398,7 +398,7 @@ public class SQLfunctionHelper {
         categoryStats.moveToFirst();
         ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
         for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
+            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(6), categoryStats.getInt(5));
             data.add(temp);
             categoryStats.moveToNext();
         }

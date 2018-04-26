@@ -1,5 +1,7 @@
 package com.hfad.mytimetracker;
 
+import android.app.job.JobInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -33,6 +35,7 @@ import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
     MenuItem prevMenuItem;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,13 @@ public class MainActivity extends AppCompatActivity {
         helper.initalizeToolBar();
         ViewPager viewPager = findViewById(R.id.pager);
         viewPager.setCurrentItem(2);
+
+    }
+
+    private void setUpChronJob(){
+        ComponentName componentName = new ComponentName(this, ScoreUpdaterAndLateMarkerChronJob.class);
+//        JobInfo jobInfor = new JobInfo.Builder(12, componentName)
+//                                .setPeriodic(21600000)
 
     }
 

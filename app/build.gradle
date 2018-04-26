@@ -45,6 +45,7 @@ dependencies {
     compile 'com.github.QuadFlask:colorpicker:0.0.13'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation 'com.evernote:android-job:1.2.5'
     compile 'com.github.sundeepk:compact-calendar-view:2.0.2.3'
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'com.github.traex.expandablelayout:library:1.3'

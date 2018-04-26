@@ -59,9 +59,9 @@ public class HomeFragment extends Fragment {
 //        bottomNavigationView.getMenu().getItem(3).setChecked(true);
         final View layout = inflater.inflate(R.layout.fragment_home, container, false);
 
-//        initBestCompleteBar(layout);        //these functions set up the respective cardviews
+          initBestCompleteBar(layout);        //these functions set up the respective cardviews
 //        initBestOnTimeBar(layout);          //as of right now these hold dummy data, in these functions implement the neccessary sql needed to show this
-//        initWorstCompleteBar(layout);
+          initWorstCompleteBar(layout);
           initTaskListView(layout);
 //        initWorstOnTimeBar(layout);
           initCompleteLineChart(layout);
@@ -80,6 +80,8 @@ public class HomeFragment extends Fragment {
             initTaskListView(getView());
             initCompleteLineChart(getView());
             initOnTimeLineChart(getView());
+            initBestCompleteBar(getView());
+            initWorstCompleteBar(getView());
         }
 
     }
@@ -161,168 +163,74 @@ public class HomeFragment extends Fragment {
     }
 
 
-//    public void initBestCompleteBar(View layout){
-//        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), new StatsFragment());
-//        for(int i =0; i<data.size(); i++){
-//            if(data.get(i).totalTasksWithCompleteStatus<5){
-//                data.remove(data.get(i));
-//                i--;
-//            }
-//        }
-//
-//        data.sort(new BestCompletionComparator());
-//
-//        //ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
-//        if(data.size()==0){
-//            return;
-//        }
+    public void initBestCompleteBar(View layout){
+        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), new StatsFragment());
+        for(int i =0; i<data.size(); i++){
+            if(data.get(i).totalTasksWithCompleteStatus<5 || data.get(i).totalTasksWithOnTimeStatus<5){
+                data.remove(data.get(i));
+                i--;
+            }
+        }
+
+        data.sort(new BestCompletionComparator());
+
+        //ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
+        if(data.size()==0){
+            return;
+        }
 //        completedBarData = new ArrayList<>();
-//        for(int i = 0; i<3 && i<data.size(); i++){
-//            completedBarData.add(data.get(i));
-//        }
+
+        int i = 0;
+        StringBuilder s = new StringBuilder();
+        for(i = 0; i<5 && i<data.size(); i++){
+            //completedBarData.add(data.get(i));
+            s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n"  + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
+        }
+        if(i==5){
+            s.append("....\n");
+        }
+        if(i==0){
+            s.append("\nNo Qualifying Data\n");
+        }
+
+        TextView text = layout.findViewById(R.id.best_categories);
+        text.setText(s.substring(1));
+    }
 //
-//        //completedBarData =
-//        GraphView completionG = layout.findViewById(R.id.hahaha);
-//        completionG.removeAllSeries();
-//        DataPoint[] completed = new DataPoint[completedBarData.size()];
-//        for(int i =0; i< completed.length; i++){
-//            completed[i] = new DataPoint(i, completedBarData.get(i).complete);
-//        }
-//        BarGraphSeries<DataPoint> completedSeries = new BarGraphSeries<>(completed);
-//        completedSeries.setColor(Color.GREEN);
-//
-//        DataPoint[] incomplete = new DataPoint[completedBarData.size()];
-//        for(int i =0; i< incomplete.length; i++){
-//            incomplete[i] = new DataPoint(i, completedBarData.get(i).incomplete);
-//        }
-//        BarGraphSeries<DataPoint> incompleteSeries = new BarGraphSeries<>(incomplete);
-//        incompleteSeries.setColor(Color.RED);
-//        incompleteSeries.setDataWidth(.8);
-//        completedSeries.setDataWidth(.8);
-//
-//        completionG.addSeries(completedSeries);
-//        completionG.addSeries(incompleteSeries);
-//        Log.d("HomeBarDebugCompleteBar", data.toString());
-//        for(int i =0; i< incomplete.length; i++){
-//            Log.d("HomeBarDebugCompleteBar", "Name: " + data.get(i).name + " X-Value: " + i + " Complete#: " + data.get(i).complete + " InComplete#: " + data.get(i).incomplete);
-//        }
-//        //barFilterComplete.
-//        //completionG.getGridLabelRenderer().setNumHorizontalLabels(completedBarData.size()+2);
-//        completionG.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter() {
-//
-//
-//            @Override
-//            public String formatLabel(double value, boolean isValueX){
-//                String label = null;
-//                if(isValueX){
-////                    if(value<completedBarData.size()) {
-////                        Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
-////                        label = completedBarData.get(((int) value)).name;
-////                    }
-//                    //Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
-//                    if(value==0 && value<completedBarData.size()){
-//                        label = completedBarData.get(((int) value)).name;
-//                    }
-//                    if(value==1 && value<completedBarData.size()){
-//                        label = completedBarData.get(((int) value)).name;
-//                    }
-//                    if(value==2 && value<completedBarData.size()){
-//                        label = completedBarData.get(((int) value)).name;
-//                    }
-//                    return label;
-//                }
-//                else{
-//                    return  super.formatLabel(value, isValueX);
-//                }
-//
-//            }
-//        });
-//
-//        completionG.getViewport().setMinY(0.0);
-//        completionG.getViewport().setMinX(-5.0);
-//        completionG.getViewport().setMaxX(5.0);
-//    }
-//
-//    public void initWorstCompleteBar(View layout){
-//        GraphView completionWG = layout.findViewById(R.id.task_completion_total_graph_worst);
-//        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), new StatsFragment(), SQLfunctionHelper.getCategoryList(getContext());
-//        for(int i =0; i<data.size(); i++){
-//            if(data.get(i).totalTasksWithCompleteStatus<5){
-//                data.remove(data.get(i));
-//                i--;
-//            }
-//        }
-//
-//        data.sort(new BestCompletionComparator());
-//        Collections.reverse(data);
-//
-//        //ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
-//        if(data.size()==0){
-//            return;
-//        }
+    public void initWorstCompleteBar(View layout){
+        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), new StatsFragment());
+        for(int i =0; i<data.size(); i++){
+            if(data.get(i).totalTasksWithCompleteStatus<5 || data.get(i).totalTasksWithOnTimeStatus<5){
+                data.remove(data.get(i));
+                i--;
+            }
+        }
+
+        data.sort(new BestCompletionComparator());
+        Collections.reverse(data);
+
+        //ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
+        if(data.size()==0){
+            return;
+        }
 //        completedBarData = new ArrayList<>();
-//        for(int i = 0; i<3 && i<data.size(); i++){
-//            completedBarData.add(data.get(i));
-//        }
-//        completionWG.removeAllSeries();
-//        DataPoint[] completed = new DataPoint[completedBarData.size()];
-//        for(int i =0; i< completed.length; i++){
-//            completed[i] = new DataPoint(i, completedBarData.get(i).complete);
-//        }
-//        BarGraphSeries<DataPoint> completedSeries = new BarGraphSeries<>(completed);
-//        completedSeries.setColor(Color.GREEN);
-//
-//        DataPoint[] incomplete = new DataPoint[completedBarData.size()];
-//        for(int i =0; i< incomplete.length; i++){
-//            incomplete[i] = new DataPoint(i, completedBarData.get(i).incomplete);
-//        }
-//        BarGraphSeries<DataPoint> incompleteSeries = new BarGraphSeries<>(incomplete);
-//        incompleteSeries.setColor(Color.RED);
-//        incompleteSeries.setDataWidth(.8);
-//        completedSeries.setDataWidth(.8);
-//
-//        completionWG.addSeries(completedSeries);
-//        completionWG.addSeries(incompleteSeries);
-//        Log.d("HomeBarDebugCompleteBarWorst", data.toString());
-//        for(int i =0; i< incomplete.length; i++){
-//            Log.d("HomeBarDebugCompleteBarWorst", "Name: " + data.get(i).name + " X-Value: " + i + " Complete#: " + data.get(i).complete + " InComplete#: " + data.get(i).incomplete);
-//        }
-//        //barFilterComplete.
-//        //completionG.getGridLabelRenderer().setNumHorizontalLabels(completedBarData.size()+2);
-//        completionWG.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter() {
-//
-//
-//            @Override
-//            public String formatLabel(double value, boolean isValueX){
-//                String label = null;
-//                if(isValueX){
-////                    if(value<completedBarData.size()) {
-////                        Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
-////                        label = completedBarData.get(((int) value)).name;
-////                    }
-//                    //Log.d("StatsLabelDebug", "Position: " + value + " Label: " + completedBarData.get(((int) value)).name);
-//                    if(value==0 && value<completedBarData.size()){
-//                        label = completedBarData.get(((int) value)).name;
-//                    }
-//                    if(value==1 && value<completedBarData.size()){
-//                        label = completedBarData.get(((int) value)).name;
-//                    }
-//                    if(value==2 && value<completedBarData.size()){
-//                        label = completedBarData.get(((int) value)).name;
-//                    }
-//                    return label;
-//                }
-//                else{
-//                    return  super.formatLabel(value, isValueX);
-//                }
-//
-//            }
-//        });
-//
-//        completionWG.getViewport().setMinY(0.0);
-//        completionWG.getViewport().setMinX(-5.0);
-//        completionWG.getViewport().setMaxX(5.0);
-//    }
+
+        int i = 0;
+        StringBuilder s = new StringBuilder();
+        for(i = 0; i<5 && i<data.size(); i++){
+            //completedBarData.add(data.get(i));
+            s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n"  + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
+        }
+        if(i==5){
+            s.append("....\n");
+        }
+        if(i==0){
+            s.append("\nNo Qualifying Data\n");
+        }
+
+        TextView text = layout.findViewById(R.id.worst_categories);
+        text.setText(s.substring(1));
+    }
 //
 //    public void initBestOnTimeBar(View layout){
 //        GraphView onTimeG = layout.findViewById(R.id.task_onTime_total_graph_best);
