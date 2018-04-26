@@ -98,9 +98,19 @@ public class SQLfunctionHelper {
         //writableDatabase = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
         Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
         temp.moveToFirst();
+        int completed = temp.getInt(4);
+        if(completed==1){       //check to make sure we can't mark complete twice
+            return;
+        }
+        else{
+            //add points for completing a task here, make a call to that function
+        }
         //we have to check to see if it's on time or not, mark those values in TASK_STATS
         Log.d("MarkCompleteDebug", "Is it on time: " + onTime);
+        boolean alreadyMarkedLate = temp.getInt(7)==1;
+
         if(onTime){
+            addToScore(helper, true);
             completeValue.put("ON_TIME", 1);
             completeValue.put("NOT_ON_TIME", 0);
             writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
@@ -127,6 +137,7 @@ public class SQLfunctionHelper {
             }
         }
         else{
+            addToScore(helper,false);
             completeValue.put("ON_TIME", 0);
             completeValue.put("NOT_ON_TIME", 1);
             writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
@@ -144,11 +155,12 @@ public class SQLfunctionHelper {
                             "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
                             "WHERE CATEGORY_NAME = \"" +
                             temp.getColumnName(i) + "\"");
-
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET NOT_ON_TIME = NOT_ON_TIME + 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");
+                    if(!alreadyMarkedLate) {                                        //makes sure we don't up the late count if the chron job already marks it late
+                        writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                                "SET NOT_ON_TIME = NOT_ON_TIME + 1 " +
+                                "WHERE CATEGORY_NAME = \"" +
+                                temp.getColumnName(i) + "\"");
+                    }
                 }
             }
         }
@@ -427,6 +439,89 @@ public class SQLfunctionHelper {
 
     public static void deleteNotif(Context c, Cursor id){
 
+    }
+
+
+    public static void addCatTaskActivity(Context c, CharSequence[] categories, int id){
+        SQLiteDatabase writableDatabase = TimeTrackerDataBaseHelper.getInstance(c).getWritableDatabase();
+        SQLiteDatabase readableDatabase = TimeTrackerDataBaseHelper.getInstance(c).getReadableDatabase();
+        ContentValues data = new ContentValues();
+        Cursor valuesOfTask = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
+        valuesOfTask.moveToFirst();
+        for(int i =0; i<categories.length; i++){
+            Cursor temp = readableDatabase.rawQuery("SELECT " + categories[i].toString() + "FROM TASK_STATS WHERE TASK_ID = " + id, null);
+            temp.moveToFirst();
+            data.put(categories[i].toString(), 1);
+            if(temp.getInt(0)==0){
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET COMPLETED = COMPLETED + " + valuesOfTask.getInt(4) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_COMPLETED = NOT_COMPLETED + " + valuesOfTask.getInt(6) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_ON_TIME = NOT_ON_TIME + " + valuesOfTask.getInt(7) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET ON_TIME = ON_TIME + " + valuesOfTask.getInt(8) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+            }
+        }
+        writableDatabase.update("TASK_STATS", data, "TASK_ID = " + id, null);
+    }
+
+    public static void removeCatTaskActivity(Context c, CharSequence[] categories, int id){
+        SQLiteDatabase writableDatabase = TimeTrackerDataBaseHelper.getInstance(c).getWritableDatabase();
+        SQLiteDatabase readableDatabase = TimeTrackerDataBaseHelper.getInstance(c).getReadableDatabase();
+        Cursor valuesOfTask = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
+        valuesOfTask.moveToFirst();
+        ContentValues data = new ContentValues();
+        for(int i =0; i<categories.length; i++){
+            Cursor temp = readableDatabase.rawQuery("SELECT " + categories[i].toString() + "FROM TASK_STATS WHERE TASK_ID = " + id, null);
+            temp.moveToFirst();
+            data.put(categories[i].toString(), 0);
+            if(temp.getInt(0)==1){
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET COMPLETED = COMPLETED - " + valuesOfTask.getInt(4) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_COMPLETED = NOT_COMPLETED - " + valuesOfTask.getInt(6) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_ON_TIME = NOT_ON_TIME - " + valuesOfTask.getInt(7) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET ON_TIME = ON_TIME - " + valuesOfTask.getInt(8) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+            }
+        }
+        writableDatabase.update("TASK_STATS", data, "TASK_ID = " + id, null);
+    }
+
+    public static void changeTimeData(Context c, int id, String dueDate, String startTime, String endTime){
+        TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(c);
+        SQLiteDatabase write = categoryHelper.getWritableDatabase();
+        SQLiteDatabase read = categoryHelper.getReadableDatabase();
+
+        ContentValues taskInfo = new ContentValues();                   //insert task info, insert task stats
+        //recordParamaters.put("TASK_CATEGORY", TaskCreatorFragment.taskCategoryName);
+        taskInfo.put("DUE_DATE", dueDate);
+        taskInfo.put("START_TIME", startTime);
+        taskInfo.put("END_TIME", endTime);
+
+        write.update("TASK_INFORMATION", taskInfo, "_ID = " + id, null);
+
+        ContentValues taskStats = new ContentValues();
+        taskStats.put("DUE_DATE", dueDate);
+        write.update("TASK_STATS", taskStats, "TASK_ID = " + id, null);
+
+    }
+
+    public static void addToScore(TimeTrackerDataBaseHelper c, boolean onTime){
+        //award fifty points if it's just complete, award 100 if its onTime as well
+        //add to the today score and for the total score
+        SQLiteDatabase write = c.getWritableDatabase();
+        if(onTime){
+            write.execSQL("UPDATE USER_STATS SET TODAY_SCORE = TODAY_SCORE + 10");
+            write.execSQL("UPDATE USER_STATS SET TOTAL_SCORE = TOTAL_SCORE + 10");
+        }
+        else {
+            write.execSQL("UPDATE USER_STATS SET TODAY_SCORE = TODAY_SCORE +5");
+            write.execSQL("UPDATE USER_STATS SET TOTAL_SCORE = TOTAL_SCORE +5");
+        }
+
+    }
+
+    public static void removeFromScore(TimeTrackerDataBaseHelper c){
+        //take away a hundred points if it's late
+        //subtract to the today score and for the total score
+        SQLiteDatabase write = c.getWritableDatabase();
+        write.execSQL("UPDATE USER_STATS SET TODAY_SCORE = TODAY_SCORE - 10");
+        write.execSQL("UPDATE USER_STATS SET TOTAL_SCORE = TOTAL_SCORE - 10");
     }
 
 }

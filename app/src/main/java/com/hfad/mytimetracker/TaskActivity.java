@@ -3,6 +3,7 @@ package com.hfad.mytimetracker;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -74,6 +75,8 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     private String incompleteHeader = "\nNot Completed: ";
     private String onTimeHeader = "\nOn Time: ";
     private String lateHeader = "\nLate:        ";
+
+    Context currentActivity = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +164,9 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 //            Toast.makeText(getActivity(), "Choose a Category!", Toast.LENGTH_SHORT).show();
 //            return false;
 //        } Don't need this for now
+
+        //add a check to see if we are late, if we are late, then return false
+
         if(endHour<startHour || (endHour==startHour && endMinute<startMinute)){
             Toast.makeText(this, "This Time is Invalid! Make End Time After Start Time", Toast.LENGTH_SHORT).show();
             return false;
@@ -318,6 +324,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         addCategoryNames =  text;
+                        SQLfunctionHelper.addCatTaskActivity(currentActivity, addCategoryNames, taskID);
                         return true;
                     }
                 })
@@ -335,6 +342,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         removeCategoryNames = text;
+                        SQLfunctionHelper.removeCatTaskActivity(currentActivity, removeCategoryNames, taskID);
                         return true;
                     }
                 })
@@ -401,12 +409,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         String dueDate = TaskCreatorFragment.constructDateStr(year, month, date);
         String startTime = startHour + "-" + startMinute + "-00";
         String endTime = endHour + "-" + endMinute + "-00";
-        //TaskCreatorFragment.categoryName = ((EditText) getActivity().findViewById(R.id.cat_name_task_adder)).getText().toString().toUpperCase();
-        //TaskCreatorFragment.taskName = ((EditText) getActivity().findViewById(R.id.task_name_task_adder)).getText().toString();
-//        TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
-//        SQLiteDatabase write = categoryHelper.getWritableDatabase();
-//        SQLiteDatabase read = categoryHelper.getReadableDatabase();
-//        SQLfunctionHelper.enterTaskInDB(this, taskName, dueDate, startTime, endTime, taskCategoryNames);
+        SQLfunctionHelper.changeTimeData(this, taskID, dueDate, startTime, endTime);
     }
 
     public void markTaskComplete(){
