@@ -243,7 +243,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         else {
             startTime += Integer.parseInt(startTimeRep[0]) % 12 + ":";
         }
-        if(Integer.parseInt(startTimeRep[1])==0){
+        if(Integer.parseInt(startTimeRep[1])<10){
             startTime += "0";
         }
         startTime += Integer.parseInt(startTimeRep[1]) + " ";
@@ -264,7 +264,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         else {
             endTime += Integer.parseInt(endTimeRep[0]) % 12 + ":";
         }
-        if(Integer.parseInt(endTimeRep[1])==0){
+        if(Integer.parseInt(endTimeRep[1])<10){
             endTime += "0";
         }
         endTime += Integer.parseInt(endTimeRep[1]) + " ";
@@ -325,6 +325,8 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         addCategoryNames =  text;
                         SQLfunctionHelper.addCatTaskActivity(currentActivity, addCategoryNames, taskID);
+                        stats = SQLfunctionHelper.getTaskStats(TaskActivity.this, taskID);
+                        initOrgInformation();
                         return true;
                     }
                 })
@@ -343,6 +345,8 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         removeCategoryNames = text;
                         SQLfunctionHelper.removeCatTaskActivity(currentActivity, removeCategoryNames, taskID);
+                        stats = SQLfunctionHelper.getTaskStats(TaskActivity.this, taskID);
+                        initOrgInformation();
                         return true;
                     }
                 })
@@ -409,7 +413,10 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         String dueDate = TaskCreatorFragment.constructDateStr(year, month, date);
         String startTime = startHour + "-" + startMinute + "-00";
         String endTime = endHour + "-" + endMinute + "-00";
+        Log.d("TaskActivityTimeDebug", "We are about to enter the change time data");
         SQLfunctionHelper.changeTimeData(this, taskID, dueDate, startTime, endTime);
+        info = SQLfunctionHelper.getTaskInfo(this, taskID);
+        initTimeInformation();
     }
 
     public void markTaskComplete(){
@@ -439,7 +446,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void showTimePickerDialog(View v) {
-        DialogFragment newFragment = new TaskCreatorFragment.TimePickerFragment();
+        DialogFragment newFragment = new TimePickerFragment();
         Log.d("time picker test", "it entered the showTimePickerDialog");
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
@@ -475,7 +482,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
 
     public void showDatePickerDialog(View v) {
-        DialogFragment newFragment = new TaskCreatorFragment.DatePickerFragment();
+        DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
@@ -499,6 +506,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
             TaskActivity.year = year;
             TaskActivity.month = month;
             TaskActivity.date = day;
+            Log.d("TaskActivityDebug", TaskActivity.year + "/" + TaskActivity.month + "/" + TaskActivity.date);
         }
     }
 }

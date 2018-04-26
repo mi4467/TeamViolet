@@ -449,7 +449,7 @@ public class SQLfunctionHelper {
         Cursor valuesOfTask = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
         valuesOfTask.moveToFirst();
         for(int i =0; i<categories.length; i++){
-            Cursor temp = readableDatabase.rawQuery("SELECT " + categories[i].toString() + "FROM TASK_STATS WHERE TASK_ID = " + id, null);
+            Cursor temp = readableDatabase.rawQuery("SELECT " + categories[i].toString() + " FROM TASK_STATS WHERE TASK_ID = " + id, null);
             temp.moveToFirst();
             data.put(categories[i].toString(), 1);
             if(temp.getInt(0)==0){
@@ -469,7 +469,7 @@ public class SQLfunctionHelper {
         valuesOfTask.moveToFirst();
         ContentValues data = new ContentValues();
         for(int i =0; i<categories.length; i++){
-            Cursor temp = readableDatabase.rawQuery("SELECT " + categories[i].toString() + "FROM TASK_STATS WHERE TASK_ID = " + id, null);
+            Cursor temp = readableDatabase.rawQuery("SELECT " + categories[i].toString() + " FROM TASK_STATS WHERE TASK_ID = " + id, null);
             temp.moveToFirst();
             data.put(categories[i].toString(), 0);
             if(temp.getInt(0)==1){
@@ -487,17 +487,20 @@ public class SQLfunctionHelper {
         SQLiteDatabase write = categoryHelper.getWritableDatabase();
         SQLiteDatabase read = categoryHelper.getReadableDatabase();
 
-        ContentValues taskInfo = new ContentValues();                   //insert task info, insert task stats
-        //recordParamaters.put("TASK_CATEGORY", TaskCreatorFragment.taskCategoryName);
-        taskInfo.put("DUE_DATE", dueDate);
-        taskInfo.put("START_TIME", startTime);
-        taskInfo.put("END_TIME", endTime);
+//        ContentValues taskInfo = new ContentValues();                   //insert task info, insert task stats
+//        //recordParamaters.put("TASK_CATEGORY", TaskCreatorFragment.taskCategoryName);
+//        taskInfo.put("DUE_DATE", dueDate);
+//        taskInfo.put("START_TIME", startTime);
+//        taskInfo.put("END_TIME", endTime);
 
-        write.update("TASK_INFORMATION", taskInfo, "_ID = " + id, null);
-
-        ContentValues taskStats = new ContentValues();
-        taskStats.put("DUE_DATE", dueDate);
-        write.update("TASK_STATS", taskStats, "TASK_ID = " + id, null);
+        //write.update("TASK_INFORMATION", taskInfo, "_ID = " + id, null);
+        write.execSQL("UPDATE TASK_INFORMATION SET DUE_DATE = '" + dueDate +"', START_TIME = '" + startTime + "', END_TIME = '" + endTime + "' WHERE _ID = " + id);
+        Log.d("TaskActivityTimeDebug", "UPDATE TASK_INFORMATION SET DUE_DATE = '" + dueDate +"', START_TIME = '" + startTime + "', END_TIME = '" + endTime + "' WHERE _ID = " + id);
+        Log.d("TaskActivityTimeDebug", "UPDATE TASK_STATS SET DUE_DATE = '" + dueDate + "' WHERE TASK_ID = " + id);
+//        ContentValues taskStats = new ContentValues();
+//        taskStats.put("DUE_DATE", dueDate);
+//        write.update("TASK_STATS", taskStats, "TASK_ID = " + id, null);
+        write.execSQL("UPDATE TASK_STATS SET DUE_DATE = '" + dueDate + "' WHERE TASK_ID = " + id);
 
     }
 
