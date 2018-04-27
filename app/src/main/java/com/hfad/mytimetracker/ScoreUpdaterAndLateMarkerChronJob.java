@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-public class ScoreUpdaterAndLateMarkerChronJob extends JobService {
+public class ScoreUpdaterAndLateMarkerChronJob extends BroadcastReceiver {
 
 
     private String getDate(){
@@ -34,7 +34,7 @@ public class ScoreUpdaterAndLateMarkerChronJob extends JobService {
         }
     }
 
-    //@Override
+    @Override
     public void onReceive(Context context, Intent intent) {
 //        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(context);
 //        SQLiteDatabase readableDatabase = helper.getReadableDatabase();
@@ -81,14 +81,14 @@ public class ScoreUpdaterAndLateMarkerChronJob extends JobService {
         Toast.makeText(context, "We are calculating streak/score", Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    public boolean onStartJob(JobParameters jobParameters) {
-        Toast.makeText(this, "We are calculating streak/score", Toast.LENGTH_LONG).show();
-        return false;
-    }
-
-    @Override
-    public boolean onStopJob(JobParameters jobParameters) {
-        return false;
-    }
+//    @Override
+//    public boolean onStartJob(JobParameters jobParameters) {
+//        Toast.makeText(this, "We are calculating streak/score", Toast.LENGTH_LONG).show();
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean onStopJob(JobParameters jobParameters) {
+//        return false;
+//    }
 }

@@ -297,6 +297,14 @@ public class SQLfunctionHelper {
         Log.d("InsertTaskTest", "it worked");
 
         Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
+
+        id.moveToFirst();
+        Integer lastID = id.getInt(0);
+        id = read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + lastID, null);
+        createNotif(c, id);
+
+
+        Log.d("TaskNOtificationDebug", DatabaseUtils.dumpCursorToString(id));
         id.moveToFirst();
         Cursor notifCursor = read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id.getInt(0), null);
         createNotif(c, notifCursor);
@@ -433,8 +441,7 @@ public class SQLfunctionHelper {
     }
 
     public static void createNotif(Context c, Cursor id){
-       // NotificationHelper.createTaskNotif(c, id);
-
+        NotificationHelper.createTaskNotif(c, id);
     }
 
     public static void deleteNotif(Context c, Cursor id){
