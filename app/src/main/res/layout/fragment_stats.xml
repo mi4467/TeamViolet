@@ -254,38 +254,38 @@
                                 android:layout_height="wrap_content" />
                         </LinearLayout>
                     </android.support.v7.widget.CardView>
-                    <android.support.v7.widget.CardView
-                        android:layout_margin="5dp"
-                        card_view:cardCornerRadius="4dp"
-                        android:layout_width="match_parent"
-                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                        android:layout_height="match_parent">
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:padding = "10dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:text="FILTER"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <LinearLayout
-                                android:orientation="horizontal"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
-                                <Button
-                                    android:text="Choose Week"
-                                    android:id="@+id/filterCompletionWeekButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" />
-                                <Button
-                                    android:text="Enter"
-                                    android:id="@+id/filterCompletionWeekEnter"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
+                    <!--<android.support.v7.widget.CardView-->
+                        <!--android:layout_margin="5dp"-->
+                        <!--card_view:cardCornerRadius="4dp"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"-->
+                        <!--android:layout_height="match_parent">-->
+                        <!--<LinearLayout-->
+                            <!--android:orientation="vertical"-->
+                            <!--android:padding = "10dp"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content">-->
+                            <!--<TextView-->
+                                <!--android:text="FILTER"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content" />-->
+                            <!--<LinearLayout-->
+                                <!--android:orientation="horizontal"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content">-->
+                                <!--<Button-->
+                                    <!--android:text="Choose Week"-->
+                                    <!--android:id="@+id/filterCompletionWeekButton"-->
+                                    <!--android:layout_width="wrap_content"-->
+                                    <!--android:layout_height="wrap_content" />-->
+                                <!--<Button-->
+                                    <!--android:text="Enter"-->
+                                    <!--android:id="@+id/filterCompletionWeekEnter"-->
+                                    <!--android:layout_width="wrap_content"-->
+                                    <!--android:layout_height="wrap_content" />-->
+                            <!--</LinearLayout>-->
+                        <!--</LinearLayout>-->
+                    <!--</android.support.v7.widget.CardView>-->
                 </LinearLayout>
             </LinearLayout>
         </android.support.v7.widget.CardView>
@@ -383,6 +383,96 @@
                         </LinearLayout>
                     </android.support.v7.widget.CardView>
                 </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
+            android:layout_margin="5dp"
+            card_view:cardCornerRadius="4dp"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:text="Task Stats Via Completion"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/complete_line_chart_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    />
+                <android.support.v7.widget.CardView
+                    android:layout_margin="5dp"
+                    card_view:cardCornerRadius="4dp"
+                    android:layout_width="match_parent"
+                    card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                    android:layout_height="match_parent">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding = "10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:text="FILTER"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <Button
+                                android:text="Choose Week"
+                                android:id="@+id/filterCompletionWeekButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                            <Button
+                                android:text="Enter"
+                                android:id="@+id/filterCompletionWeekEnter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
+            android:layout_margin="5dp"
+            card_view:cardCornerRadius="4dp"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:text="Task Stats Via Lateness"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/onTime_line_chart_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    />
+
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

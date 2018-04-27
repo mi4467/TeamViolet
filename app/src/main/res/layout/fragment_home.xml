@@ -435,122 +435,179 @@
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
+        <!--<android.support.v7.widget.CardView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--card_view:cardBackgroundColor="@color/cardview_bgcolor"-->
+            <!--android:layout_margin="5dp"-->
+            <!--android:padding = "10dp"-->
+            <!--card_view:cardCornerRadius="4dp"-->
+            <!--&gt;-->
+            <!--<LinearLayout-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+                <!--<com.jjoe64.graphview.GraphView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="200dip"-->
+                    <!--android:id="@+id/task_complete_week_graph" />-->
+                <!--<android.support.v7.widget.CardView-->
+                    <!--android:layout_margin="5dp"-->
+                    <!--card_view:cardCornerRadius="4dp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"-->
+                    <!--android:layout_height="wrap_content">-->
+                    <!--<LinearLayout-->
+                        <!--android:orientation="vertical"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:padding="10dp"-->
+                        <!--android:weightSum="3"-->
+                        <!--&gt;-->
+                        <!--<TextView-->
+                            <!--android:text="LEGEND"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:text="Total Tasks"-->
+                            <!--android:textAlignment="center"-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:id="@+id/total_complete_key"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:textAlignment="center"-->
+                            <!--android:text="Complete Tasks"-->
+                            <!--android:id="@+id/complete_key"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:textAlignment="center"-->
+                            <!--android:text="Incomplete Tasks"-->
+                            <!--android:id="@+id/incomplete_key"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                    <!--</LinearLayout>-->
+                <!--</android.support.v7.widget.CardView>-->
+            <!--</LinearLayout>-->
+        <!--</android.support.v7.widget.CardView>-->
+
         <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             card_view:cardBackgroundColor="@color/cardview_bgcolor"
             android:layout_margin="5dp"
-            android:padding = "10dp"
             card_view:cardCornerRadius="4dp"
-            >
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
             <LinearLayout
                 android:orientation="vertical"
+                android:padding="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <com.jjoe64.graphview.GraphView
+                android:layout_height="match_parent"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:text="Task Stats Via Completion"
+                    android:textAlignment="center"
                     android:layout_width="match_parent"
-                    android:layout_height="200dip"
-                    android:id="@+id/task_complete_week_graph" />
-                <android.support.v7.widget.CardView
-                    android:layout_margin="5dp"
-                    card_view:cardCornerRadius="4dp"
-                    android:layout_width="wrap_content"
-                    card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                    android:layout_height="wrap_content">
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="10dp"
-                        android:weightSum="3"
-                        >
-                        <TextView
-                            android:text="LEGEND"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                        <TextView
-                            android:text="Total Tasks"
-                            android:textAlignment="center"
-                            android:layout_weight="1"
-                            android:id="@+id/total_complete_key"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                        <TextView
-                            android:layout_weight="1"
-                            android:textAlignment="center"
-                            android:text="Complete Tasks"
-                            android:id="@+id/complete_key"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                        <TextView
-                            android:layout_weight="1"
-                            android:textAlignment="center"
-                            android:text="Incomplete Tasks"
-                            android:id="@+id/incomplete_key"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-                </android.support.v7.widget.CardView>
+                    android:layout_height="wrap_content" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/complete_line_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
+            android:layout_margin="5dp"
+            card_view:cardCornerRadius="4dp"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:text="Task Stats Via Lateness"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/onTime_line_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            card_view:cardBackgroundColor="@color/cardview_bgcolor"
-            android:layout_margin="5dp"
-            card_view:cardCornerRadius="4dp"
-            >
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <com.jjoe64.graphview.GraphView
-                    android:layout_width="match_parent"
-                    android:layout_height="200dip"
-                    android:id="@+id/task_onTime_week_graph" />
-                <android.support.v7.widget.CardView
-                    android:layout_margin="5dp"
-                    card_view:cardCornerRadius="4dp"
-                    android:layout_width="wrap_content"
-                    card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                    android:layout_height="wrap_content">
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:padding = "10dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:weightSum="3"
-                        >
-                        <TextView
-                            android:text="LEGEND"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                        <TextView
-                            android:text="Total Tasks"
-                            android:textAlignment="center"
-                            android:layout_weight="1"
-                            android:id="@+id/total_onTime_key"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                        <TextView
-                            android:layout_weight="1"
-                            android:textAlignment="center"
-                            android:text="On-Time Tasks"
-                            android:id="@+id/onTime_key"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                        <TextView
-                            android:layout_weight="1"
-                            android:textAlignment="center"
-                            android:text="Late Tasks"
-                            android:id="@+id/late_onTime_key"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-                </android.support.v7.widget.CardView>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+        <!--<android.support.v7.widget.CardView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--card_view:cardBackgroundColor="@color/cardview_bgcolor"-->
+            <!--android:layout_margin="5dp"-->
+            <!--card_view:cardCornerRadius="4dp"-->
+            <!--&gt;-->
+            <!--<LinearLayout-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+                <!--<com.jjoe64.graphview.GraphView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="200dip"-->
+                    <!--android:id="@+id/task_onTime_week_graph" />-->
+                <!--<android.support.v7.widget.CardView-->
+                    <!--android:layout_margin="5dp"-->
+                    <!--card_view:cardCornerRadius="4dp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"-->
+                    <!--android:layout_height="wrap_content">-->
+                    <!--<LinearLayout-->
+                        <!--android:orientation="vertical"-->
+                        <!--android:padding = "10dp"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:weightSum="3"-->
+                        <!--&gt;-->
+                        <!--<TextView-->
+                            <!--android:text="LEGEND"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:text="Total Tasks"-->
+                            <!--android:textAlignment="center"-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:id="@+id/total_onTime_key"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:textAlignment="center"-->
+                            <!--android:text="On-Time Tasks"-->
+                            <!--android:id="@+id/onTime_key"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:textAlignment="center"-->
+                            <!--android:text="Late Tasks"-->
+                            <!--android:id="@+id/late_onTime_key"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                    <!--</LinearLayout>-->
+                <!--</android.support.v7.widget.CardView>-->
+            <!--</LinearLayout>-->
+        <!--</android.support.v7.widget.CardView>-->
     </LinearLayout>
 
 </ScrollView>

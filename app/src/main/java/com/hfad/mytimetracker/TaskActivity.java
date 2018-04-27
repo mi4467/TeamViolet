@@ -62,8 +62,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     private static CharSequence[] addCategoryNames;     //use for add/remove cats
     private static CharSequence[] removeCategoryNames;
 
-
-
     private String dueDateText = "\nDue Date:   ";
     private String startTimeText = "\nStart Time: ";
     private String endTimeText = "\nEnd Time:   ";
@@ -144,10 +142,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean checkValidityOfTask(){
-//        if(taskName.equals("")){          //We don't need the name
-//            //Toast.makeText(getActivity(), "Choose a Task!", Toast.LENGTH_SHORT).show();
-//            return false;
-//        }
         if(year==null){
             Toast.makeText(this, "Choose a Due Date!", Toast.LENGTH_SHORT).show();
             return false;
@@ -160,13 +154,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "Choose a End Time!", Toast.LENGTH_SHORT).show();
             return false;
         }
-//        if(taskCategoryNames==null){
-//            Toast.makeText(getActivity(), "Choose a Category!", Toast.LENGTH_SHORT).show();
-//            return false;
-//        } Don't need this for now
-
         //add a check to see if we are late, if we are late, then return false
-
         if(endHour<startHour || (endHour==startHour && endMinute<startMinute)){
             Toast.makeText(this, "This Time is Invalid! Make End Time After Start Time", Toast.LENGTH_SHORT).show();
             return false;
@@ -276,8 +264,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         }
         TextView endTimeView = findViewById(R.id.endt_time_record);
         endTimeView.setText(endTimeText + endTime);
-
-        //the above is for the time info
     }
 
     private void initStats(){
@@ -403,9 +389,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    public void changeTaskDate(){           //not finished
-        //Log.d("TaskActivityDebug", "What We Entered: Year = " + year + " Month =  ")
-        //this is where we check all of the information, and if valid, change the properties, and the respective fields
+    public void changeTaskDate(){
         if(!checkValidityOfTask()){
             //send out a toast
             return;

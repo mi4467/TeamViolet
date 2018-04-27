@@ -370,7 +370,7 @@ public class SQLfunctionHelper {
             Log.d("DayStatsDebug","SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1");
             Log.d("DayStatsDebug","SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1");
             Log.d("DayStatsDebug", "SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1");
-            Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1", null);
+            Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = '" + date + "' AND COMPLETED = 1", null);
             int completed = dayQuery.getCount();
             dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = '" + date + "' AND NOT_COMPLETED = 1", null);
             int incompleted = dayQuery.getCount();
@@ -381,7 +381,7 @@ public class SQLfunctionHelper {
             data.add(frag.new DayStats(date, completed, incompleted, onTime, late));
             gcal.add(Calendar.DATE, -1);
         }
-        Log.d("StatsCatDateDebug", data.toString());
+        Log.d("LineGraphDebug", data.toString());
         return data;
     }
 
