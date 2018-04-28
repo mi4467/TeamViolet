@@ -43,8 +43,10 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
@@ -263,6 +265,7 @@ public class StatsFragment extends Fragment {
         if(divisor==0){
             return;
         }
+        final Integer hole = divisor;
         for(int i =0 ; i<data.size(); i++){
             slices.add(new PieEntry(((float) data.get(i).incomplete)*100/divisor, data.get(i).name));
             colors.add(data.get(i).color);
@@ -272,7 +275,7 @@ public class StatsFragment extends Fragment {
         set.setValueTextColor(Color.WHITE);
         set.setValueTextSize(12f);
         PieData results = new PieData(set);
-        PieChart chart = layout.findViewById(R.id.incomplete_pie_chart);
+        final PieChart chart = layout.findViewById(R.id.incomplete_pie_chart);
         chart.setData(results);
         chart.invalidate();
         chart.setDrawSliceText(false);
@@ -280,6 +283,19 @@ public class StatsFragment extends Fragment {
         chart.getLegend().setTextColor(Color.WHITE);
         chart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
         chart.getDescription().setEnabled(false);
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                PieEntry slice = (PieEntry) e;
+                chart.setCenterText(slice.getLabel() + ": " + (int) e.getY()*hole/100 + " tasks");
+
+            }
+
+            @Override
+            public void onNothingSelected() {
+                chart.setCenterText("Total Incomplete Tasks: " + hole);
+            }
+        });
     }
 
     public void setUpLatePieGraph(View layout){
@@ -293,6 +309,7 @@ public class StatsFragment extends Fragment {
         for(CategoryStats curr: data){
             divisor += curr.late;
         }
+        final Integer hole = divisor;
         if(divisor==0){
             return;
         }
@@ -306,7 +323,7 @@ public class StatsFragment extends Fragment {
         set.setValueTextColor(Color.WHITE);
         set.setValueTextSize(12f);
         PieData results = new PieData(set);
-        PieChart chart = layout.findViewById(R.id.late_pie_chart);
+        final PieChart chart = layout.findViewById(R.id.late_pie_chart);
         chart.setData(results);
         chart.invalidate();
         chart.setDrawSliceText(false);
@@ -314,6 +331,19 @@ public class StatsFragment extends Fragment {
         chart.getLegend().setTextColor(Color.WHITE);
         chart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
         chart.getDescription().setEnabled(false);
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                PieEntry slice = (PieEntry) e;
+                chart.setCenterText(slice.getLabel() + ": " + e.getY()*hole/100 + " tasks");
+
+            }
+
+            @Override
+            public void onNothingSelected() {
+                chart.setCenterText("Total Late Tasks: " + hole);
+            }
+        });
     }
 
     public void setUpOnTimeBarGraph(View layout){
