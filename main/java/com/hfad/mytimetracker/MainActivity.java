@@ -1,5 +1,9 @@
 package com.hfad.mytimetracker;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -30,9 +34,12 @@ import com.facebook.stetho.Stetho;
 import junit.framework.Test;
 
 import java.lang.reflect.Field;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     MenuItem prevMenuItem;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +50,33 @@ public class MainActivity extends AppCompatActivity {
         helper.initalizeDatabase(this);
         helper.initalizeBottomNavagationBar();
         helper.initalizeToolBar();
+        ViewPager viewPager = findViewById(R.id.pager);
+        viewPager.setCurrentItem(2);
+
+//        Calendar calendar = Calendar.getInstance();
+//
+//        Date date = new Date(System.currentTimeMillis());
+//
+//        calendar.set(Calendar.HOUR_OF_DAY, date.getHours());
+//        calendar.set(Calendar.MINUTE, date.getMinutes());
+//        calendar.set(Calendar.SECOND, date.getSeconds());
+//        calendar.set(Calendar.MILLISECOND, 0);
+//
+//        Intent intent = new Intent(this, ScoreUpdaterAndLateMarkerChronJob.class);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        AlarmManager manager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+//        manager.setRepeating(manager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+
     }
+
+    private void setUpChronJob(){
+        ComponentName componentName = new ComponentName(this, ScoreUpdaterAndLateMarkerChronJob.class);
+//        JobInfo jobInfor = new JobInfo.Builder(12, componentName)
+//                                .setPeriodic(21600000)
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){

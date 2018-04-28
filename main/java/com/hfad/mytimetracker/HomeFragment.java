@@ -2,6 +2,8 @@ package com.hfad.mytimetracker;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,26 +11,52 @@ import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import net.sqlcipher.DatabaseUtils;
+
 import org.eazegraph.lib.charts.PieChart;
 import org.eazegraph.lib.models.PieModel;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import lecho.lib.hellocharts.model.Axis;
 
 
 public class HomeFragment extends Fragment {
+    private static ArrayList<StatsFragment.CategoryStats> completedBarData = null;
+    private static ArrayList<StatsFragment.CategoryStats> onTimeBarData = null;
 
     public HomeFragment(){
 
@@ -43,23 +71,302 @@ public class HomeFragment extends Fragment {
 //        bottomNavigationView.getMenu().getItem(3).setChecked(true);
         final View layout = inflater.inflate(R.layout.fragment_home, container, false);
 
-        initBestCompleteBar(layout);        //these functions set up the respective cardviews
-        initBestOnTimeBar(layout);          //as of right now these hold dummy data, in these functions implement the neccessary sql needed to show this
-        initWorstCompleteBar(layout);
-        initWorstOnTimeBar(layout);
-        initCompleteLineChart(layout);
-        initOnTimeLineChart(layout);
+          initBestCompleteBar(layout);        //these functions set up the respective cardviews
+//        initBestOnTimeBar(layout);          //as of right now these hold dummy data, in these functions implement the neccessary sql needed to show this
+          initWorstCompleteBar(layout);
+          initTaskListView(layout);
+//        initWorstOnTimeBar(layout);
+          initCompleteLineChart(layout);
+          initOnTimeLineChart(layout);
 //        initIncompletePieChart(layout);
 //        initLatePieChart(layout);
+          //testGraph(layout);
+//          mpLineGraphWeekCompletion(layout);
 
         return layout;
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && getView()!=null) {
+            // Do your stuff here
+            initTaskListView(getView());
+            initCompleteLineChart(getView());
+            initOnTimeLineChart(getView());
+            initBestCompleteBar(getView());
+            initWorstCompleteBar(getView());
+        }
+
+    }
+
+//    public void testGraph(View layout){
+//        List<Entry> vals = new ArrayList<Entry>();
+//        vals.add(new Entry(0f, 10f));
+//        vals.add(new Entry(1f, 10f));
+//        vals.add(new Entry(2f, 10f));
+//        vals.add(new Entry(3f, 10f));
+//        vals.add(new Entry(4f, 10f));
+//        LineDataSet setComp1 = new LineDataSet(vals, "Test");
+//        setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
+//        List<ILineDataSet> dataSets = new ArrayList<>();
+//        dataSets.add(setComp1);
+//        LineData totalData = new LineData(dataSets);
+//        LineChart chart = layout.findViewById(R.id.test_chart);
+//        chart.setData(totalData);
+//        chart.invalidate();
+//    }
+
+    public void mpLineGraphWeekCompletion(View layout){
+GregorianCalendar gcal = new GregorianCalendar();
+        gcal.setTime(Calendar.getInstance().getTime());
+
+    Map<String, Integer> monthMapper = new HashMap<>();
+        monthMapper.put("Jan", 0);
+        monthMapper.put("Feb", 1);
+        monthMapper.put("Mar", 2);
+        monthMapper.put("Apr", 3);
+        monthMapper.put("May", 4);
+        monthMapper.put("Jun", 5);
+        monthMapper.put("Jul", 6);
+        monthMapper.put("Aug", 7);
+        monthMapper.put("Sep", 8);
+        monthMapper.put("Oct", 9);
+        monthMapper.put("Nov", 10);
+        monthMapper.put("Dec", 11);
+
+    String[] daterep = gcal.getTime().toString().split(" ");
+    String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+    final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
+        Collections.reverse(data);
+        Log.d("HomeDebug", data.toString());
+    //above is getting the weeks data, same as before
+    ArrayList<Entry> totalWithCompleteStatus = new ArrayList<>();
+        for(int i =0; i< data.size(); i++){
+        totalWithCompleteStatus.add(new Entry((float) i, (float) data.get(i).totalTasksWithOnTimeStatus));
+    }
+    ArrayList<Entry> complete = new ArrayList<>();
+        for(int i =0; i< data.size(); i++){
+        complete.add(new Entry((float) i, (float) data.get(i).onTime));
+    }
+    ArrayList<Entry> incomplete = new ArrayList<>();
+        for(int i =0; i< data.size(); i++){
+        incomplete.add(new Entry((float) i, (float) data.get(i).late));
+    }
+    LineDataSet total = new LineDataSet(totalWithCompleteStatus, "Total Qualifying Tasks");
+        total.setAxisDependency(YAxis.AxisDependency.LEFT);
+        total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
+        total.setCircleColor(Color.parseColor("#827717"));
+        total.setCircleColorHole(Color.parseColor("#EEFF41"));
+    LineDataSet onTime = new LineDataSet(complete, "On-Time Tasks");
+        onTime.setAxisDependency(YAxis.AxisDependency.LEFT);
+        onTime.setColor(Color.parseColor("#689F38"));    //Dark Green
+        onTime.setCircleColor(Color.parseColor("#33691E"));
+        onTime.setCircleColorHole(Color.parseColor("#64DD17"));
+    LineDataSet late = new LineDataSet(incomplete, "Late Tasks");
+        late.setAxisDependency(YAxis.AxisDependency.LEFT);
+        late.setColor(Color.parseColor("#D32F2F"));    //Dark Red
+        late.setCircleColor(Color.parseColor("#B71C1C"));
+        late.setCircleColorHole(Color.parseColor("#FF5252"));
+
+    //above is creating entry lists and their data sets
+    ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(total);
+        dataSets.add(onTime);
+        dataSets.add(late);
+
+    LineData chartData = new LineData(dataSets);
+
+    LineChart chart = layout.findViewById(R.id.onTime_line_chart);
+        chart.setData(chartData);
+        chart.invalidate();
+
+    final String[] days = new String[7];
+        for(int i =0; i<days.length; i++){
+        days[i] = data.get(i).date;
+    }
+    IAxisValueFormatter formatter = new IAxisValueFormatter() {
+
+        @Override
+        public String getFormattedValue(float value, AxisBase axis) {
+
+            // String[] date = data.get(data.size()-1-((int) value)).date.split("-");
+            //
+            //                        return date[1] + "/" + date[2];
+            String[] dateRep = days[(int) value].split("-");
+            return dateRep[1] + "/" + dateRep[2];
+        }
+
+        // we don't draw numbers, so no decimal digits needed
+    };
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setGranularity(1f);       //interval
+        xAxis.setValueFormatter(formatter);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextColor(Color.WHITE);
+        chart.getDescription().setEnabled(false);
+        chart.getAxisLeft().setGranularity(1f);
+        chart.getAxisLeft().setTextColor(Color.WHITE);
+        chart.getAxisRight().setEnabled(false);
+        chart.getLegend().setTextColor(Color.WHITE);
+        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
+    }
+
+    public void initTaskListView(View layout){
+        GregorianCalendar gcal = new GregorianCalendar();
+        gcal.setTime(Calendar.getInstance().getTime());
+        String[] daterep = gcal.getTime().toString().split(" ");
+        Map<String, Integer> monthMapper = new HashMap<>();
+        monthMapper.put("Jan", 0);
+        monthMapper.put("Feb", 1);
+        monthMapper.put("Mar", 2);
+        monthMapper.put("Apr", 3);
+        monthMapper.put("May", 4);
+        monthMapper.put("Jun", 5);
+        monthMapper.put("Jul", 6);
+        monthMapper.put("Aug", 7);
+        monthMapper.put("Sep", 8);
+        monthMapper.put("Oct", 9);
+        monthMapper.put("Nov", 10);
+        monthMapper.put("Dec", 11);
+        Cursor result = SQLfunctionHelper.getTasksGivenDate(getContext(), TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2])));
+        Log.d("HomeTodaysListsDebug", android.database.DatabaseUtils.dumpCursorToString(result));
+
+        ArrayList<String> completedTasks = new ArrayList<>();
+        ArrayList<String> notCompletedTasks = new ArrayList<>();
+        result.moveToFirst();
+        String completed="";
+        for(int i =0; i< result.getCount(); i++){
+            if(result.getInt(1)==1){                //completed
+                completedTasks.add(result.getString(0));
+                completed = completed +"\n " +result.getString(0);
+            }
+            result.moveToNext();
+        }
+        result.moveToFirst();
+        String incomplete = "";
+        for(int i =0; i< result.getCount(); i++){
+            if(result.getInt(2)==1){                //notcompleted
+                notCompletedTasks.add(result.getString(0));
+                incomplete = incomplete +"\n" +result.getString(0);
+            }
+            result.moveToNext();
+        }
+
+        Log.d("HomeListViewDebug", completed);
+        Log.d("HomeListViewDebug", incomplete);
+
+//         completed = new String[completedTasks.size()];
+//        String[] notCompleted = new String[notCompletedTasks.size()];
+//
+//        ArrayAdapter<String> completedAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, completed);
+//        ArrayAdapter<String> notCompletedAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, notCompleted);
+
+        TextView completedList = layout.findViewById(R.id.completed_listview);
+        TextView notCompletedList = layout.findViewById(R.id.not_completed_listview);
+
+        if(!completed.equals("")){
+            completedList.setText("Completed Tasks\n" + completed);
+            completedList.setGravity(Gravity.CENTER);
+        }
+        else{
+            completedList.setText("Completed Tasks\n\nNo Tasks Completed Today");
+            completedList.setGravity(Gravity.CENTER);
+        }
+        if(!incomplete.equals("")){
+            notCompletedList.setText("Incomplete Tasks\n" + incomplete);
+            notCompletedList.setGravity(Gravity.CENTER);
+        }
+        else{
+            notCompletedList.setText("Incomplete Tasks\n\nNo Tasks Left To Do Today");
+            notCompletedList.setGravity(Gravity.CENTER);
+        }
+
+        //completedList.setAdapter(completedAdapter);
+        //notCompletedList.setAdapter(notCompletedAdapter);
+
+
+    }
+
 
     public void initBestCompleteBar(View layout){
-        ArrayList<StatsFragment.CategoryStats> categories = SQLfunctionHelper.getFiveBestCompleteCategories(getContext(), new StatsFragment());
-        final GraphView completionG = layout.findViewById(R.id.task_completion_total_graph_best);
-        //for()
+        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), new StatsFragment());
+        for(int i =0; i<data.size(); i++){
+            if(data.get(i).totalTasksWithCompleteStatus<5 || data.get(i).totalTasksWithOnTimeStatus<5){
+                data.remove(data.get(i));
+                i--;
+            }
+        }
+
+        data.sort(new BestCompletionComparator());
+
+        //ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
+        if(data.size()==0){
+            return;
+        }
+//        completedBarData = new ArrayList<>();
+
+        int i = 0;
+        StringBuilder s = new StringBuilder();
+        for(i = 0; i<5 && i<data.size(); i++){
+            //completedBarData.add(data.get(i));
+            s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n"  + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
+        }
+        if(i==5){
+            s.append("....\n");
+        }
+        if(i==0){
+            s.append("\nNo Qualifying Data\n");
+        }
+
+        TextView text = layout.findViewById(R.id.best_categories);
+        text.setText(s.substring(1));
+    }
+//
+    public void initWorstCompleteBar(View layout){
+        ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), new StatsFragment());
+        for(int i =0; i<data.size(); i++){
+            if(data.get(i).totalTasksWithCompleteStatus<5 || data.get(i).totalTasksWithOnTimeStatus<5){
+                data.remove(data.get(i));
+                i--;
+            }
+        }
+
+        data.sort(new BestCompletionComparator());
+        Collections.reverse(data);
+
+        //ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
+        if(data.size()==0){
+            return;
+        }
+//        completedBarData = new ArrayList<>();
+
+        int i = 0;
+        StringBuilder s = new StringBuilder();
+        for(i = 0; i<5 && i<data.size(); i++){
+            //completedBarData.add(data.get(i));
+            s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n"  + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
+        }
+        if(i==5){
+            s.append("....\n");
+        }
+        if(i==0){
+            s.append("\nNo Qualifying Data\n");
+        }
+
+        TextView text = layout.findViewById(R.id.worst_categories);
+        text.setText(s.substring(1));
+    }
+//
+//    public void initBestOnTimeBar(View layout){
+//        GraphView onTimeG = layout.findViewById(R.id.task_onTime_total_graph_best);
+//        BarGraphSeries<DataPoint> seriestwo = new BarGraphSeries<>(new DataPoint[] {
+//                new DataPoint(0, 7),
+//                new DataPoint(1, 7),
+//                new DataPoint(2, 7),
+//                new DataPoint(3, 7),
+//                new DataPoint(4, 7)
+//        });
 //        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
 //                new DataPoint(0, -1),
 //                new DataPoint(1, 5),
@@ -67,261 +374,235 @@ public class HomeFragment extends Fragment {
 //                new DataPoint(3, 2),
 //                new DataPoint(4, 6)
 //        });
+//        onTimeG.addSeries(series);
+//        onTimeG.addSeries(seriestwo);
+//        onTimeG.setTitle("Best Task On-Time Total");
+//        seriestwo.setSpacing(50);
 //
-//        completionG.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter(){
-//
-//            @Override
-//            public String formatLabel(double value, boolean isValueX){
-//                String result = "";
-//                if(isValueX){
-//                    //return "pizza";             //use this to create x axis as category labels
-//                    return super.formatLabel(value, isValueX);
-//                }
-//                else{
-//                    return super.formatLabel(value, isValueX);
-//                }
-//            }
-//        });
-//
-//        completionG.addSeries(series);
-//        completionG.getViewport().setScrollable(true);
-//        completionG.getViewport().setScalable(true);
-//        completionG.setTitle("Best Task Completion Total");
-//        series.setSpacing(50);
-//        completionG.getViewport().setMaxX(3);
-//        completionG.getGridLabelRenderer().setHorizontalAxisTitle("Category");
-//        //completionG.getGridLabelRenderer().setVerticalAxisTitle("Number of Tasks");
-//
-//        TextView onTimeKey = layout.findViewById(R.id.completed_key_best);
+//        TextView onTimeKey = layout.findViewById(R.id.onTime_key_best);
 //        onTimeKey.setBackgroundColor(Color.GREEN);
 //
-//        TextView lateKey = layout.findViewById(R.id.not_completed_key_best);
+//        TextView lateKey = layout.findViewById(R.id.late_key_best);
 //        lateKey.setBackgroundColor(Color.RED);
 //
-////        Button left = layout.findViewById(R.id.scroll_left_complete_best);
-////        Button right = layout.findViewById(R.id.scroll_right_complete_best);
-////
-////        left.setOnClickListener(new View.OnClickListener() {
-////            @Override
-////            public void onClick(View view) {
-////                completionG.getViewport().scrollToEnd();
-////                completionG.getViewport().
-////            }
-////        });
-
-
-    }
-
-    public void initWorstCompleteBar(View layout){
-        GraphView completionWG = layout.findViewById(R.id.task_completion_total_graph_worst);
-        BarGraphSeries<DataPoint> seriestwo = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, 7),
-                new DataPoint(1, 7),
-                new DataPoint(2, 7)
-        });
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, -1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
-
-        completionWG.addSeries(series);
-        completionWG.setTitle("Worst Task Completion Total");
-        seriestwo.setSpacing(50);
-
-        TextView onTimeKey = layout.findViewById(R.id.completed_key_worst);
-        onTimeKey.setBackgroundColor(Color.GREEN);
-
-        TextView lateKey = layout.findViewById(R.id.not_completed_key_worst);
-        lateKey.setBackgroundColor(Color.RED);
-
-
-    }
-
-    public void initBestOnTimeBar(View layout){
-        GraphView onTimeG = layout.findViewById(R.id.task_onTime_total_graph_best);
-        BarGraphSeries<DataPoint> seriestwo = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, 7),
-                new DataPoint(1, 7),
-                new DataPoint(2, 7),
-                new DataPoint(3, 7),
-                new DataPoint(4, 7)
-        });
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, -1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
-        onTimeG.addSeries(series);
-        onTimeG.addSeries(seriestwo);
-        onTimeG.setTitle("Best Task On-Time Total");
-        seriestwo.setSpacing(50);
-
-        TextView onTimeKey = layout.findViewById(R.id.onTime_key_best);
-        onTimeKey.setBackgroundColor(Color.GREEN);
-
-        TextView lateKey = layout.findViewById(R.id.late_key_best);
-        lateKey.setBackgroundColor(Color.RED);
-
-    }
-
-    public void initWorstOnTimeBar(View layout){
-        GraphView onTimeWG = layout.findViewById(R.id.task_onTime_total_graph_worst);
-        BarGraphSeries<DataPoint> seriestwo = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, 7),
-                new DataPoint(1, 7),
-                new DataPoint(2, 7),
-                new DataPoint(3, 7),
-                new DataPoint(4, 7)
-        });
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, -1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
-        onTimeWG.addSeries(series);
-        onTimeWG.setTitle("Worst Task On-Time Total");
-        seriestwo.setSpacing(50);
-
-        TextView onTimeKey = layout.findViewById(R.id.onTime_key_worst);
-        onTimeKey.setBackgroundColor(Color.GREEN);
-
-        TextView lateKey = layout.findViewById(R.id.late_key_worst);
-        lateKey.setBackgroundColor(Color.RED);
-
-    }
+//    }
+//
+//    public void initWorstOnTimeBar(View layout){
+//        GraphView onTimeWG = layout.findViewById(R.id.task_onTime_total_graph_worst);
+//        BarGraphSeries<DataPoint> seriestwo = new BarGraphSeries<>(new DataPoint[] {
+//                new DataPoint(0, 7),
+//                new DataPoint(1, 7),
+//                new DataPoint(2, 7),
+//                new DataPoint(3, 7),
+//                new DataPoint(4, 7)
+//        });
+//        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
+//                new DataPoint(0, -1),
+//                new DataPoint(1, 5),
+//                new DataPoint(2, 3),
+//                new DataPoint(3, 2),
+//                new DataPoint(4, 6)
+//        });
+//        onTimeWG.addSeries(series);
+//        onTimeWG.setTitle("Worst Task On-Time Total");
+//        seriestwo.setSpacing(50);
+//
+//        TextView onTimeKey = layout.findViewById(R.id.onTime_key_worst);
+//        onTimeKey.setBackgroundColor(Color.GREEN);
+//
+//        TextView lateKey = layout.findViewById(R.id.late_key_worst);
+//        lateKey.setBackgroundColor(Color.RED);
+//
+//    }
 
     public void initCompleteLineChart(View layout){
-        final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasks(getContext(), new StatsFragment());
-        DataPoint[] total = new DataPoint[7];
-        for(int i = 0; i<7; i++){
-            total[i] = new DataPoint(i, data.get(total.length-i-1).totalTasksWithCompleteStatus);
-        }
-        DataPoint[] complete = new DataPoint[7];
-        for(int i = 0; i<7; i++){
-            complete[i] = new DataPoint(i, data.get(total.length-i-1).complete);
-        }
-        DataPoint[] incomplete = new DataPoint[7];
-        for(int i = 0; i<7; i++){
-            incomplete[i] = new DataPoint(i, data.get(total.length-i-1).incomplete);
-        }
+        GregorianCalendar gcal = new GregorianCalendar();
+        gcal.setTime(Calendar.getInstance().getTime());
 
-        GraphView completeWeek = layout.findViewById(R.id.task_complete_week_graph);
-        completeWeek.addSeries(new LineGraphSeries<DataPoint>(total));
-        completeWeek.addSeries(new LineGraphSeries<DataPoint>(complete));
-        completeWeek.addSeries(new LineGraphSeries<DataPoint>(incomplete));
+        Map<String, Integer> monthMapper = new HashMap<>();
+        monthMapper.put("Jan", 0);
+        monthMapper.put("Feb", 1);
+        monthMapper.put("Mar", 2);
+        monthMapper.put("Apr", 3);
+        monthMapper.put("May", 4);
+        monthMapper.put("Jun", 5);
+        monthMapper.put("Jul", 6);
+        monthMapper.put("Aug", 7);
+        monthMapper.put("Sep", 8);
+        monthMapper.put("Oct", 9);
+        monthMapper.put("Nov", 10);
+        monthMapper.put("Dec", 11);
 
-        LineGraphSeries<DataPoint> totalSeries = new LineGraphSeries<DataPoint>(total);
-        LineGraphSeries<DataPoint> completeSeries = new LineGraphSeries<DataPoint>(complete);////////////////////////////////////////
-        LineGraphSeries<DataPoint> incompleteSeries = new LineGraphSeries<DataPoint>(incomplete);
-        totalSeries.setTitle("Total");
-        totalSeries.setColor(Color.YELLOW);
-        completeWeek.addSeries(totalSeries);
-        completeSeries.setTitle("Complete");
-        completeSeries.setColor(Color.GREEN);
-        completeWeek.addSeries(completeSeries);
-        incompleteSeries.setTitle("Incomplete");
-        incompleteSeries.setColor(Color.RED);
-        completeWeek.addSeries(incompleteSeries);
-        completeWeek.getGridLabelRenderer().setNumHorizontalLabels(7);
-        completeWeek.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter(){
+        String[] daterep = gcal.getTime().toString().split(" ");
+        String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+        final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
+        Collections.reverse(data);
+        Log.d("HomeDebug", data.toString());
+        //above is getting the weeks data, same as before
+        ArrayList<Entry> totalWithCompleteStatus = new ArrayList<>();
+        for(int i =0; i< data.size(); i++){
+            totalWithCompleteStatus.add(new Entry((float) i, (float) data.get(i).totalTasksWithCompleteStatus));
+        }
+        ArrayList<Entry> complete = new ArrayList<>();
+        for(int i =0; i< data.size(); i++){
+            complete.add(new Entry((float) i, (float) data.get(i).complete));
+        }
+        ArrayList<Entry> incomplete = new ArrayList<>();
+        for(int i =0; i< data.size(); i++){
+            incomplete.add(new Entry((float) i, (float) data.get(i).incomplete));
+        }
+        LineDataSet total = new LineDataSet(totalWithCompleteStatus, "Total Tasks");
+        total.setAxisDependency(YAxis.AxisDependency.LEFT);
+        total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
+        total.setCircleColor(Color.parseColor("#827717"));
+        total.setCircleColorHole(Color.parseColor("#EEFF41"));
+        LineDataSet completeTasks = new LineDataSet(complete, "Completed Tasks");
+        completeTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
+        completeTasks.setColor(Color.parseColor("#689F38"));    //Dark Green
+        completeTasks.setCircleColor(Color.parseColor("#33691E"));
+        completeTasks.setCircleColorHole(Color.parseColor("#64DD17"));
+        LineDataSet incompleteTasks = new LineDataSet(incomplete, "Incomplete Tasks");
+        incompleteTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
+        incompleteTasks.setColor(Color.parseColor("#D32F2F"));    //Dark Red
+        incompleteTasks.setCircleColor(Color.parseColor("#B71C1C"));
+        incompleteTasks.setCircleColorHole(Color.parseColor("#FF5252"));
+
+        //above is creating entry lists and their data sets
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(total);
+        dataSets.add(completeTasks);
+        dataSets.add(incompleteTasks);
+
+        LineData chartData = new LineData(dataSets);
+
+        LineChart chart = layout.findViewById(R.id.complete_line_chart);
+        chart.setData(chartData);
+        chart.invalidate();
+
+        final String[] days = new String[7];
+        for(int i =0; i<days.length; i++){
+            days[i] = data.get(i).date;
+        }
+        IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
             @Override
-            public String formatLabel(double value, boolean isValueX){
-                String result = "";
-                if(isValueX){
-                    if(value<7) {
-                        //return data.get((int)value).date;             //use this to create x axis as category labels
-                        String[] date = data.get(data.size()-1-((int) value)).date.split("-");
+            public String getFormattedValue(float value, AxisBase axis) {
 
-                        return date[1] + "/" + date[2];
-                    }
-                    return null;
-                }
-                else{
-                    return super.formatLabel(value, isValueX);
-                }
+                // String[] date = data.get(data.size()-1-((int) value)).date.split("-");
+                //
+                //                        return date[1] + "/" + date[2];
+                String[] dateRep = days[(int) value].split("-");
+                return dateRep[1] + "/" + dateRep[2];
             }
-        });
-        completeWeek.setTitle("On-Time Stats Over Past Week");
 
-        TextView totalKey = layout.findViewById(R.id.total_complete_key);
-        totalKey.setBackgroundColor(Color.YELLOW);
-
-        TextView onTimeKey = layout.findViewById(R.id.complete_key);
-        onTimeKey.setBackgroundColor(Color.GREEN);
-
-        TextView lateKey = layout.findViewById(R.id.incomplete_key);
-        lateKey.setBackgroundColor(Color.RED);
+            // we don't draw numbers, so no decimal digits needed
+        };
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setGranularity(1f);       //interval
+        xAxis.setValueFormatter(formatter);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextColor(Color.WHITE);
+        chart.getDescription().setEnabled(false);
+        chart.getAxisLeft().setGranularity(1f);
+        chart.getAxisLeft().setTextColor(Color.WHITE);
+        chart.getAxisRight().setEnabled(false);
+        chart.getLegend().setTextColor(Color.WHITE);
+        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
     }
 
     public void initOnTimeLineChart(View layout){
-        final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasks(getContext(), new StatsFragment());
-        DataPoint[] total = new DataPoint[7];
-        for(int i = 0; i<7; i++){
-            total[i] = new DataPoint(i, data.get(total.length-i-1).totalTasksWithOnTimeStatus);
-        }
-        DataPoint[] ontime = new DataPoint[7];
-        for(int i = 0; i<7; i++){
-            ontime[i] = new DataPoint(i, data.get(total.length-i-1).onTime);
-        }
-        DataPoint[] late = new DataPoint[7];
-        for(int i = 0; i<7; i++){
-            late[i] = new DataPoint(i, data.get(total.length-i-1).late);
-        }
+        GregorianCalendar gcal = new GregorianCalendar();
+        gcal.setTime(Calendar.getInstance().getTime());
 
-        GraphView onTimeWeek = layout.findViewById(R.id.task_onTime_week_graph);
-        LineGraphSeries<DataPoint> totalSeries = new LineGraphSeries<DataPoint>(total);
-        LineGraphSeries<DataPoint> onTimeSeries = new LineGraphSeries<DataPoint>(ontime);////////////////////////////////////////
-        LineGraphSeries<DataPoint> lateSeries = new LineGraphSeries<DataPoint>(late);
-        totalSeries.setTitle("Total");
-        totalSeries.setColor(Color.YELLOW);
-        onTimeWeek.addSeries(totalSeries);
-        onTimeSeries.setTitle("On-Time");
-        onTimeSeries.setColor(Color.GREEN);
-        onTimeWeek.addSeries(onTimeSeries);
-        lateSeries.setTitle("Late");
-        lateSeries.setColor(Color.RED);
-        onTimeWeek.addSeries(lateSeries);
-        onTimeWeek.getGridLabelRenderer().setNumHorizontalLabels(7);
-        onTimeWeek.getGridLabelRenderer().setLabelFormatter( new DefaultLabelFormatter(){
+        Map<String, Integer> monthMapper = new HashMap<>();
+        monthMapper.put("Jan", 0);
+        monthMapper.put("Feb", 1);
+        monthMapper.put("Mar", 2);
+        monthMapper.put("Apr", 3);
+        monthMapper.put("May", 4);
+        monthMapper.put("Jun", 5);
+        monthMapper.put("Jul", 6);
+        monthMapper.put("Aug", 7);
+        monthMapper.put("Sep", 8);
+        monthMapper.put("Oct", 9);
+        monthMapper.put("Nov", 10);
+        monthMapper.put("Dec", 11);
+
+        String[] daterep = gcal.getTime().toString().split(" ");
+        String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+        final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
+        Collections.reverse(data);
+        Log.d("HomeDebug", data.toString());
+        //above is getting the weeks data, same as before
+        ArrayList<Entry> totalWithCompleteStatus = new ArrayList<>();
+        for(int i =0; i< data.size(); i++){
+            totalWithCompleteStatus.add(new Entry((float) i, (float) data.get(i).totalTasksWithOnTimeStatus));
+        }
+        ArrayList<Entry> complete = new ArrayList<>();
+        for(int i =0; i< data.size(); i++){
+            complete.add(new Entry((float) i, (float) data.get(i).onTime));
+        }
+        ArrayList<Entry> incomplete = new ArrayList<>();
+        for(int i =0; i< data.size(); i++){
+            incomplete.add(new Entry((float) i, (float) data.get(i).late));
+        }
+        LineDataSet total = new LineDataSet(totalWithCompleteStatus, "Total Qualifying Tasks");
+        total.setAxisDependency(YAxis.AxisDependency.LEFT);
+        total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
+        total.setCircleColor(Color.parseColor("#827717"));
+        total.setCircleColorHole(Color.parseColor("#EEFF41"));
+        LineDataSet onTime = new LineDataSet(complete, "On-Time Tasks");
+        onTime.setAxisDependency(YAxis.AxisDependency.LEFT);
+        onTime.setColor(Color.parseColor("#689F38"));    //Dark Green
+        onTime.setCircleColor(Color.parseColor("#33691E"));
+        onTime.setCircleColorHole(Color.parseColor("#64DD17"));
+        LineDataSet late = new LineDataSet(incomplete, "Late Tasks");
+        late.setAxisDependency(YAxis.AxisDependency.LEFT);
+        late.setColor(Color.parseColor("#D32F2F"));    //Dark Red
+        late.setCircleColor(Color.parseColor("#B71C1C"));
+        late.setCircleColorHole(Color.parseColor("#FF5252"));
+
+        //above is creating entry lists and their data sets
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(total);
+        dataSets.add(onTime);
+        dataSets.add(late);
+
+        LineData chartData = new LineData(dataSets);
+
+        LineChart chart = layout.findViewById(R.id.onTime_line_chart);
+        chart.setData(chartData);
+        chart.invalidate();
+
+        final String[] days = new String[7];
+        for(int i =0; i<days.length; i++){
+            days[i] = data.get(i).date;
+        }
+        IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
             @Override
-            public String formatLabel(double value, boolean isValueX){
-                String result = "";
-                if(isValueX){
-                    if(value<7) {
-                        //return data.get((int)value).date;             //use this to create x axis as category labels
-                        String[] date = data.get(data.size()-1-((int) value)).date.split("-");
+            public String getFormattedValue(float value, AxisBase axis) {
 
-                        return date[1] + "/" + date[2];
-                    }
-                    return null;
-                }
-                else{
-                    return super.formatLabel(value, isValueX);
-                }
+                // String[] date = data.get(data.size()-1-((int) value)).date.split("-");
+                //
+                //                        return date[1] + "/" + date[2];
+                String[] dateRep = days[(int) value].split("-");
+                return dateRep[1] + "/" + dateRep[2];
             }
-        });
-        onTimeWeek.setTitle("On-Time Stats Over Past Week");
 
-        onTimeWeek.getGridLabelRenderer().setVerticalAxisTitle("Number of Tasks");
-        onTimeWeek.getGridLabelRenderer().setHorizontalAxisTitle("Date");
-
-        TextView totalKey = layout.findViewById(R.id.total_onTime_key);
-        totalKey.setBackgroundColor(Color.YELLOW);
-
-        TextView onTimeKey = layout.findViewById(R.id.onTime_key);
-        onTimeKey.setBackgroundColor(Color.GREEN);
-
-        TextView lateKey = layout.findViewById(R.id.late_onTime_key);
-        lateKey.setBackgroundColor(Color.RED);
+            // we don't draw numbers, so no decimal digits needed
+        };
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setGranularity(1f);       //interval
+        xAxis.setValueFormatter(formatter);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextColor(Color.WHITE);
+        chart.getDescription().setEnabled(false);
+        chart.getAxisLeft().setGranularity(1f);
+        chart.getAxisLeft().setTextColor(Color.WHITE);
+        chart.getAxisRight().setEnabled(false);
+        chart.getLegend().setTextColor(Color.WHITE);
+        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
 
     }
 
@@ -330,17 +611,19 @@ public class HomeFragment extends Fragment {
 
         @Override
         public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
-            if(t1.totalTasksWithCompleteStatus<5){
-                return -1;
-            }
-            if(categoryStats.totalTasksWithCompleteStatus<5){
-                return 1;
-            }
-            if(categoryStats.complete/categoryStats.totalTasksWithCompleteStatus > t1.complete/t1.totalTasksWithCompleteStatus){
+            if(100*categoryStats.complete/categoryStats.totalTasksWithCompleteStatus < 100*t1.complete/t1.totalTasksWithCompleteStatus){
                 return 1;
             }
             else{
-                return -1;
+                if(100*categoryStats.complete/categoryStats.totalTasksWithCompleteStatus == 100*t1.complete/t1.totalTasksWithCompleteStatus){
+                    if(categoryStats.totalTasksWithCompleteStatus < t1.totalTasksWithCompleteStatus){
+                        return 1;
+                    }
+                    return -1;
+                }
+                else {
+                    return -1;
+                }
             }
         }
     }
@@ -350,14 +633,13 @@ public class HomeFragment extends Fragment {
 
         @Override
         public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
-            if(t1.totalTasksWithCompleteStatus<5){
-                return -1;
-            }
-            if(categoryStats.totalTasksWithCompleteStatus<5){
-                return 1;
-            }
             if(categoryStats.complete/categoryStats.totalTasksWithCompleteStatus < t1.complete/t1.totalTasksWithCompleteStatus){
-                return 1;
+                if(categoryStats.complete/categoryStats.totalTasksWithCompleteStatus < t1.complete/t1.totalTasksWithCompleteStatus){
+                    return 1;
+                }
+                else {
+                    return 1;
+                }
             }
             else{
                 return -1;
@@ -380,6 +662,12 @@ public class HomeFragment extends Fragment {
                 return 1;
             }
             else{
+//                if(categoryStats.onTime/categoryStats.totalTasksWithOnTimeStatus == t1.onTime/t1.totalTasksWithOnTimeStatus){
+//                    if(categoryStats.onTime/)
+//                }
+//                else {
+//                    return -1;
+//                }
                 return -1;
             }
         }

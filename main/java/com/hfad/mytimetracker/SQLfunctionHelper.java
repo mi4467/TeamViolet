@@ -38,7 +38,10 @@ public class SQLfunctionHelper {
         return result;
     }
 
-    public static void deleteTask(int id, SQLiteDatabase readableDatabase, SQLiteDatabase writableDatabase){
+    public static void deleteTask(int id, Context c){
+        TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase writableDatabase = categoryHelper.getWritableDatabase();
+        SQLiteDatabase readableDatabase = categoryHelper.getReadableDatabase();
         Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
         temp.moveToFirst();
         boolean completed = temp.getInt(4)==1;
@@ -79,11 +82,15 @@ public class SQLfunctionHelper {
                 }
             }
         }
+        deleteNotif(c, readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id, null));
         writableDatabase.delete("TASK_STATS", "TASK_ID = ?", new String[]{id+""});
         writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
     }
 
-    public static void markComplete(int id, SQLiteDatabase readableDatabase, SQLiteDatabase writableDatabase, boolean onTime){
+    public static void markComplete(int id, TimeTrackerDataBaseHelper helper, boolean onTime){
+        SQLiteDatabase readableDatabase = helper.getReadableDatabase();
+        SQLiteDatabase writableDatabase = helper.getWritableDatabase();
+        //Something here is broken
         //ADD a check for the general category
         ContentValues completeValue = new ContentValues();
         completeValue.put("COMPLETED", 1);
@@ -91,9 +98,19 @@ public class SQLfunctionHelper {
         //writableDatabase = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
         Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
         temp.moveToFirst();
+        int completed = temp.getInt(4);
+        if(completed==1){       //check to make sure we can't mark complete twice
+            return;
+        }
+        else{
+            //add points for completing a task here, make a call to that function
+        }
         //we have to check to see if it's on time or not, mark those values in TASK_STATS
         Log.d("MarkCompleteDebug", "Is it on time: " + onTime);
+        boolean alreadyMarkedLate = temp.getInt(7)==1;
+
         if(onTime){
+            addToScore(helper, true);
             completeValue.put("ON_TIME", 1);
             completeValue.put("NOT_ON_TIME", 0);
             writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
@@ -120,6 +137,7 @@ public class SQLfunctionHelper {
             }
         }
         else{
+            addToScore(helper,false);
             completeValue.put("ON_TIME", 0);
             completeValue.put("NOT_ON_TIME", 1);
             writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
@@ -137,11 +155,12 @@ public class SQLfunctionHelper {
                             "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
                             "WHERE CATEGORY_NAME = \"" +
                             temp.getColumnName(i) + "\"");
-
-                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-                            "SET NOT_ON_TIME = NOT_ON_TIME + 1 " +
-                            "WHERE CATEGORY_NAME = \"" +
-                            temp.getColumnName(i) + "\"");
+                    if(!alreadyMarkedLate) {                                        //makes sure we don't up the late count if the chron job already marks it late
+                        writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
+                                "SET NOT_ON_TIME = NOT_ON_TIME + 1 " +
+                                "WHERE CATEGORY_NAME = \"" +
+                                temp.getColumnName(i) + "\"");
+                    }
                 }
             }
         }
@@ -181,11 +200,17 @@ public class SQLfunctionHelper {
                     recordParamaters.put("DUE_DATE", dueDate);
                     recordParamaters.put("START_TIME", startTime);
                     recordParamaters.put("END_TIME", endTime);
+                    recordParamaters.put("NOTIFICATION", 1);
                     //construct date value, start time value, end time value
                     write.insert("TASK_INFORMATION", null, recordParamaters);
 
+//                    Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
+//                    id.moveToFirst();
+
                     Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
                     id.moveToFirst();
+                    Cursor notifCursor = read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id.getInt(0), null);
+                    createNotif(c, notifCursor);
 
                     //We want to put in the task in task stats
                     ContentValues taskStatsParams = new ContentValues();
@@ -214,16 +239,19 @@ public class SQLfunctionHelper {
         }
     }
 
-    public static  boolean enterCatInDB(Context c, SQLiteDatabase read, SQLiteDatabase write, String cat, String categoryName, Integer color) {
+    public static  boolean enterCatInDB(Context c, String categoryName, Integer color) {
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase read = helper.getReadableDatabase();
+        SQLiteDatabase write = helper.getWritableDatabase();
         Cursor check = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null);
         boolean exists = false;
         check.moveToFirst();
         for(int i =0; i<check.getCount(); i++){
             String name = check.getString(0);
             Log.d("CategorySQL", name);
-            if(name.equalsIgnoreCase(cat)){
+            if(name.equalsIgnoreCase(categoryName)){
                 //break and send toast or some shit
-                Toast.makeText(c, "This Category Already Exists!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(c, "This Category Already Exists!", Toast.LENGTH_SHORT).show();
                 Log.d("CategorySQL", "It was in DB already");
                 exists = true;
                 break;
@@ -234,9 +262,9 @@ public class SQLfunctionHelper {
             return false;
         }
         else{
-            write.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + cat + " BOOLEAN;");
+            write.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + categoryName + " BOOLEAN;");
             ContentValues entry = new ContentValues();
-            entry.put("CATEGORY_NAME", cat);
+            entry.put("CATEGORY_NAME", categoryName);
             entry.put("COLOR", color);
             entry.put("COMPLETED", 0);
             entry.put("NOT_COMPLETED", 0);
@@ -244,7 +272,7 @@ public class SQLfunctionHelper {
             entry.put("ON_TIME", 0);
             write.insert("TASK_CATEGORY_INFO", null, entry);
             Log.d("CategorySQL", "We put in DB");
-            Toast.makeText(c, "The Category " + categoryName+ " was made", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(c, "The Category " + categoryName+ " was made", Toast.LENGTH_SHORT).show();
             return true;
             //TaskCreatorFragment.categoryName = null;
             //TaskCreatorFragment.color = null;
@@ -262,11 +290,25 @@ public class SQLfunctionHelper {
         recordParamaters.put("DUE_DATE", dueDate);
         recordParamaters.put("START_TIME", startTime);
         recordParamaters.put("END_TIME", endTime);
+        recordParamaters.put("NOTIFICATION", 1);
+
         //construct date value, start time value, end time value
         write.insert("TASK_INFORMATION", null, recordParamaters);
         Log.d("InsertTaskTest", "it worked");
 
         Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
+
+        id.moveToFirst();
+        Integer lastID = id.getInt(0);
+        id = read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + lastID, null);
+        createNotif(c, id);
+
+
+        Log.d("TaskNOtificationDebug", DatabaseUtils.dumpCursorToString(id));
+        id.moveToFirst();
+        Cursor notifCursor = read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id.getInt(0), null);
+        createNotif(c, notifCursor);
+
         id.moveToFirst();
         ContentValues recordParamaterstwo = new ContentValues();
         recordParamaterstwo.put("TASK_NAME", taskName);
@@ -291,102 +333,13 @@ public class SQLfunctionHelper {
         Log.d("InsertTaskTest", "it worked");
     }
 
-    public static ArrayList<StatsFragment.CategoryStats> getFiveBestCompleteCategories(Context c, StatsFragment frag){
+    public static Cursor getTasksGivenDate(Context c, String date){
+        //Cursor data = SQLfunctionHelper.getTasksGivenDate(getContext(), TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2])));
         TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
         SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.CategoryStats> getFiveWorstCompleteCategories(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.CategoryStats> getFiveBestOnTimeCategories(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.CategoryStats> getFiveWorstOnTimeCategories(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data, but do not sort it
-        return data;
-    }
-
-    public static ArrayList<StatsFragment.DayStats> getWeekOnTimeTasks(Context c, StatsFragment frag){
-        GregorianCalendar gcal = new GregorianCalendar();
-        gcal.setTime(Calendar.getInstance().getTime());
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        ArrayList<StatsFragment.DayStats> data = new ArrayList<>();
-        Map<String, Integer> monthMapper = new HashMap<>();
-        monthMapper.put("Jan", 0);
-        monthMapper.put("Feb", 1);
-        monthMapper.put("Mar", 2);
-        monthMapper.put("Apr", 3);
-        monthMapper.put("May", 4);
-        monthMapper.put("Jun", 5);
-        monthMapper.put("Jul", 6);
-        monthMapper.put("Aug", 7);
-        monthMapper.put("Sep", 8);
-        monthMapper.put("Oct", 9);
-        monthMapper.put("Nov", 10);
-        monthMapper.put("Dec", 11);
-        for(int i =0; i<7; i++){
-            Log.d("StatsTimeDebug", gcal.getTime().toString());     //split into word array, then collect indexes 1,2,5 month/day/year into 5,1,2 for sql
-            String[] daterep = gcal.getTime().toString().split(" ");
-            String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
-            Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1", null);
-            int completed = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1", null);
-            int incompleted = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1", null);
-            int onTime = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1", null);
-            int late = dayQuery.getCount();
-            data.add(frag.new DayStats(date, completed, incompleted, onTime, late));
-            gcal.add(Calendar.DATE, -1);
-        }
-        Log.d("StatsCatDateDebug", data.toString());
-        return data;
+        Cursor result;
+        result = read.query("TASK_STATS", new String[] {"TASK_NAME", "COMPLETED", "NOT_COMPLETED"}, "DUE_DATE = ?", new String[] {date}, null, null, null);
+        return result;
     }
 
     public static ArrayList<StatsFragment.DayStats> getWeekOnTimeTasksFilter(Context c, StatsFragment frag, String d){
@@ -421,18 +374,22 @@ public class SQLfunctionHelper {
             Log.d("StatsTimeDebug", gcal.getTime().toString());     //split into word array, then collect indexes 1,2,5 month/day/year into 5,1,2 for sql
             String[] daterep = gcal.getTime().toString().split(" ");
             String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
-            Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1", null);
+            Log.d("DayStatsDebug","SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1" );
+            Log.d("DayStatsDebug","SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1");
+            Log.d("DayStatsDebug","SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1");
+            Log.d("DayStatsDebug", "SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1");
+            Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = '" + date + "' AND COMPLETED = 1", null);
             int completed = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1", null);
+            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = '" + date + "' AND NOT_COMPLETED = 1", null);
             int incompleted = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1", null);
+            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = '" + date + "' AND ON_TIME = 1", null);
             int onTime = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1", null);
+            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = '" + date + "' AND NOT_ON_TIME = 1", null);
             int late = dayQuery.getCount();
             data.add(frag.new DayStats(date, completed, incompleted, onTime, late));
             gcal.add(Calendar.DATE, -1);
         }
-        Log.d("StatsCatDateDebug", data.toString());
+        Log.d("LineGraphDebug", data.toString());
         return data;
     }
 
@@ -449,7 +406,7 @@ public class SQLfunctionHelper {
         categoryStats.moveToFirst();
         ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
         for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
+            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(6), categoryStats.getInt(5));
             data.add(temp);
             categoryStats.moveToNext();
         }
@@ -457,72 +414,124 @@ public class SQLfunctionHelper {
         return data;
     }
 
-    public static ArrayList<StatsFragment.DayStats> getWeekCompleteTasks(Context c, StatsFragment frag){
-        GregorianCalendar gcal = new GregorianCalendar();
-        gcal.setTime(Calendar.getInstance().getTime());
+    public static Cursor getTaskInfo(Context c, int id){
         TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
         SQLiteDatabase read = helper.getReadableDatabase();
-        ArrayList<StatsFragment.DayStats> data = new ArrayList<>();
-        Map<String, Integer> monthMapper = new HashMap<>();
-        monthMapper.put("Jan", 0);
-        monthMapper.put("Feb", 1);
-        monthMapper.put("Mar", 2);
-        monthMapper.put("Apr", 3);
-        monthMapper.put("May", 4);
-        monthMapper.put("Jun", 5);
-        monthMapper.put("Jul", 6);
-        monthMapper.put("Aug", 7);
-        monthMapper.put("Sep", 8);
-        monthMapper.put("Oct", 9);
-        monthMapper.put("Nov", 10);
-        monthMapper.put("Dec", 11);
-        for(int i =0; i<7; i++){
-            Log.d("StatsTimeDebug", gcal.getTime().toString());     //split into word array, then collect indexes 1,2,5 month/day/year into 5,1,2 for sql
-            String[] daterep = gcal.getTime().toString().split(" ");
-            String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
-            Cursor dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND COMPLETED = 1", null);
-            int completed = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_COMPLETED = 1", null);
-            int incompleted = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND ON_TIME = 1", null);
-            int onTime = dayQuery.getCount();
-            dayQuery = read.rawQuery("SELECT * FROM TASK_STATS WHERE DUE_DATE = " + date + " AND NOT_ON_TIME = 1", null);
-            int late = dayQuery.getCount();
-            data.add(frag.new DayStats(date, completed, incompleted, onTime, late));
-            gcal.add(Calendar.DATE, -1);
-        }
-        Log.d("StatsCatDateDebug", data.toString());
-        return data;
+        return read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id, null);
     }
 
-    public static ArrayList<StatsFragment.CategoryStats> getLateTasks(Context c, StatsFragment frag){
+    public static Cursor getTaskStats(Context c, int id){
         TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
         SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
-        }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data, but do not sort it
-        return data;
+        return read.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
     }
 
-    public static ArrayList<StatsFragment.CategoryStats> getInCompleteTasks(Context c, StatsFragment frag){
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
-        SQLiteDatabase read = helper.getReadableDatabase();
-        Cursor categoryStats = read.rawQuery("SELECT * FROM TASK_CATEGORY_INFO", null);
-        categoryStats.moveToFirst();
-        ArrayList<StatsFragment.CategoryStats> data = new ArrayList<>();
-        for(int i =0; i< categoryStats.getCount(); i++){
-            StatsFragment.CategoryStats temp = frag.new CategoryStats(categoryStats.getString(1), categoryStats.getInt(2), categoryStats.getInt(3), categoryStats.getInt(4), categoryStats.getInt(5), categoryStats.getInt(6));
-            data.add(temp);
-            categoryStats.moveToNext();
+    public static void changeNotification(Context c, int id, boolean state){
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);            //test
+        SQLiteDatabase write = helper.getReadableDatabase();
+        Integer val;
+        if(state){
+            val = 1;
         }
-        Log.d("StatsCategoriesDebug", data.toString());     //we return the correct data, but do not sort it
-        return data;
+        else{
+            val = 0;
+        }
+        write.execSQL("UPDATE TASK_INFORMATION SET NOTIFICATION = " + val + " WHERE _ID = " + id);
+        return;
+    }
+
+    public static void createNotif(Context c, Cursor id){
+        NotificationHelper.createTaskNotif(c, id);
+    }
+
+    public static void deleteNotif(Context c, Cursor id){
+
+    }
+
+
+    public static void addCatTaskActivity(Context c, CharSequence[] categories, int id){
+        SQLiteDatabase writableDatabase = TimeTrackerDataBaseHelper.getInstance(c).getWritableDatabase();
+        SQLiteDatabase readableDatabase = TimeTrackerDataBaseHelper.getInstance(c).getReadableDatabase();
+        ContentValues data = new ContentValues();
+        Cursor valuesOfTask = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
+        valuesOfTask.moveToFirst();
+        for(int i =0; i<categories.length; i++){
+            Cursor temp = readableDatabase.rawQuery("SELECT " + categories[i].toString() + " FROM TASK_STATS WHERE TASK_ID = " + id, null);
+            temp.moveToFirst();
+            data.put(categories[i].toString(), 1);
+            if(temp.getInt(0)==0){
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET COMPLETED = COMPLETED + " + valuesOfTask.getInt(4) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_COMPLETED = NOT_COMPLETED + " + valuesOfTask.getInt(6) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_ON_TIME = NOT_ON_TIME + " + valuesOfTask.getInt(7) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET ON_TIME = ON_TIME + " + valuesOfTask.getInt(8) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+            }
+        }
+        writableDatabase.update("TASK_STATS", data, "TASK_ID = " + id, null);
+    }
+
+    public static void removeCatTaskActivity(Context c, CharSequence[] categories, int id){
+        SQLiteDatabase writableDatabase = TimeTrackerDataBaseHelper.getInstance(c).getWritableDatabase();
+        SQLiteDatabase readableDatabase = TimeTrackerDataBaseHelper.getInstance(c).getReadableDatabase();
+        Cursor valuesOfTask = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
+        valuesOfTask.moveToFirst();
+        ContentValues data = new ContentValues();
+        for(int i =0; i<categories.length; i++){
+            Cursor temp = readableDatabase.rawQuery("SELECT " + categories[i].toString() + " FROM TASK_STATS WHERE TASK_ID = " + id, null);
+            temp.moveToFirst();
+            data.put(categories[i].toString(), 0);
+            if(temp.getInt(0)==1){
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET COMPLETED = COMPLETED - " + valuesOfTask.getInt(4) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_COMPLETED = NOT_COMPLETED - " + valuesOfTask.getInt(6) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_ON_TIME = NOT_ON_TIME - " + valuesOfTask.getInt(7) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+                writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO SET ON_TIME = ON_TIME - " + valuesOfTask.getInt(8) + " WHERE CATEGORY_NAME = '" + categories[i] + "'");
+            }
+        }
+        writableDatabase.update("TASK_STATS", data, "TASK_ID = " + id, null);
+    }
+
+    public static void changeTimeData(Context c, int id, String dueDate, String startTime, String endTime){
+        TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(c);
+        SQLiteDatabase write = categoryHelper.getWritableDatabase();
+        SQLiteDatabase read = categoryHelper.getReadableDatabase();
+
+//        ContentValues taskInfo = new ContentValues();                   //insert task info, insert task stats
+//        //recordParamaters.put("TASK_CATEGORY", TaskCreatorFragment.taskCategoryName);
+//        taskInfo.put("DUE_DATE", dueDate);
+//        taskInfo.put("START_TIME", startTime);
+//        taskInfo.put("END_TIME", endTime);
+
+        //write.update("TASK_INFORMATION", taskInfo, "_ID = " + id, null);
+        write.execSQL("UPDATE TASK_INFORMATION SET DUE_DATE = '" + dueDate +"', START_TIME = '" + startTime + "', END_TIME = '" + endTime + "' WHERE _ID = " + id);
+        Log.d("TaskActivityTimeDebug", "UPDATE TASK_INFORMATION SET DUE_DATE = '" + dueDate +"', START_TIME = '" + startTime + "', END_TIME = '" + endTime + "' WHERE _ID = " + id);
+        Log.d("TaskActivityTimeDebug", "UPDATE TASK_STATS SET DUE_DATE = '" + dueDate + "' WHERE TASK_ID = " + id);
+//        ContentValues taskStats = new ContentValues();
+//        taskStats.put("DUE_DATE", dueDate);
+//        write.update("TASK_STATS", taskStats, "TASK_ID = " + id, null);
+        write.execSQL("UPDATE TASK_STATS SET DUE_DATE = '" + dueDate + "' WHERE TASK_ID = " + id);
+
+    }
+
+    public static void addToScore(TimeTrackerDataBaseHelper c, boolean onTime){
+        //award fifty points if it's just complete, award 100 if its onTime as well
+        //add to the today score and for the total score
+        SQLiteDatabase write = c.getWritableDatabase();
+        if(onTime){
+            write.execSQL("UPDATE USER_STATS SET TODAY_SCORE = TODAY_SCORE + 10");
+            write.execSQL("UPDATE USER_STATS SET TOTAL_SCORE = TOTAL_SCORE + 10");
+        }
+        else {
+            write.execSQL("UPDATE USER_STATS SET TODAY_SCORE = TODAY_SCORE +5");
+            write.execSQL("UPDATE USER_STATS SET TOTAL_SCORE = TOTAL_SCORE +5");
+        }
+
+    }
+
+    public static void removeFromScore(TimeTrackerDataBaseHelper c){
+        //take away a hundred points if it's late
+        //subtract to the today score and for the total score
+        SQLiteDatabase write = c.getWritableDatabase();
+        write.execSQL("UPDATE USER_STATS SET TODAY_SCORE = TODAY_SCORE - 10");
+        write.execSQL("UPDATE USER_STATS SET TOTAL_SCORE = TOTAL_SCORE - 10");
     }
 
 }

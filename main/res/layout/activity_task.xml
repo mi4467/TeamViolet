@@ -22,46 +22,27 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.v4.widget.NestedScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        tools:context="com.hfad.mytimetracker.TaskActivity"
         android:id="@+id/scrollView1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:fillViewport="true" >
+        android:fillViewport="true"
+         >
         <LinearLayout
             android:paddingTop="55dp"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="5"
             >
-
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:layout_margin="5dp"
-                card_view:cardCornerRadius="4dp"
-                >
-            <com.alamkanak.weekview.WeekView
-                android:id="@+id/weekView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:eventTextColor="@android:color/white"
-                app:textSize="12sp"
-                app:hourHeight="60dp"
-                app:headerColumnPadding="8dp"
-                app:headerColumnTextColor="#8f000000"
-                app:headerRowPadding="12dp"
-                app:columnGap="8dp"
-                app:noOfVisibleDays="1"
-
-                />
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                card_view:cardBackgroundColor="@color/cardview_bgcolor"
                 android:layout_margin="5dp"
                 card_view:cardCornerRadius="4dp"
                 >
@@ -71,35 +52,176 @@
                     android:layout_height="wrap_content">
                     <TextView
                         android:text="Task Information"
+                        android:padding="10dp"
                         android:textAlignment="center"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:weightSum="2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <android.support.v7.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_margin="5dp"
+                            card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                            card_view:cardCornerRadius="4dp"
+                            android:layout_height="match_parent">
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:padding="10dp"
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Time Information"
+                                    android:textAlignment="center"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <TextView
+                                    android:id="@+id/due_date_record"
+                                    android:text="\nDue Date:   "
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <TextView
+                                    android:text="\nStart Time: "
+                                    android:id="@+id/start_time_record"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <TextView
+                                    android:text="\nEnd Time:   "
+                                    android:id="@+id/endt_time_record"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                        </android.support.v7.widget.CardView>
+                        <android.support.v7.widget.CardView
+                            android:layout_margin="5dp"
+                            card_view:cardCornerRadius="4dp"
+                            android:layout_weight="1"
+                            card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent">
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:padding="10dp"
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Organizational Information"
+                                    android:textAlignment="center"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <TextView
+                                    android:text="\nTitle: "
+                                    android:id="@+id/name_record"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <TextView
+                                    android:text="\nTagged Categories: "
+                                    android:id="@+id/category_record"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+
+                        </android.support.v7.widget.CardView>
+                    </LinearLayout>
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                card_view:cardBackgroundColor="@color/cardview_bgcolor"
                 android:layout_margin="5dp"
                 card_view:cardCornerRadius="4dp"
                 >
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
                     <TextView
                         android:text="Task Stats"
+                        android:padding="10dp"
                         android:textAlignment="center"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:weightSum="2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <android.support.v7.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                            android:layout_margin="5dp"
+                            card_view:cardCornerRadius="4dp"
+                            android:layout_height="match_parent">
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:padding="10dp"
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Completion Status"
+                                    android:textAlignment="center"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <TextView
+                                    android:id="@+id/completed_record"
+                                    android:text="\nCompleted:        "
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <TextView
+                                    android:text="\nNot Completed: "
+                                    android:id="@+id/incomplete_record"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                        </android.support.v7.widget.CardView>
+                        <android.support.v7.widget.CardView
+                            android:layout_margin="5dp"
+                            card_view:cardCornerRadius="4dp"
+                            android:layout_weight="1"
+                            card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent">
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:padding="10dp"
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Punctuality Status"
+                                    android:textAlignment="center"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <TextView
+                                    android:text="\nOn Time: "
+                                    android:id="@+id/onTime_record"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <TextView
+                                    android:text="\nLate:        "
+                                    android:id="@+id/late_record"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+
+                        </android.support.v7.widget.CardView>
+                    </LinearLayout>
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                card_view:cardBackgroundColor="@color/cardview_bgcolor"
                 android:layout_margin="5dp"
                 card_view:cardCornerRadius="4dp"
                 >
@@ -107,17 +229,159 @@
                     android:orientation="vertical"
                     android:textAlignment="center"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
                     <TextView
                         android:text="Task Settings"
+                        android:padding="10dp"
                         android:textAlignment="center"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <android.support.v7.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_margin="5dp"
+                            card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                            card_view:cardCornerRadius="4dp"
+                            android:layout_height="match_parent">
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Organization Settings"
+                                    android:padding="10dp"
+                                    android:textAlignment="center"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <LinearLayout
+                                    android:orientation="horizontal"
+                                    android:padding="10dp"
+                                    android:weightSum="7"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                                        <Button
+                                            android:id="@+id/task_act_addCat"
+                                            android:text="Add Category"
+                                            android:layout_gravity="center"
+                                            android:layout_weight="3"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content" />
+                                        <Button
+                                            android:id="@+id/task_act_removeCat"
+                                            android:text="Remove Category"
+                                            android:layout_gravity="center"
+                                            android:layout_weight="4"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content" />
+
+                                </LinearLayout>
+                            </LinearLayout>
+                        </android.support.v7.widget.CardView>
+                        <android.support.v7.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_margin="5dp"
+                            card_view:cardCornerRadius="4dp"
+                            card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                            android:layout_height="match_parent">
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Management Settings"
+                                    android:padding="10dp"
+                                    android:textAlignment="center"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                                <LinearLayout
+                                    android:orientation="horizontal"
+                                    android:padding="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                                    <Button
+                                        android:id="@+id/task_act_mark_complete"
+                                        android:text="Mark Complete"
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content" />
+                                    <Button
+                                        android:id="@+id/task_act_delete"
+                                        android:text="Delete"
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content" />
+
+                                    <ToggleButton
+                                        android:id="@+id/task_act_notification_toggle"
+                                        android:layout_width="match_parent"
+                                        android:textOff="Notification Off"
+                                        android:textOn="Notification On"
+                                        android:layout_height="wrap_content" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                        </android.support.v7.widget.CardView>
+
+                    </LinearLayout>
+                    <android.support.v7.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_margin="5dp"
+                        card_view:cardCornerRadius="4dp"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                        android:layout_height="match_parent">
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:padding="10dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:text="Time Settings"
+                                android:padding="10dp"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:weightSum="4"
+                                android:layout_height="wrap_content">
+                                <Button
+                                    android:id="@+id/task_act_start_time"
+                                    android:text="Start Time"
+                                    android:layout_weight="1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+                                <Button
+                                    android:id="@+id/task_act_end_time"
+                                    android:text="End Time"
+                                    android:layout_weight="1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+                                <Button
+                                    android:id="@+id/task_act_due_date"
+                                    android:text="Due Date"
+                                    android:layout_weight="1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+                                <Button
+                                    android:id="@+id/task_act_date_enter"
+                                    android:text="Enter"
+                                    android:layout_weight="1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </android.support.v7.widget.CardView>
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
         </LinearLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
