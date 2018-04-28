@@ -65,6 +65,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     private static Integer endMinuteReocc=null;
     private static Integer endHourReocc=null;
     private static Integer[] days=null;
+
     private static CharSequence[] categoriesReocc = null;
     private static String  reoccTaskName = null;
 
@@ -153,9 +154,9 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                 .setPositiveButton("ok", new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                        TextView yolo = (TextView) getActivity().findViewById(R.id.colorbox);
+                        //TextView yolo = (TextView) getActivity().findViewById(R.id.colorbox);
                         color = selectedColor;
-                        yolo.setBackgroundColor(selectedColor);
+                        //yolo.setBackgroundColor(selectedColor);
                     }
                 })
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -437,10 +438,10 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         TaskCreatorFragment.categoriesReocc=null;
     }
 
-    private boolean checkValidityOfReoccTask(){
+    public boolean checkValidityOfReoccTask(){
       //  Log.d("ReoccTest", TaskCreatorFragment.startYear + " " + TaskCreatorFragment.startMonth + " " + TaskCreatorFragment.startDate);
       //  Log.d("ReoccTest", TaskCreatorFragment.endYear + " " + TaskCreatorFragment.endMonth +  " " + TaskCreatorFragment.endDay);
-        if(TaskCreatorFragment.reoccTaskName.equals("")){                      //change
+        if(TaskCreatorFragment.reoccTaskName == null || TaskCreatorFragment.reoccTaskName.equals("") ){                      //change
             Toast.makeText(getActivity(), "Choose a Task!", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -497,7 +498,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
 
-    private boolean checkValidityOfTask(){
+    public boolean checkValidityOfTask(){
         if(TaskCreatorFragment.taskName.equals("")){
             Toast.makeText(getActivity(), "Choose a Task!", Toast.LENGTH_SHORT).show();
             return false;
@@ -531,6 +532,103 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
             return false;
         }
         return true;
+    }
+
+
+    public static void setColor(Integer color) {
+        TaskCreatorFragment.color = color;
+    }
+
+    public static void setCategoryName(String categoryName) {
+        TaskCreatorFragment.categoryName = categoryName;
+    }
+
+    public static void setYear(Integer year) {
+        TaskCreatorFragment.year = year;
+    }
+
+    public static void setMonth(Integer month) {
+        TaskCreatorFragment.month = month;
+    }
+
+    public static void setDate(Integer date) {
+        TaskCreatorFragment.date = date;
+    }
+
+    public static void setStartYear(Integer startYear) {
+        TaskCreatorFragment.startYear = startYear;
+    }
+
+    public static void setStartDate(Integer startDate) {
+        TaskCreatorFragment.startDate = startDate;
+    }
+
+    public static void setStartMonth(Integer startMonth) {
+        TaskCreatorFragment.startMonth = startMonth;
+    }
+
+    public static void setEndYear(Integer endYear) {
+        TaskCreatorFragment.endYear = endYear;
+    }
+
+    public static void setEndMonth(Integer endMonth) {
+        TaskCreatorFragment.endMonth = endMonth;
+    }
+
+    public static void setEndDay(Integer endDay) {
+        TaskCreatorFragment.endDay = endDay;
+    }
+
+    public static void setStartMinuteReocc(Integer startMinuteReocc) {
+        TaskCreatorFragment.startMinuteReocc = startMinuteReocc;
+    }
+
+    public static void setStartHourReocc(Integer startHourReocc) {
+        TaskCreatorFragment.startHourReocc = startHourReocc;
+    }
+
+    public static void setEndMinuteReocc(Integer endMinuteReocc) {
+        TaskCreatorFragment.endMinuteReocc = endMinuteReocc;
+    }
+
+    public static void setEndHourReocc(Integer endHourReocc) {
+        TaskCreatorFragment.endHourReocc = endHourReocc;
+    }
+
+    public static void setDays(Integer[] days) {
+        TaskCreatorFragment.days = days;
+    }
+
+    public static void setCategoriesReocc(CharSequence[] categoriesReocc) {
+        TaskCreatorFragment.categoriesReocc = categoriesReocc;
+    }
+
+    public static void setReoccTaskName(String reoccTaskName) {
+        TaskCreatorFragment.reoccTaskName = reoccTaskName;
+    }
+
+    public static void setTaskName(String taskName) {
+        TaskCreatorFragment.taskName = taskName;
+    }
+
+    public static void setTaskCategoryNames(CharSequence[] taskCategoryNames) {
+        TaskCreatorFragment.taskCategoryNames = taskCategoryNames;
+    }
+
+    public static void setStartMinute(Integer startMinute) {
+        TaskCreatorFragment.startMinute = startMinute;
+    }
+
+    public static void setStartHour(Integer startHour) {
+        TaskCreatorFragment.startHour = startHour;
+    }
+
+    public static void setEndMinute(Integer endMinute) {
+        TaskCreatorFragment.endMinute = endMinute;
+    }
+
+    public static void setEndHour(Integer endHour) {
+        TaskCreatorFragment.endHour = endHour;
     }
 
 

@@ -292,7 +292,7 @@ GregorianCalendar gcal = new GregorianCalendar();
     public void initBestCompleteBar(View layout){
         ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), new StatsFragment());
         for(int i =0; i<data.size(); i++){
-            if(data.get(i).totalTasksWithCompleteStatus<5 || data.get(i).totalTasksWithOnTimeStatus<5){
+            if(data.get(i).totalTasksWithCompleteStatus<5 && data.get(i).totalTasksWithOnTimeStatus<5){
                 data.remove(data.get(i));
                 i--;
             }
@@ -302,6 +302,7 @@ GregorianCalendar gcal = new GregorianCalendar();
 
         //ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
         if(data.size()==0){
+            Log.d("HelpfulTipsDebug", "We have no viable categories");
             return;
         }
 //        completedBarData = new ArrayList<>();
@@ -326,7 +327,7 @@ GregorianCalendar gcal = new GregorianCalendar();
     public void initWorstCompleteBar(View layout){
         ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), new StatsFragment());
         for(int i =0; i<data.size(); i++){
-            if(data.get(i).totalTasksWithCompleteStatus<5 || data.get(i).totalTasksWithOnTimeStatus<5){
+            if(data.get(i).totalTasksWithCompleteStatus<5 && data.get(i).totalTasksWithOnTimeStatus<5){
                 data.remove(data.get(i));
                 i--;
             }
@@ -456,16 +457,19 @@ GregorianCalendar gcal = new GregorianCalendar();
         total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
         total.setCircleColor(Color.parseColor("#827717"));
         total.setCircleColorHole(Color.parseColor("#EEFF41"));
+        total.setValueTextColor(Color.WHITE);
         LineDataSet completeTasks = new LineDataSet(complete, "Completed Tasks");
         completeTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
         completeTasks.setColor(Color.parseColor("#689F38"));    //Dark Green
         completeTasks.setCircleColor(Color.parseColor("#33691E"));
         completeTasks.setCircleColorHole(Color.parseColor("#64DD17"));
+        completeTasks.setValueTextColor(Color.WHITE);
         LineDataSet incompleteTasks = new LineDataSet(incomplete, "Incomplete Tasks");
         incompleteTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
         incompleteTasks.setColor(Color.parseColor("#D32F2F"));    //Dark Red
         incompleteTasks.setCircleColor(Color.parseColor("#B71C1C"));
         incompleteTasks.setCircleColorHole(Color.parseColor("#FF5252"));
+        incompleteTasks.setValueTextColor(Color.WHITE);
 
         //above is creating entry lists and their data sets
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
@@ -551,17 +555,19 @@ GregorianCalendar gcal = new GregorianCalendar();
         total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
         total.setCircleColor(Color.parseColor("#827717"));
         total.setCircleColorHole(Color.parseColor("#EEFF41"));
+        total.setValueTextColor(Color.WHITE);
         LineDataSet onTime = new LineDataSet(complete, "On-Time Tasks");
         onTime.setAxisDependency(YAxis.AxisDependency.LEFT);
         onTime.setColor(Color.parseColor("#689F38"));    //Dark Green
         onTime.setCircleColor(Color.parseColor("#33691E"));
         onTime.setCircleColorHole(Color.parseColor("#64DD17"));
+        onTime.setValueTextColor(Color.WHITE);
         LineDataSet late = new LineDataSet(incomplete, "Late Tasks");
         late.setAxisDependency(YAxis.AxisDependency.LEFT);
         late.setColor(Color.parseColor("#D32F2F"));    //Dark Red
         late.setCircleColor(Color.parseColor("#B71C1C"));
         late.setCircleColorHole(Color.parseColor("#FF5252"));
-
+        late.setValueTextColor(Color.WHITE);
         //above is creating entry lists and their data sets
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(total);
