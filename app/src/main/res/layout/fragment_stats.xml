@@ -11,380 +11,165 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            card_view:cardBackgroundColor="@color/cardview_bgcolor"
-            android:layout_margin="5dp"
-            card_view:cardCornerRadius="4dp"
-            >
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <com.jjoe64.graphview.GraphView
-                    android:layout_width="match_parent"
-                    android:layout_height="200dip"
-                    android:id="@+id/task_completion_total_graph_pick_three" />
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <android.support.v7.widget.CardView
-                        android:layout_margin="5dp"
-                        card_view:cardCornerRadius="4dp"
-                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent">
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:padding = "10dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:weightSum="3"
-                            >
-                            <TextView
-                                android:text="LEGEND"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:text="Completed Tasks"
-                                android:textAlignment="center"
-                                android:layout_weight="1"
-                                android:id="@+id/completed_key_pick_three"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:text="Incomplete Tasks"
-                                android:textAlignment="center"
-                                android:layout_weight="1"
-                                android:id="@+id/not_completed_key_pick_three"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
-                    <android.support.v7.widget.CardView
-                        android:layout_margin="5dp"
-                        card_view:cardCornerRadius="4dp"
-                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:padding = "10dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:text="FILTER"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <LinearLayout
-                                android:orientation="horizontal"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
-                                <Button
-                                    android:text="Choose Category"
-                                    android:id="@+id/filterCompletionButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" />
-                                <Button
-                                    android:text="Enter"
-                                    android:id="@+id/filterCompletionEnter"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" />
-                            </LinearLayout>
-
-
-                        </LinearLayout>
-
-
-                    </android.support.v7.widget.CardView>
-                </LinearLayout>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            card_view:cardBackgroundColor="@color/cardview_bgcolor"
-            android:layout_height="match_parent"
-            android:layout_margin="5dp"
-            card_view:cardCornerRadius="4dp"
-            >
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <com.jjoe64.graphview.GraphView
-                    android:layout_width="match_parent"
-                    android:layout_height="200dip"
-                    android:id="@+id/task_onTime_total_graph_pick_three" />
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <android.support.v7.widget.CardView
-                        android:layout_margin="5dp"
-                        card_view:cardCornerRadius="4dp"
-                        android:layout_width="wrap_content"
-                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                        android:layout_height="match_parent">
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:padding = "10dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:weightSum="3"
-                            >
-                            <TextView
-                                android:text="LEGEND"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:text="On-Time Tasks"
-                                android:textAlignment="center"
-                                android:layout_weight="1"
-                                android:id="@+id/onTime_key_pick_three"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:text="Late Tasks"
-                                android:textAlignment="center"
-                                android:layout_weight="1"
-                                android:id="@+id/late_key_pick_three"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
-                    <android.support.v7.widget.CardView
-                        android:layout_margin="5dp"
-                        card_view:cardCornerRadius="4dp"
-                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:padding = "10dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:text="FILTER"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <LinearLayout
-                                android:orientation="horizontal"
-                                android:layout_width="wrap_content"
-                                android:weightSum="3"
-                                android:layout_height="wrap_content">
-                                <Button
-                                    android:text="Choose Category"
-                                    android:id="@+id/filterOnTimeButton"
-                                    android:layout_width="0dp"
-                                    android:layout_weight="2"
-                                    android:layout_height="wrap_content" />
-                                <Button
-                                    android:text="Enter"
-                                    android:id="@+id/filterOnTimeButtonEnter"
-                                    android:layout_width="0dp"
-                                    android:layout_weight="1"
-                                    android:layout_height="wrap_content" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
-                </LinearLayout>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            card_view:cardBackgroundColor="@color/cardview_bgcolor"
-            android:layout_margin="5dp"
-            android:padding = "10dp"
-            card_view:cardCornerRadius="4dp"
-            >
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <com.jjoe64.graphview.GraphView
-                    android:layout_width="match_parent"
-                    android:layout_height="200dip"
-                    android:id="@+id/task_complete_week_graph_filter" />
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <android.support.v7.widget.CardView
-                        android:layout_margin="5dp"
-                        card_view:cardCornerRadius="4dp"
-                        android:layout_width="wrap_content"
-                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                        android:layout_height="wrap_content">
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="10dp"
-                            android:weightSum="3"
-                            >
-                            <TextView
-                                android:text="LEGEND"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:text="Total Tasks"
-                                android:textAlignment="center"
-                                android:layout_weight="1"
-                                android:id="@+id/total_complete_key_filter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:layout_weight="1"
-                                android:textAlignment="center"
-                                android:text="Complete Tasks"
-                                android:id="@+id/complete_key_filter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:layout_weight="1"
-                                android:textAlignment="center"
-                                android:text="Incomplete Tasks"
-                                android:id="@+id/incomplete_key_filter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
+        <!--<android.support.v7.widget.CardView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--card_view:cardBackgroundColor="@color/cardview_bgcolor"-->
+            <!--android:layout_margin="5dp"-->
+            <!--android:padding = "10dp"-->
+            <!--card_view:cardCornerRadius="4dp"-->
+            <!--&gt;-->
+            <!--<LinearLayout-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+                <!--<com.jjoe64.graphview.GraphView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="200dip"-->
+                    <!--android:id="@+id/task_complete_week_graph_filter" />-->
+                <!--<LinearLayout-->
+                    <!--android:orientation="horizontal"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content">-->
                     <!--<android.support.v7.widget.CardView-->
                         <!--android:layout_margin="5dp"-->
                         <!--card_view:cardCornerRadius="4dp"-->
-                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_width="wrap_content"-->
                         <!--card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"-->
-                        <!--android:layout_height="match_parent">-->
+                        <!--android:layout_height="wrap_content">-->
                         <!--<LinearLayout-->
                             <!--android:orientation="vertical"-->
-                            <!--android:padding = "10dp"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content">-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:padding="10dp"-->
+                            <!--android:weightSum="3"-->
+                            <!--&gt;-->
                             <!--<TextView-->
-                                <!--android:text="FILTER"-->
+                                <!--android:text="LEGEND"-->
+                                <!--android:layout_width="match_parent"-->
+                                <!--android:layout_height="wrap_content" />-->
+                            <!--<TextView-->
+                                <!--android:text="Total Tasks"-->
+                                <!--android:textAlignment="center"-->
+                                <!--android:layout_weight="1"-->
+                                <!--android:id="@+id/total_complete_key_filter"-->
                                 <!--android:layout_width="wrap_content"-->
                                 <!--android:layout_height="wrap_content" />-->
-                            <!--<LinearLayout-->
-                                <!--android:orientation="horizontal"-->
+                            <!--<TextView-->
+                                <!--android:layout_weight="1"-->
+                                <!--android:textAlignment="center"-->
+                                <!--android:text="Complete Tasks"-->
+                                <!--android:id="@+id/complete_key_filter"-->
                                 <!--android:layout_width="wrap_content"-->
-                                <!--android:layout_height="wrap_content">-->
-                                <!--<Button-->
-                                    <!--android:text="Choose Week"-->
-                                    <!--android:id="@+id/filterCompletionWeekButton"-->
-                                    <!--android:layout_width="wrap_content"-->
-                                    <!--android:layout_height="wrap_content" />-->
-                                <!--<Button-->
-                                    <!--android:text="Enter"-->
-                                    <!--android:id="@+id/filterCompletionWeekEnter"-->
-                                    <!--android:layout_width="wrap_content"-->
-                                    <!--android:layout_height="wrap_content" />-->
-                            <!--</LinearLayout>-->
+                                <!--android:layout_height="wrap_content" />-->
+                            <!--<TextView-->
+                                <!--android:layout_weight="1"-->
+                                <!--android:textAlignment="center"-->
+                                <!--android:text="Incomplete Tasks"-->
+                                <!--android:id="@+id/incomplete_key_filter"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content" />-->
                         <!--</LinearLayout>-->
                     <!--</android.support.v7.widget.CardView>-->
-                </LinearLayout>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+                    <!--&lt;!&ndash;<android.support.v7.widget.CardView&ndash;&gt;-->
+                        <!--&lt;!&ndash;android:layout_margin="5dp"&ndash;&gt;-->
+                        <!--&lt;!&ndash;card_view:cardCornerRadius="4dp"&ndash;&gt;-->
+                        <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+                        <!--&lt;!&ndash;card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"&ndash;&gt;-->
+                        <!--&lt;!&ndash;android:layout_height="match_parent">&ndash;&gt;-->
+                        <!--&lt;!&ndash;<LinearLayout&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:orientation="vertical"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:padding = "10dp"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_height="wrap_content">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<TextView&ndash;&gt;-->
+                                <!--&lt;!&ndash;android:text="FILTER"&ndash;&gt;-->
+                                <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                                <!--&lt;!&ndash;android:layout_height="wrap_content" />&ndash;&gt;-->
+                            <!--&lt;!&ndash;<LinearLayout&ndash;&gt;-->
+                                <!--&lt;!&ndash;android:orientation="horizontal"&ndash;&gt;-->
+                                <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                                <!--&lt;!&ndash;android:layout_height="wrap_content">&ndash;&gt;-->
+                                <!--&lt;!&ndash;<Button&ndash;&gt;-->
+                                    <!--&lt;!&ndash;android:text="Choose Week"&ndash;&gt;-->
+                                    <!--&lt;!&ndash;android:id="@+id/filterCompletionWeekButton"&ndash;&gt;-->
+                                    <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                                    <!--&lt;!&ndash;android:layout_height="wrap_content" />&ndash;&gt;-->
+                                <!--&lt;!&ndash;<Button&ndash;&gt;-->
+                                    <!--&lt;!&ndash;android:text="Enter"&ndash;&gt;-->
+                                    <!--&lt;!&ndash;android:id="@+id/filterCompletionWeekEnter"&ndash;&gt;-->
+                                    <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                                    <!--&lt;!&ndash;android:layout_height="wrap_content" />&ndash;&gt;-->
+                            <!--&lt;!&ndash;</LinearLayout>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</LinearLayout>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</android.support.v7.widget.CardView>&ndash;&gt;-->
+                <!--</LinearLayout>-->
+            <!--</LinearLayout>-->
+        <!--</android.support.v7.widget.CardView>-->
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            card_view:cardBackgroundColor="@color/cardview_bgcolor"
-            android:layout_margin="5dp"
-            android:padding = "10dp"
-            card_view:cardCornerRadius="4dp"
-            >
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <com.jjoe64.graphview.GraphView
-                    android:layout_width="match_parent"
-                    android:layout_height="200dip"
-                    android:id="@+id/onTime_week_graph_filter" />
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <android.support.v7.widget.CardView
-                        android:layout_margin="5dp"
-                        card_view:cardCornerRadius="4dp"
-                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="10dp"
-                            android:weightSum="3"
-                            >
-                            <TextView
-                                android:text="LEGEND"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:text="Total Tasks"
-                                android:textAlignment="center"
-                                android:layout_weight="1"
-                                android:id="@+id/onTime_complete_key_filter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:layout_weight="1"
-                                android:textAlignment="center"
-                                android:text="On Time Tasks"
-                                android:id="@+id/onTime_key_filter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <TextView
-                                android:layout_weight="1"
-                                android:textAlignment="center"
-                                android:text="Late Tasks"
-                                android:id="@+id/late_key_filter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
-                    <android.support.v7.widget.CardView
-                        android:layout_margin="5dp"
-                        card_view:cardCornerRadius="4dp"
-                        android:layout_width="match_parent"
-                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
-                        android:layout_height="match_parent">
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:padding = "10dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent">
-                            <TextView
-                                android:text="FILTER"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                            <LinearLayout
-                                android:orientation="horizontal"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
-                                <Button
-                                    android:text="Choose Week"
-                                    android:id="@+id/filterOnTimeWeekButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" />
-                                <Button
-                                    android:text="Enter"
-                                    android:id="@+id/filterOnTimeWeekEnter"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
-                </LinearLayout>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+        <!--<android.support.v7.widget.CardView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--card_view:cardBackgroundColor="@color/cardview_bgcolor"-->
+            <!--android:layout_margin="5dp"-->
+            <!--android:padding = "10dp"-->
+            <!--card_view:cardCornerRadius="4dp"-->
+            <!--&gt;-->
+            <!--<LinearLayout-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+                <!--<com.jjoe64.graphview.GraphView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="200dip"-->
+                    <!--android:id="@+id/onTime_week_graph_filter" />-->
+                <!--<LinearLayout-->
+                    <!--android:orientation="horizontal"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content">-->
+                    <!--<android.support.v7.widget.CardView-->
+                        <!--android:layout_margin="5dp"-->
+                        <!--card_view:cardCornerRadius="4dp"-->
+                        <!--card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content">-->
+                        <!--<LinearLayout-->
+                            <!--android:orientation="vertical"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:padding="10dp"-->
+                            <!--android:weightSum="3"-->
+                            <!--&gt;-->
+                            <!--<TextView-->
+                                <!--android:text="LEGEND"-->
+                                <!--android:layout_width="match_parent"-->
+                                <!--android:layout_height="wrap_content" />-->
+                            <!--<TextView-->
+                                <!--android:text="Total Tasks"-->
+                                <!--android:textAlignment="center"-->
+                                <!--android:layout_weight="1"-->
+                                <!--android:id="@+id/onTime_complete_key_filter"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content" />-->
+                            <!--<TextView-->
+                                <!--android:layout_weight="1"-->
+                                <!--android:textAlignment="center"-->
+                                <!--android:text="On Time Tasks"-->
+                                <!--android:id="@+id/onTime_key_filter"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content" />-->
+                            <!--<TextView-->
+                                <!--android:layout_weight="1"-->
+                                <!--android:textAlignment="center"-->
+                                <!--android:text="Late Tasks"-->
+                                <!--android:id="@+id/late_key_filter"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content" />-->
+                        <!--</LinearLayout>-->
+                    <!--</android.support.v7.widget.CardView>-->
+                <!--</LinearLayout>-->
+            <!--</LinearLayout>-->
+        <!--</android.support.v7.widget.CardView>-->
 
         <android.support.v7.widget.CardView
             card_view:cardBackgroundColor="@color/cardview_bgcolor"
@@ -421,25 +206,29 @@
                     <LinearLayout
                         android:orientation="vertical"
                         android:padding = "10dp"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <TextView
-                            android:text="FILTER"
-                            android:layout_width="wrap_content"
+                            android:text="Filter Control"
+                            android:textAlignment="center"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                         <LinearLayout
                             android:orientation="horizontal"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
+                            android:weightSum="2"
                             android:layout_height="wrap_content">
                             <Button
                                 android:text="Choose Week"
                                 android:id="@+id/filterCompletionWeekButton"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
                                 android:layout_height="wrap_content" />
                             <Button
                                 android:text="Enter"
                                 android:id="@+id/filterCompletionWeekEnter"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
                                 android:layout_height="wrap_content" />
                         </LinearLayout>
                     </LinearLayout>
@@ -472,6 +261,42 @@
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     />
+                <android.support.v7.widget.CardView
+                    android:layout_margin="5dp"
+                    card_view:cardCornerRadius="4dp"
+                    android:layout_width="match_parent"
+                    card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                    android:layout_height="match_parent">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding = "10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:text="Filter Control"
+                            android:textAlignment="center"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:weightSum="2"
+                            android:layout_height="wrap_content">
+                            <Button
+                                android:text="Choose Week"
+                                android:id="@+id/filterOnTimeWeekButton"
+                                android:layout_width="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content" />
+                            <Button
+                                android:text="Enter"
+                                android:id="@+id/filterOnTimeWeekEnter"
+                                android:layout_width="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
@@ -521,6 +346,129 @@
                     <!--app:egValueTextSize="36sp"/>-->
             <!--</LinearLayout>-->
         <!--</android.support.v7.widget.CardView>-->
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
+            android:layout_margin="5dp"
+            card_view:cardCornerRadius="4dp"
+            >
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/complete_cat_barchart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp">
+
+                </com.github.mikephil.charting.charts.BarChart>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.v7.widget.CardView
+                        android:layout_margin="5dp"
+                        card_view:cardCornerRadius="4dp"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:padding = "10dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:text="Filter Control"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:weightSum="2"
+                                android:layout_height="wrap_content">
+                                <Button
+                                    android:text="Choose Category"
+                                    android:id="@+id/filterCompletionButton"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content" />
+                                <Button
+                                    android:text="Enter"
+                                    android:id="@+id/filterCompletionEnter"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
+            android:layout_margin="5dp"
+            card_view:cardCornerRadius="4dp"
+            >
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/onTime_cat_barchart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp">
+
+                </com.github.mikephil.charting.charts.BarChart>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.v7.widget.CardView
+                        android:layout_margin="5dp"
+                        card_view:cardCornerRadius="4dp"
+                        card_view:cardBackgroundColor="@color/cardview_secondary_bgcolor"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:padding = "10dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:text="Filter Control"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:weightSum="2"
+                                android:layout_height="wrap_content">
+                                <Button
+                                    android:text="Choose Category"
+                                    android:id="@+id/filterOnTimeButton"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content" />
+                                <Button
+                                    android:text="Enter"
+                                    android:id="@+id/filterOnTimeButtonEnter"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
 
     </LinearLayout>
 
