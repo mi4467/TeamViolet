@@ -53,20 +53,21 @@ public class MainActivity extends AppCompatActivity {
         ViewPager viewPager = findViewById(R.id.pager);
         viewPager.setCurrentItem(2);
 
-//        Calendar calendar = Calendar.getInstance();
-//
-//        Date date = new Date(System.currentTimeMillis());
-//
-//        calendar.set(Calendar.HOUR_OF_DAY, date.getHours());
-//        calendar.set(Calendar.MINUTE, date.getMinutes());
-//        calendar.set(Calendar.SECOND, date.getSeconds());
-//        calendar.set(Calendar.MILLISECOND, 0);
-//
-//        Intent intent = new Intent(this, ScoreUpdaterAndLateMarkerChronJob.class);
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//        AlarmManager manager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-//        manager.setRepeating(manager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        Calendar calendar = Calendar.getInstance();
+
+        Date date = new Date(System.currentTimeMillis());
+
+        calendar.set(Calendar.HOUR_OF_DAY, 11);
+        calendar.set(Calendar.MINUTE, 45);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Log.d("ChronDebug", calendar.getTime().toString());
+
+        Intent intent = new Intent(this, ScoreUpdaterAndLateMarkerChronJob.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager manager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        manager.setRepeating(manager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
 
     }
 

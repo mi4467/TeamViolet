@@ -168,15 +168,15 @@ public class SQLFunctionHelperTest {
 
     }
 
-    @Test
-    public void markTaskCompleteTest(){
-        //to do
-    }
-
-    @Test
-    public void addReoccTaskTest(){
-        //to do
-    }
+//    @Test
+//    public void markTaskCompleteTest(){
+//        //to do
+//    }
+//
+//    @Test
+//    public void addReoccTaskTest(){
+//        //to do
+//    }
 
     @Test
     public void deleteTaskTest(){

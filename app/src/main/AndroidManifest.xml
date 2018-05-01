@@ -29,9 +29,7 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme"></activity>
         <activity android:name=".TestMapScroll"></activity>
-        <receiver
-            android:name=".ScoreUpdaterAndLateMarkerChronJob"
-            android:enabled="true"/>
+        <receiver android:name=".ScoreUpdaterAndLateMarkerChronJob" android:enabled="true"/>
         <receiver android:name="com.hfad.mytimetracker.DigestPublisher" android:enabled="true"/>
         <receiver android:name="com.hfad.mytimetracker.NotificationPublisher" android:enabled="true"/>
 

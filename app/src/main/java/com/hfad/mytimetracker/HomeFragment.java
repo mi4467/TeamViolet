@@ -57,7 +57,10 @@ import lecho.lib.hellocharts.model.Axis;
 public class HomeFragment extends Fragment {
     private static ArrayList<StatsFragment.CategoryStats> completedBarData = null;
     private static ArrayList<StatsFragment.CategoryStats> onTimeBarData = null;
-
+    private static String currentStr = "Current Streak: ";
+    private static String todayScr = "\nToday's Score:  ";
+    private static String longestStr = "Longest Streak: ";
+    private static String totlScr = "\nTotal Score:       " ;
     public HomeFragment(){
 
     }
@@ -78,6 +81,7 @@ public class HomeFragment extends Fragment {
 //        initWorstOnTimeBar(layout);
           initCompleteLineChart(layout);
           initOnTimeLineChart(layout);
+          initUserStats(layout);
 //        initIncompletePieChart(layout);
 //        initLatePieChart(layout);
           //testGraph(layout);
@@ -96,6 +100,7 @@ public class HomeFragment extends Fragment {
             initOnTimeLineChart(getView());
             initBestCompleteBar(getView());
             initWorstCompleteBar(getView());
+            initUserStats(getView());
         }
 
     }
@@ -116,6 +121,21 @@ public class HomeFragment extends Fragment {
 //        chart.setData(totalData);
 //        chart.invalidate();
 //    }
+
+    public void initUserStats(View layout){
+        Cursor userStats = TimeTrackerDataBaseHelper.getInstance(getContext()).getReadableDatabase().rawQuery("SELECT * FROM USER_STATS", null);
+        userStats.moveToFirst();
+        TextView currentString = layout.findViewById(R.id.current_streak);
+        TextView tdayScr = layout.findViewById(R.id.today_score);
+        TextView longStr = layout.findViewById(R.id.longest_streak);
+        TextView totalScr = layout.findViewById(R.id.total_score);
+        currentString.setText(currentStr + userStats.getInt(0));
+        longStr.setText(longestStr + userStats.getInt(1));
+        tdayScr.setText(todayScr + userStats.getInt(2));
+        totalScr.setText(totlScr + userStats.getInt(3));
+        //for total score and tday score, put a check to see if its negative
+        //if its negative, append one more space 
+    }
 
     public void mpLineGraphWeekCompletion(View layout){
 GregorianCalendar gcal = new GregorianCalendar();

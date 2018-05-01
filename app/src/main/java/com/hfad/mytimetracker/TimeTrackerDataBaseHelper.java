@@ -1,5 +1,6 @@
 package com.hfad.mytimetracker;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -82,6 +83,12 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
                                 +"TOTAL_STREAK INTEGER,"
                                 +"TODAY_SCORE INTEGER,"
                                 +"TOTAL_SCORE INTEGER);");
+        ContentValues initialVal = new ContentValues();
+        initialVal.put("CURRENT_STREAK", 0);
+        initialVal.put("TOTAL_STREAK", 0);
+        initialVal.put("TODAY_SCORE", 0);
+        initialVal.put("TOTAL_SCORE", 0);
+        sqLiteDatabase.insert("USER_STATS", null, initialVal);
     }
 
     private void addTaskCategory(SQLiteDatabase sqLiteDatabase, String category){

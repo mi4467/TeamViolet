@@ -164,8 +164,6 @@ public class SQLfunctionHelper {
                 }
             }
         }
-        //Then iterate through category information and update the values for the categories the task belongs to
-
     }
 
     public static void enterReoccTasksInDB(Context c, Integer startYear, Integer startMonth, Integer startDay,
