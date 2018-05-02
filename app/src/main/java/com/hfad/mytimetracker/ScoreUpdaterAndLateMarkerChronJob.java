@@ -28,6 +28,7 @@ public class ScoreUpdaterAndLateMarkerChronJob extends BroadcastReceiver {
 
     private void updateTotalStreak(SQLiteDatabase read, SQLiteDatabase write){
         Cursor userStats = read.rawQuery("SELECT * FROM USER_STATS", null);
+        userStats.moveToFirst();
         int totalStreak = userStats.getInt(0);
         int allTimeStreak = userStats.getInt(1);
         //Lo
@@ -70,17 +71,21 @@ public class ScoreUpdaterAndLateMarkerChronJob extends BroadcastReceiver {
                 }
             }
             else{
-                onTimeAndComplete += punctual.getInt(7);        //otherwise we keep a total of punctual and complete
+                onTimeAndComplete += punctual.getInt(8);        //otherwise we keep a total of punctual and complete
+                Log.d("ChronDebug", "Streak will be getting incremented");
             }
             punctual.moveToNext();
         }
         if(onTimeAndComplete>0){
+            Log.d("ChronDebug", "We are increasing streak");
             writableDatabase.execSQL("UPDATE USER_STATS SET CURRENT_STREAK = CURRENT_STREAK + 1");
             //update streak accordingly in response to having completed some task on time
             updateTotalStreak(readableDatabase, writableDatabase);
         }
         else{
-            writableDatabase.execSQL("UPDATE USER_STATS SET CURRENT_STREAK = 0"); //Reset current streak to zero
+            if(punctual.getCount()!=0) {
+                writableDatabase.execSQL("UPDATE USER_STATS SET CURRENT_STREAK = 0"); //Reset current streak to zero
+            }
         }
         writableDatabase.execSQL("UPDATE USER_STATS SET TODAY_SCORE = 0");      // reset the today score paramater
         Log.d("ChronDebug", "It Sent");

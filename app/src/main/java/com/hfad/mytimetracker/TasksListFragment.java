@@ -9,6 +9,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +29,9 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
+
+import de.mateware.snacky.Snacky;
+import es.dmoral.toasty.Toasty;
 
 
 public class TasksListFragment extends Fragment {
@@ -101,7 +105,7 @@ public class TasksListFragment extends Fragment {
                 Log.d("ButtonDebug", "We entered to submit a task");
                 if(taskCategoryNames==null){
                     Log.d("ButtonDebug", "We are returning");
-                    Toast.makeText(getActivity(), "Choose Categories", Toast.LENGTH_LONG).show();
+                    Toasty.error(getContext(), "Choose Categories!", Toast.LENGTH_LONG, true).show();
                     return;
                 }
                 Cursor next = constructCommand();
@@ -113,6 +117,7 @@ public class TasksListFragment extends Fragment {
             }
         });
         resetFilters();
+        setUpToast();
         return layout;
     }
 
@@ -283,17 +288,6 @@ public class TasksListFragment extends Fragment {
     }
 
     public String[] getCategoryList(){
-//        TimeTrackerDataBaseHelper db = TimeTrackerDataBaseHelper.getInstance(getContext());
-//        SQLiteDatabase read = db.getWritableDatabase();
-//        Cursor categories = read.query("TASK_CATEGORY_INFO", new String[] {"CATEGORY_NAME"}, null, null, null, null, null, null);
-//        String[] result = new String[categories.getCount()];
-//        categories.moveToFirst();
-//        for(int i =0; i<categories.getCount(); i++){
-//            String name = categories.getString(0);
-//            result[i] = name;
-//            categories.moveToNext();
-//        }
-//        return result;
         return SQLfunctionHelper.getCategoryList(getContext());
     }
 
@@ -314,72 +308,22 @@ public class TasksListFragment extends Fragment {
     }
 
     private void markComplete(int id){
-//        //ADD a check for the general category
-//        ContentValues completeValue = new ContentValues();
-//        completeValue.put("COMPLETED", 1);
-//        completeValue.put("NOT_COMPLETED", 0);
-//        //writableDatabase = (new TimeTrackerDataBaseHelper(getActivity())).getWritableDatabase();
-//        Cursor temp = readableDatabase.rawQuery("SELECT * FROM TASK_STATS WHERE TASK_ID = " + id, null);
-//        temp.moveToFirst();
-//        //we have to check to see if it's on time or not, mark those values in TASK_STATS
-//        Log.d("MarkCompleteDebug", "Is it on time: " + verifyOnTime(id));
-//        if(verifyOnTime(id)){
-//            completeValue.put("ON_TIME", 1);
-//            completeValue.put("NOT_ON_TIME", 0);
-//            writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
-//            for(int i =9; i<temp.getColumnCount(); i++){
-//                //UPDATE THE ONTIME AND COMPLETED FOR THAT CATEGORY
-//                Log.d("MarkCompleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
-//                if(temp.getInt(i)==1){
-//                    Log.d("MarkCompleteDebug", "We are entering data for: " + temp.getColumnName(i));
-//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-//                            "SET COMPLETED = COMPLETED + 1 " +
-//                            "WHERE CATEGORY_NAME = \"" +
-//                            temp.getColumnName(i) + "\"");      //Mark it complete
-//
-//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-//                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
-//                            "WHERE CATEGORY_NAME = \"" +
-//                            temp.getColumnName(i) + "\"");
-//
-//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-//                            "SET ON_TIME = ON_TIME + 1 " +
-//                            "WHERE CATEGORY_NAME = \"" +
-//                            temp.getColumnName(i) + "\"");
-//                }
-//            }
-//        }
-//        else{
-//            completeValue.put("ON_TIME", 0);
-//            completeValue.put("NOT_ON_TIME", 1);
-//            writableDatabase.update("TASK_STATS", completeValue, "TASK_ID = ?", new String[] {id + ""});
-//            for(int i =9; i<temp.getColumnCount(); i++){
-//                //UPDATE THE NOT_ONTIME AND COMPLETED FOR THAT CATEGORY
-//                Log.d("MarkCompleteDebug", "Column " + i + " is: " + temp.getColumnName(i));
-//                if(temp.getInt(i)==1){
-//                    Log.d("MarkCompleteDebug", "We are entering data for: " + temp.getColumnName(i));
-//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-//                            "SET COMPLETED = COMPLETED + 1 " +
-//                            "WHERE CATEGORY_NAME = \"" +
-//                            temp.getColumnName(i) + "\"");      //Mark it complete
-//
-//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-//                            "SET NOT_COMPLETED = NOT_COMPLETED - 1 " +
-//                            "WHERE CATEGORY_NAME = \"" +
-//                            temp.getColumnName(i) + "\"");
-//
-//                    writableDatabase.execSQL("UPDATE TASK_CATEGORY_INFO " +
-//                            "SET NOT_ON_TIME = NOT_ON_TIME + 1 " +
-//                            "WHERE CATEGORY_NAME = \"" +
-//                            temp.getColumnName(i) + "\"");
-//                }
-//            }
-//        }
-        verifyOnTime(id);
-
-        SQLfunctionHelper.markComplete(id, TimeTrackerDataBaseHelper.getInstance(getContext()), verifyOnTime(id));
+        boolean result = SQLfunctionHelper.markComplete(id, TimeTrackerDataBaseHelper.getInstance(getContext()), verifyOnTime(id));
         //Then iterate through category information and update the values for the categories the task belongs to
+        if(result){
+            Toasty.success(getContext(), "Marked Complete!", Toast.LENGTH_LONG, true).show();
+        }
+        else{
+            Toasty.error(getContext(), "Already Marked Complete!", Toast.LENGTH_LONG, true).show();
+        }
+    }
 
+    public void setUpToast(){
+        Toasty.Config.getInstance()
+                .setErrorColor(Color.parseColor("#B71C1C"))
+                .setSuccessColor(Color.parseColor("#1B5E20"))
+                .setTextColor(Color.WHITE)
+                .apply();
     }
 
     private boolean verifyOnTime(int id){

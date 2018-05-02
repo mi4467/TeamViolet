@@ -62,6 +62,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
 import im.dacer.androidcharts.PieHelper;
 import im.dacer.androidcharts.PieView;
 
@@ -101,22 +102,7 @@ public class StatsFragment extends Fragment {
         setUpOnTimeWeekLineGraph(layout);
         setUpCompletePieGraph(layout);
         setUpLatePieGraph(layout);
-//        PieView pieView = (PieView)layout.findViewById(R.id.late_pie_view);
-//        ArrayList<PieHelper> pieHelperArrayList = new ArrayList<PieHelper>();
-//        pieHelperArrayList.add(new PieHelper(45, Color.YELLOW));
-//        pieHelperArrayList.add(new PieHelper(50, Color.BLUE));
-//        pieView.setDate(pieHelperArrayList);
-//        pieView.selectedPie(2); //optional
-//        //pieView.setOnPieClickListener(listener) //optional
-//        pieView.showPercentLabel(true); //optional
-//
-//        pieView = layout.findViewById(R.id.incomplete_pie_view);
-//        pieView.setDate(pieHelperArrayList);
-//        pieView.showPercentLabel(true);
-
-    //    initIncompletePieChart(layout);
-
-        //PieChart mChart = layout.findViewById(R.id.chart1);
+        setUpToast();
         return layout;
     }
 
@@ -131,6 +117,8 @@ public class StatsFragment extends Fragment {
             initLayout(layout);
             setUpCompletionWeekLineGraph(layout);
             setUpOnTimeWeekLineGraph(layout);
+            setUpLatePieGraph(layout);
+            setUpCompletePieGraph(layout);
         }
 
     }
@@ -253,6 +241,12 @@ public class StatsFragment extends Fragment {
 
     public void setUpCompletePieGraph(View layout){
         ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
+        for(int i =0; i< data.size(); i++){
+            if(data.get(i).incomplete==0){
+                data.remove(i);
+                i--;
+            }
+        }
         if(data.size()==0){
             return;
         }
@@ -270,7 +264,7 @@ public class StatsFragment extends Fragment {
             slices.add(new PieEntry(((float) data.get(i).incomplete)*100/divisor, data.get(i).name));
             colors.add(data.get(i).color);
         }
-        PieDataSet set = new PieDataSet(slices, "Incompletion Per Category");
+        PieDataSet set = new PieDataSet(slices, "");
         set.setColors(colors);
         set.setValueTextColor(Color.WHITE);
         set.setValueTextSize(12f);
@@ -281,7 +275,8 @@ public class StatsFragment extends Fragment {
         chart.setDrawSliceText(false);
         chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
         chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
+        chart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        chart.getLegend().setWordWrapEnabled(true);
         chart.getDescription().setEnabled(false);
         chart.setCenterTextColor(Color.WHITE);
         chart.setHoleColor(Color.parseColor("#607D8B"));
@@ -305,6 +300,12 @@ public class StatsFragment extends Fragment {
         if(data.size()==0){
             return;
         }
+        for(int i =0; i< data.size(); i++){
+            if(data.get(i).late==0){
+                data.remove(i);
+                i--;
+            }
+        }
         ArrayList<Integer> colors = new ArrayList<>();
         ArrayList<PieEntry> slices = new ArrayList<>();
         Integer divisor =0;
@@ -319,7 +320,7 @@ public class StatsFragment extends Fragment {
             slices.add(new PieEntry(((float) data.get(i).late)*100/divisor, data.get(i).name));
             colors.add(data.get(i).color);
         }
-        PieDataSet set = new PieDataSet(slices, "Late Per Category");
+        PieDataSet set = new PieDataSet(slices, "");
         set.setColors(colors);
         set.setColors(colors);
         set.setValueTextColor(Color.WHITE);
@@ -331,9 +332,11 @@ public class StatsFragment extends Fragment {
         chart.setDrawSliceText(false);
         chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
         chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
+        chart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        chart.getLegend().setWordWrapEnabled(true);
         chart.getDescription().setEnabled(false);
         chart.setHoleColor(Color.parseColor("#607D8B"));
+        chart.setCenterTextColor(Color.WHITE);
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
@@ -413,6 +416,7 @@ public class StatsFragment extends Fragment {
         xAxis.setCenterAxisLabels(true);
         xAxis.setAxisMaximum((float) onTimeBarData.size());
         chart.getLegend().setTextColor(Color.WHITE);
+        chart.getLegend().setWordWrapEnabled(true);
         chart.getAxisRight().setEnabled(false);
         chart.getAxisLeft().setTextColor(Color.WHITE);
         chart.setNoDataText("No Categories Were Selected. Choose Up To Three Categories!");
@@ -450,10 +454,6 @@ public class StatsFragment extends Fragment {
         float barSpace = .02f;
         float barWidth = .45f;
 
-//        ArrayList<IBarDataSet> dataSets = new ArrayList<>();
-//        dataSets.add(completedTasks);
-//        dataSets.add(incompleteTasks);
-
         final String[] cat = new String[data.size()];
         for(int i =0; i<cat.length; i++){
             cat[i] = completedBarData.get(i).name;
@@ -462,11 +462,6 @@ public class StatsFragment extends Fragment {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-
-                // String[] date = data.get(data.size()-1-((int) value)).date.split("-");
-                //
-                //                        return date[1] + "/" + date[2];
-                //String[] dateRep = days[(int) value].split("-");
                 if((int) value>=cat.length || value <0){
                     return "";
                 }
@@ -490,6 +485,7 @@ public class StatsFragment extends Fragment {
         chart.getLegend().setTextColor(Color.WHITE);
         chart.getAxisRight().setEnabled(false);
         chart.getAxisLeft().setTextColor(Color.WHITE);
+        chart.getLegend().setWordWrapEnabled(true);
         chart.setNoDataText("No Categories Were Selected. Choose Up To Three Categories!");
         chart.setData(barData);
         chart.groupBars(0f, groupSpace, barSpace);
@@ -562,10 +558,6 @@ public class StatsFragment extends Fragment {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-
-                // String[] date = data.get(data.size()-1-((int) value)).date.split("-");
-                //
-                //                        return date[1] + "/" + date[2];
                 String[] dateRep = days[(int) value].split("-");
                 return dateRep[1] + "/" + dateRep[2];
             }
@@ -669,7 +661,16 @@ public class StatsFragment extends Fragment {
         chart.setScaleEnabled(false);
         chart.getLegend().setTextColor(Color.WHITE);
         chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
+        chart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
 
+    }
+
+    public void setUpToast(){
+        Toasty.Config.getInstance()
+                .setErrorColor(Color.parseColor("#B71C1C"))
+                .setSuccessColor(Color.parseColor("#1B5E20"))
+                .setTextColor(Color.WHITE)
+                .apply();
     }
 
     public void showCompleteTaskCatSelection(){
@@ -680,7 +681,7 @@ public class StatsFragment extends Fragment {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         if (text.length > 5) {
-                            Toast.makeText(getActivity(), "You selected too many. Try Again", Toast.LENGTH_SHORT).show();
+                            Toasty.error(getContext(), "Choose 5 or Less Categories!", Toast.LENGTH_LONG, true).show();
                         }
                         else {
                             StatsFragment.categoriesComplete = text;
@@ -701,7 +702,7 @@ public class StatsFragment extends Fragment {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
                         if (text.length > 5) {
-                            Toast.makeText(getActivity(), "You selected too many. Try Again", Toast.LENGTH_SHORT).show();
+                            Toasty.error(getContext(), "Choose 5 or Less Categories!", Toast.LENGTH_LONG, true).show();
                         }
                         else {
                             StatsFragment.categoriesOnTime = text;

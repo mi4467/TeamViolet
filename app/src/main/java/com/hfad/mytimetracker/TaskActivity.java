@@ -42,6 +42,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import de.mateware.snacky.Snacky;
+import es.dmoral.toasty.Toasty;
+import greco.lorenzo.com.lgsnackbar.LGSnackbarManager;
+import greco.lorenzo.com.lgsnackbar.style.LGSnackBarTheme;
+import greco.lorenzo.com.lgsnackbar.style.LGSnackBarThemeManager;
+
 import static java.security.AccessController.getContext;
 
 
@@ -85,9 +91,11 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("TaskDebug", "Task id is: " + taskID);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle("Task Creator Center");
 
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setTitle("Task Center");
 
         info = SQLfunctionHelper.getTaskInfo(this, taskID);
         stats = SQLfunctionHelper.getTaskStats(this, taskID);
@@ -95,6 +103,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         initOrgInformation();
         initStats();
         initListeners();
+        setUpToast();
     }
 
     private boolean verifyOnTime(int id){
@@ -143,20 +152,20 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
     private boolean checkValidityOfTask(){
         if(year==null){
-            Toast.makeText(this, "Choose a Due Date!", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "You didn't choose a date. Choose a date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(startHour==null){
-            Toast.makeText(this, "Choose a Start Time!", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "You didn't choose a date. Choose a date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(endHour==null){
-            Toast.makeText(this, "Choose a End Time!", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "No Date Selected!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         //add a check to see if we are late, if we are late, then return false
         if(endHour<startHour || (endHour==startHour && endMinute<startMinute)){
-            Toast.makeText(this, "This Time is Invalid! Make End Time After Start Time", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Invalid End Time!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         Calendar today = Calendar.getInstance();
@@ -164,9 +173,10 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         Integer cmonth = today.get(Calendar.MONTH);
         Integer cyear = today.get(Calendar.YEAR);
         if(year<cyear ||  (year==cyear && month<cmonth) || (year==cyear && month==cmonth && date<cday) ){
-            Toast.makeText(this, "This Date is Invalid! Make The Due Date Today or After", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Invalid Date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
+        Toasty.success(TaskActivity.this, "Time Successfully Changed!", Toast.LENGTH_LONG, true).show();
         return true;
     }
 
@@ -313,6 +323,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
                         SQLfunctionHelper.addCatTaskActivity(currentActivity, addCategoryNames, taskID);
                         stats = SQLfunctionHelper.getTaskStats(TaskActivity.this, taskID);
                         initOrgInformation();
+                        Toasty.success(TaskActivity.this, "Categories Successfully Added!", Toast.LENGTH_LONG, true).show();
                         return true;
                     }
                 })
@@ -333,6 +344,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
                         SQLfunctionHelper.removeCatTaskActivity(currentActivity, removeCategoryNames, taskID);
                         stats = SQLfunctionHelper.getTaskStats(TaskActivity.this, taskID);
                         initOrgInformation();
+                        Toasty.success(TaskActivity.this, "Categories Successfully Removed!", Toast.LENGTH_LONG, true).show();
                         return true;
                     }
                 })
@@ -394,19 +406,36 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
             //send out a toast
             return;
         }
+        SQLfunctionHelper.deleteNotif(this, info);
         String dueDate = TaskCreatorFragment.constructDateStr(year, month, date);
         String startTime = startHour + "-" + startMinute + "-00";
         String endTime = endHour + "-" + endMinute + "-00";
         Log.d("TaskActivityTimeDebug", "We are about to enter the change time data");
         SQLfunctionHelper.changeTimeData(this, taskID, dueDate, startTime, endTime);
         info = SQLfunctionHelper.getTaskInfo(this, taskID);
+        SQLfunctionHelper.createNotif(this, info);
         initTimeInformation();
     }
 
     public void markTaskComplete(){
-        SQLfunctionHelper.markComplete(taskID, TimeTrackerDataBaseHelper.getInstance(this), verifyOnTime(taskID));
+        boolean result = SQLfunctionHelper.markComplete(taskID, TimeTrackerDataBaseHelper.getInstance(this), verifyOnTime(taskID));
         stats = SQLfunctionHelper.getTaskStats(this, taskID);
+        stats.moveToFirst();
+        if(result){
+            Toasty.success(this, "Marked Complete!", Toast.LENGTH_LONG, true).show();
+        }
+        else{
+            Toasty.error(this, "Already Marked Complete!", Toast.LENGTH_LONG, true).show();
+        }
         return;
+    }
+
+    public void setUpToast(){
+        Toasty.Config.getInstance()
+                .setErrorColor(Color.parseColor("#B71C1C"))
+                .setSuccessColor(Color.parseColor("#1B5E20"))
+                .setTextColor(Color.WHITE)
+                .apply();
     }
 
     public void deleteTask(){                               //test
@@ -419,14 +448,17 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     public void adjustNotification(View button){
         ToggleButton not = (ToggleButton) button;
         boolean param = false;
-        if(not.getText().equals("Notification Off")){
-            param = false;
+        Log.d("NotificationDebug", "Is it false: " + not.isChecked());
+        if(!not.isChecked()){
+            Log.d("NotificationDebug", "We should be canceling the notification");
+            param = false;      //basically when it says notification off
+            SQLfunctionHelper.deleteNotif(this, info);
         }
         else{
             param = true;
+            SQLfunctionHelper.createNotif(this, info);
         }
         SQLfunctionHelper.changeNotification(this, taskID, param);
-
     }
 
     public void showTimePickerDialog(View v) {

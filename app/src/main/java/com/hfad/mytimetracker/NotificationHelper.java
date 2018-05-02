@@ -67,8 +67,9 @@ public class NotificationHelper {
         manager.set(manager.RTC, calendar.getTimeInMillis(), pendingIntent);
     }
 
-    public void deleteTaskNotif(Context context, Cursor id){
+    public static void deleteTaskNotif(Context context, Cursor id){
         Intent intent = new Intent(context, NotificationPublisher.class);
+        id.moveToFirst();
         intent.putExtra("TASK_NAME", id.getString(1));
         intent.putExtra("ID", id.getInt(0));
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id.getInt(0), intent, PendingIntent.FLAG_UPDATE_CURRENT);

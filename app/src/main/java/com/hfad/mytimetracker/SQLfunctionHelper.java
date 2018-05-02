@@ -78,6 +78,7 @@ public class SQLfunctionHelper {
                                 "SET NOT_ON_TIME = NOT_ON_TIME - 1 " +
                                 "WHERE CATEGORY_NAME = \"" +
                                 temp.getColumnName(i) + "\"");
+                        removeFromScore(categoryHelper);
                     }
                 }
             }
@@ -87,7 +88,7 @@ public class SQLfunctionHelper {
         writableDatabase.delete("TASK_INFORMATION", "_ID = ?", new String[]{id+""});
     }
 
-    public static void markComplete(int id, TimeTrackerDataBaseHelper helper, boolean onTime){
+    public static boolean markComplete(int id, TimeTrackerDataBaseHelper helper, boolean onTime){
         SQLiteDatabase readableDatabase = helper.getReadableDatabase();
         SQLiteDatabase writableDatabase = helper.getWritableDatabase();
         //Something here is broken
@@ -100,7 +101,7 @@ public class SQLfunctionHelper {
         temp.moveToFirst();
         int completed = temp.getInt(4);
         if(completed==1){       //check to make sure we can't mark complete twice
-            return;
+            return false;
         }
         else{
             //add points for completing a task here, make a call to that function
@@ -164,6 +165,7 @@ public class SQLfunctionHelper {
                 }
             }
         }
+        return true;
     }
 
     public static void enterReoccTasksInDB(Context c, Integer startYear, Integer startMonth, Integer startDay,
@@ -174,7 +176,6 @@ public class SQLfunctionHelper {
         String startTime = startHourReocc + "-" + startMinuteReocc + "-00";
         String endTime = endHourReocc + "-" + endMinuteReocc + "-00";
         Log.d("ReoccTest", startDate + " " + endDate);
-        Toast.makeText(c, startDate + " " + endDate, Toast.LENGTH_LONG).show();
         TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(c);
         SQLiteDatabase write = categoryHelper.getWritableDatabase();
         SQLiteDatabase read = categoryHelper.getReadableDatabase();
@@ -443,7 +444,7 @@ public class SQLfunctionHelper {
     }
 
     public static void deleteNotif(Context c, Cursor id){
-
+        NotificationHelper.deleteTaskNotif(c, id);
     }
 
 

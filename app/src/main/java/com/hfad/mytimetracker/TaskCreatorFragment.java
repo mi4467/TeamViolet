@@ -1,5 +1,6 @@
 package com.hfad.mytimetracker;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -10,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.format.DateFormat;
@@ -36,6 +38,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+
+import de.mateware.snacky.Snacky;
+import es.dmoral.toasty.Toasty;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -124,7 +129,16 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         submitReocc.setOnClickListener(this);
         pickStartDate.setOnClickListener(this);
         pickEndDate.setOnClickListener(this);
+        setUpToast();
         return layout;
+    }
+
+    public void setUpToast(){
+        Toasty.Config.getInstance()
+                .setErrorColor(Color.parseColor("#B71C1C"))
+                .setSuccessColor(Color.parseColor("#1B5E20"))
+                .setTextColor(Color.WHITE)
+                .apply();
     }
 
     public void showTimePickerDialog(View v) {
@@ -288,68 +302,13 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
           }
           SQLfunctionHelper.enterReoccTasksInDB(getContext(), startYear, startMonth, startDate, endYear, endMonth, endDay, startHourReocc, startMinuteReocc,
                   endHourReocc, endMinuteReocc, days, reoccTaskName, categoriesReocc);
-//        String startDate = constructDateStr(TaskCreatorFragment.startYear, TaskCreatorFragment.startMonth, TaskCreatorFragment.startDate);
-//        String endDate = constructDateStr(TaskCreatorFragment.endYear, TaskCreatorFragment.endMonth, TaskCreatorFragment.endDay);
-//        String startTime = TaskCreatorFragment.startHourReocc + "-" + TaskCreatorFragment.startMinuteReocc + "-00";
-//        String endTime = TaskCreatorFragment.endHourReocc + "-" + TaskCreatorFragment.endMinuteReocc + "-00";
-//        Log.d("ReoccTest", startDate + " " + endDate);
-//
-//        Toast.makeText(getActivity(), startDate + " " + endDate, Toast.LENGTH_LONG).show();
-//        TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(getContext());
-//        SQLiteDatabase write = categoryHelper.getWritableDatabase();
-//        SQLiteDatabase read = categoryHelper.getReadableDatabase();
-//        HashSet<Integer> days = new HashSet<Integer>();
-//        for(int i=0; i< TaskCreatorFragment.days.length; i++){
-//            days.add(TaskCreatorFragment.days[i]+1);
-//        }
-//        try {
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");      //year.month.day
-//            Date start = sdf.parse(startDate);
-//            Date end = sdf.parse(endDate);
-//
-//            GregorianCalendar gcal = new GregorianCalendar();
-//            gcal.setTime(start);
-//            while (!gcal.getTime().after(end)) {
-//               if(days.contains(gcal.get(Calendar.DAY_OF_WEEK))){
-//                   //We want to put in the task in task info
-//                   String dueDate = constructDateStr(gcal.get(Calendar.YEAR), gcal.get(Calendar.MONTH), gcal.get(Calendar.DAY_OF_MONTH));
-//                   ContentValues recordParamaters = new ContentValues();                   //insert task info, insert task stats
-//                   recordParamaters.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
-//                   recordParamaters.put("DUE_DATE", dueDate);
-//                   recordParamaters.put("START_TIME", startTime);
-//                   recordParamaters.put("END_TIME", endTime);
-//                   //construct date value, start time value, end time value
-//                   write.insert("TASK_INFORMATION", null, recordParamaters);
-//
-//                   Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
-//                   id.moveToFirst();
-//
-//                   //We want to put in the task in task stats
-//                   ContentValues taskStatsParams = new ContentValues();
-//                   taskStatsParams.put("TASK_NAME", TaskCreatorFragment.reoccTaskName);
-//                   taskStatsParams.put("CATEGORY_GENERAL", "1");
-//                   taskStatsParams.put("NOT_COMPLETED", "1");
-//                   taskStatsParams.put("NOT_ON_TIME", "0");
-//                   taskStatsParams.put("ON_TIME", "0");
-//                   taskStatsParams.put("TASK_ID", id.getString(0));
-//                   taskStatsParams.put("COMPLETED", "0");
-//                   taskStatsParams.put("DUE_DATE", dueDate);
-//                   for(int i =0; i<TaskCreatorFragment.categoriesReocc.length; i++){
-//                       taskStatsParams.put(TaskCreatorFragment.categoriesReocc[i].toString(), "1");
-//                       write.execSQL("UPDATE TASK_CATEGORY_INFO " +
-//                               "SET NOT_COMPLETED = NOT_COMPLETED + 1 " +
-//                               "WHERE CATEGORY_NAME = \"" +
-//                               TaskCreatorFragment.categoriesReocc[i] + "\"");
-//                   }
-//                   write.insert("TASK_STATS", null, taskStatsParams);      //issue here
-//               }
-//                gcal.add(Calendar.DATE, 1);
-//            }
-//        }
-//        catch (Exception e){
-//            Log.d("ReoccTest", "Did not work");
-//        }
         cleanUpCardViewThree();
+        Snacky.builder().setActivity(getActivity())
+                .setText(" Already Marked Complete!")
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .setBackgroundColor(Color.parseColor("#B71C1C"))
+                .error().show();
     }
 
     public static String constructDateStr(int y, int m, int d){
@@ -374,12 +333,12 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         Integer color = this.color;
         if(TaskCreatorFragment.color==null){
             Log.d("CategorySQL", "No Color");
-            Toast.makeText(getActivity(), "This Category Needs a Color!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Pick A Color!", Toast.LENGTH_LONG, true).show();
             return;
         }
         if(TaskCreatorFragment.categoryName.equals("")){
             Log.d("CategorySQL", "this is cat" + cat + "!");
-            Toast.makeText(getActivity(), "This Category Needs a Name!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Give A Name!", Toast.LENGTH_LONG, true).show();
             return;
         }
         TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
@@ -388,9 +347,10 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         if(SQLfunctionHelper.enterCatInDB(getActivity(), categoryName, color)){
             TaskCreatorFragment.categoryName = null;
             TaskCreatorFragment.color = null;
+            Toasty.success(getContext(), "Successfully Added!", Toast.LENGTH_LONG, true).show();
         }
         else{
-            Toast.makeText(getActivity(), "This Category Already Exists!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Already Exists!", Toast.LENGTH_LONG, true).show();
             return;
         }
     }
@@ -442,31 +402,31 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
       //  Log.d("ReoccTest", TaskCreatorFragment.startYear + " " + TaskCreatorFragment.startMonth + " " + TaskCreatorFragment.startDate);
       //  Log.d("ReoccTest", TaskCreatorFragment.endYear + " " + TaskCreatorFragment.endMonth +  " " + TaskCreatorFragment.endDay);
         if(TaskCreatorFragment.reoccTaskName == null || TaskCreatorFragment.reoccTaskName.equals("") ){                      //change
-            Toast.makeText(getActivity(), "Choose a Task!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Make A Task!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.endYear==null){
-            Toast.makeText(getActivity(), "Choose a End Date!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose An End Date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.startYear==null){
-            Toast.makeText(getActivity(), "Choose a Start Date!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose A Start Date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.startHourReocc==null){
-            Toast.makeText(getActivity(), "Choose a Start Time!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose A Start Time!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.endHourReocc==null){
-            Toast.makeText(getActivity(), "Choose a End Time!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose An End Time!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.categoriesReocc==null){
-            Toast.makeText(getActivity(), "Choose a Category!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose a Category!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.days==null){
-            Toast.makeText(getActivity(), "Choose Days!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose Days!", Toast.LENGTH_LONG, true).show();
             return false;
         }
 
@@ -475,7 +435,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         Log.d("ReoccTest", TaskCreatorFragment.startHourReocc + " " + TaskCreatorFragment.startMinuteReocc);
         Log.d("ReoccTest", TaskCreatorFragment.endHourReocc + " " + TaskCreatorFragment.endMinuteReocc);
         if(TaskCreatorFragment.endHourReocc<TaskCreatorFragment.startHourReocc || (TaskCreatorFragment.endHourReocc==TaskCreatorFragment.startHourReocc && TaskCreatorFragment.endMinuteReocc<TaskCreatorFragment.startMinuteReocc)){
-            Toast.makeText(getActivity(), "This Time is Invalid! Make End Time After Start Time", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Invalid Times!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         Calendar today = Calendar.getInstance();
@@ -483,44 +443,45 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         Integer cmonth = today.get(Calendar.MONTH);
         Integer cyear = today.get(Calendar.YEAR);
         if(TaskCreatorFragment.startYear<cyear ||  (TaskCreatorFragment.startYear==cyear && TaskCreatorFragment.startMonth<cmonth) || (TaskCreatorFragment.startYear==cyear && TaskCreatorFragment.startMonth==cmonth && TaskCreatorFragment.startDate<cday) ){
-            Toast.makeText(getActivity(), "The Start Date is Invalid! Make The Start Date Today or After", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Invalid Start Date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.endYear<cyear ||  (TaskCreatorFragment.endYear==cyear && TaskCreatorFragment.endMonth<cmonth) || (TaskCreatorFragment.endYear==cyear && TaskCreatorFragment.endMonth==cmonth && TaskCreatorFragment.endDay<cday) ){
-            Toast.makeText(getActivity(), "The End Date is Invalid! Make The Due Date Today or After", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Invalid End Date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.endYear<TaskCreatorFragment.startYear ||  (TaskCreatorFragment.endYear==TaskCreatorFragment.startYear && TaskCreatorFragment.endMonth<TaskCreatorFragment.startMonth) || (TaskCreatorFragment.endYear==TaskCreatorFragment.startYear && TaskCreatorFragment.endMonth==TaskCreatorFragment.startMonth && TaskCreatorFragment.endDay<TaskCreatorFragment.startDate) ){
-            Toast.makeText(getActivity(), "The End Date  Invalid! Make The End Date The Same Day Or After The EndDate", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Invalid End Date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
+        Toasty.success(getContext(), "Successfully Added!", Toast.LENGTH_LONG, true).show();
         return  true;
     }
 
 
     public boolean checkValidityOfTask(){
         if(TaskCreatorFragment.taskName.equals("")){
-            Toast.makeText(getActivity(), "Choose a Task!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Make A Task!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.year==null){
-            Toast.makeText(getActivity(), "Choose a Due Date!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose A Due Date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.startHour==null){
-            Toast.makeText(getActivity(), "Choose a Start Time!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose A Start Time!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.endHour==null){
-            Toast.makeText(getActivity(), "Choose a End Time!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose An End Time", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.taskCategoryNames==null){
-            Toast.makeText(getActivity(), "Choose a Category!", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Choose Categories!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.endHour<TaskCreatorFragment.startHour || (TaskCreatorFragment.endHour==TaskCreatorFragment.startHour && TaskCreatorFragment.endMinute<TaskCreatorFragment.startMinute)){
-            Toast.makeText(getActivity(), "This Time is Invalid! Make End Time After Start Time", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Invalid End Time!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         Calendar today = Calendar.getInstance();
@@ -528,9 +489,10 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         Integer cmonth = today.get(Calendar.MONTH);
         Integer cyear = today.get(Calendar.YEAR);
         if(TaskCreatorFragment.year<cyear ||  (TaskCreatorFragment.year==cyear && TaskCreatorFragment.month<cmonth) || (TaskCreatorFragment.year==cyear && TaskCreatorFragment.month==cmonth && TaskCreatorFragment.date<cday) ){
-            Toast.makeText(getActivity(), "This Date is Invalid! Make The Due Date Today or After", Toast.LENGTH_SHORT).show();
+            Toasty.error(getContext(), "Invalid Due Date!", Toast.LENGTH_LONG, true).show();
             return false;
         }
+        Toasty.success(getContext(), "Successfully Added!", Toast.LENGTH_LONG, true).show();
         return true;
     }
 

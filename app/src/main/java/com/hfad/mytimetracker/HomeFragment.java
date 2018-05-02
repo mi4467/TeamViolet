@@ -105,22 +105,6 @@ public class HomeFragment extends Fragment {
 
     }
 
-//    public void testGraph(View layout){
-//        List<Entry> vals = new ArrayList<Entry>();
-//        vals.add(new Entry(0f, 10f));
-//        vals.add(new Entry(1f, 10f));
-//        vals.add(new Entry(2f, 10f));
-//        vals.add(new Entry(3f, 10f));
-//        vals.add(new Entry(4f, 10f));
-//        LineDataSet setComp1 = new LineDataSet(vals, "Test");
-//        setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
-//        List<ILineDataSet> dataSets = new ArrayList<>();
-//        dataSets.add(setComp1);
-//        LineData totalData = new LineData(dataSets);
-//        LineChart chart = layout.findViewById(R.id.test_chart);
-//        chart.setData(totalData);
-//        chart.invalidate();
-//    }
 
     public void initUserStats(View layout){
         Cursor userStats = TimeTrackerDataBaseHelper.getInstance(getContext()).getReadableDatabase().rawQuery("SELECT * FROM USER_STATS", null);
@@ -137,100 +121,6 @@ public class HomeFragment extends Fragment {
         //if its negative, append one more space 
     }
 
-    public void mpLineGraphWeekCompletion(View layout){
-GregorianCalendar gcal = new GregorianCalendar();
-        gcal.setTime(Calendar.getInstance().getTime());
-
-    Map<String, Integer> monthMapper = new HashMap<>();
-        monthMapper.put("Jan", 0);
-        monthMapper.put("Feb", 1);
-        monthMapper.put("Mar", 2);
-        monthMapper.put("Apr", 3);
-        monthMapper.put("May", 4);
-        monthMapper.put("Jun", 5);
-        monthMapper.put("Jul", 6);
-        monthMapper.put("Aug", 7);
-        monthMapper.put("Sep", 8);
-        monthMapper.put("Oct", 9);
-        monthMapper.put("Nov", 10);
-        monthMapper.put("Dec", 11);
-
-    String[] daterep = gcal.getTime().toString().split(" ");
-    String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
-    final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
-        Collections.reverse(data);
-        Log.d("HomeDebug", data.toString());
-    //above is getting the weeks data, same as before
-    ArrayList<Entry> totalWithCompleteStatus = new ArrayList<>();
-        for(int i =0; i< data.size(); i++){
-        totalWithCompleteStatus.add(new Entry((float) i, (float) data.get(i).totalTasksWithOnTimeStatus));
-    }
-    ArrayList<Entry> complete = new ArrayList<>();
-        for(int i =0; i< data.size(); i++){
-        complete.add(new Entry((float) i, (float) data.get(i).onTime));
-    }
-    ArrayList<Entry> incomplete = new ArrayList<>();
-        for(int i =0; i< data.size(); i++){
-        incomplete.add(new Entry((float) i, (float) data.get(i).late));
-    }
-    LineDataSet total = new LineDataSet(totalWithCompleteStatus, "Total Qualifying Tasks");
-        total.setAxisDependency(YAxis.AxisDependency.LEFT);
-        total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
-        total.setCircleColor(Color.parseColor("#827717"));
-        total.setCircleColorHole(Color.parseColor("#EEFF41"));
-    LineDataSet onTime = new LineDataSet(complete, "On-Time Tasks");
-        onTime.setAxisDependency(YAxis.AxisDependency.LEFT);
-        onTime.setColor(Color.parseColor("#689F38"));    //Dark Green
-        onTime.setCircleColor(Color.parseColor("#33691E"));
-        onTime.setCircleColorHole(Color.parseColor("#64DD17"));
-    LineDataSet late = new LineDataSet(incomplete, "Late Tasks");
-        late.setAxisDependency(YAxis.AxisDependency.LEFT);
-        late.setColor(Color.parseColor("#D32F2F"));    //Dark Red
-        late.setCircleColor(Color.parseColor("#B71C1C"));
-        late.setCircleColorHole(Color.parseColor("#FF5252"));
-
-    //above is creating entry lists and their data sets
-    ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-        dataSets.add(total);
-        dataSets.add(onTime);
-        dataSets.add(late);
-
-    LineData chartData = new LineData(dataSets);
-
-    LineChart chart = layout.findViewById(R.id.onTime_line_chart);
-        chart.setData(chartData);
-        chart.invalidate();
-
-    final String[] days = new String[7];
-        for(int i =0; i<days.length; i++){
-        days[i] = data.get(i).date;
-    }
-    IAxisValueFormatter formatter = new IAxisValueFormatter() {
-
-        @Override
-        public String getFormattedValue(float value, AxisBase axis) {
-
-            // String[] date = data.get(data.size()-1-((int) value)).date.split("-");
-            //
-            //                        return date[1] + "/" + date[2];
-            String[] dateRep = days[(int) value].split("-");
-            return dateRep[1] + "/" + dateRep[2];
-        }
-
-        // we don't draw numbers, so no decimal digits needed
-    };
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setGranularity(1f);       //interval
-        xAxis.setValueFormatter(formatter);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(Color.WHITE);
-        chart.getDescription().setEnabled(false);
-        chart.getAxisLeft().setGranularity(1f);
-        chart.getAxisLeft().setTextColor(Color.WHITE);
-        chart.getAxisRight().setEnabled(false);
-        chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
-    }
 
     public void initTaskListView(View layout){
         GregorianCalendar gcal = new GregorianCalendar();
@@ -331,7 +221,12 @@ GregorianCalendar gcal = new GregorianCalendar();
         StringBuilder s = new StringBuilder();
         for(i = 0; i<5 && i<data.size(); i++){
             //completedBarData.add(data.get(i));
-            s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n"  + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
+            if(data.get(i).totalTasksWithOnTimeStatus!=0) {
+                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
+            }
+            else{
+                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + "N/A" + "\n");
+            }
         }
         if(i==5){
             s.append("....\n");
@@ -366,7 +261,12 @@ GregorianCalendar gcal = new GregorianCalendar();
         StringBuilder s = new StringBuilder();
         for(i = 0; i<5 && i<data.size(); i++){
             //completedBarData.add(data.get(i));
-            s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n"  + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
+            if(data.get(i).totalTasksWithOnTimeStatus!=0) {
+                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
+            }
+            else{
+                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + "N/A" + "\n");
+            }
         }
         if(i==5){
             s.append("....\n");
@@ -378,63 +278,6 @@ GregorianCalendar gcal = new GregorianCalendar();
         TextView text = layout.findViewById(R.id.worst_categories);
         text.setText(s.substring(1));
     }
-//
-//    public void initBestOnTimeBar(View layout){
-//        GraphView onTimeG = layout.findViewById(R.id.task_onTime_total_graph_best);
-//        BarGraphSeries<DataPoint> seriestwo = new BarGraphSeries<>(new DataPoint[] {
-//                new DataPoint(0, 7),
-//                new DataPoint(1, 7),
-//                new DataPoint(2, 7),
-//                new DataPoint(3, 7),
-//                new DataPoint(4, 7)
-//        });
-//        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-//                new DataPoint(0, -1),
-//                new DataPoint(1, 5),
-//                new DataPoint(2, 3),
-//                new DataPoint(3, 2),
-//                new DataPoint(4, 6)
-//        });
-//        onTimeG.addSeries(series);
-//        onTimeG.addSeries(seriestwo);
-//        onTimeG.setTitle("Best Task On-Time Total");
-//        seriestwo.setSpacing(50);
-//
-//        TextView onTimeKey = layout.findViewById(R.id.onTime_key_best);
-//        onTimeKey.setBackgroundColor(Color.GREEN);
-//
-//        TextView lateKey = layout.findViewById(R.id.late_key_best);
-//        lateKey.setBackgroundColor(Color.RED);
-//
-//    }
-//
-//    public void initWorstOnTimeBar(View layout){
-//        GraphView onTimeWG = layout.findViewById(R.id.task_onTime_total_graph_worst);
-//        BarGraphSeries<DataPoint> seriestwo = new BarGraphSeries<>(new DataPoint[] {
-//                new DataPoint(0, 7),
-//                new DataPoint(1, 7),
-//                new DataPoint(2, 7),
-//                new DataPoint(3, 7),
-//                new DataPoint(4, 7)
-//        });
-//        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-//                new DataPoint(0, -1),
-//                new DataPoint(1, 5),
-//                new DataPoint(2, 3),
-//                new DataPoint(3, 2),
-//                new DataPoint(4, 6)
-//        });
-//        onTimeWG.addSeries(series);
-//        onTimeWG.setTitle("Worst Task On-Time Total");
-//        seriestwo.setSpacing(50);
-//
-//        TextView onTimeKey = layout.findViewById(R.id.onTime_key_worst);
-//        onTimeKey.setBackgroundColor(Color.GREEN);
-//
-//        TextView lateKey = layout.findViewById(R.id.late_key_worst);
-//        lateKey.setBackgroundColor(Color.RED);
-//
-//    }
 
     public void initCompleteLineChart(View layout){
         GregorianCalendar gcal = new GregorianCalendar();
@@ -633,8 +476,6 @@ GregorianCalendar gcal = new GregorianCalendar();
     }
 
     public class BestCompletionComparator implements Comparator<StatsFragment.CategoryStats> {
-
-
         @Override
         public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
             if(100*categoryStats.complete/categoryStats.totalTasksWithCompleteStatus < 100*t1.complete/t1.totalTasksWithCompleteStatus){
@@ -653,73 +494,4 @@ GregorianCalendar gcal = new GregorianCalendar();
             }
         }
     }
-
-    public class WorstCompletionComparator implements Comparator<StatsFragment.CategoryStats> {
-
-
-        @Override
-        public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
-            if(categoryStats.complete/categoryStats.totalTasksWithCompleteStatus < t1.complete/t1.totalTasksWithCompleteStatus){
-                if(categoryStats.complete/categoryStats.totalTasksWithCompleteStatus < t1.complete/t1.totalTasksWithCompleteStatus){
-                    return 1;
-                }
-                else {
-                    return 1;
-                }
-            }
-            else{
-                return -1;
-            }
-        }
-    }
-
-    public class BestOnTimeComparator implements Comparator<StatsFragment.CategoryStats> {
-
-
-        @Override
-        public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
-            if(t1.totalTasksWithOnTimeStatus<5){
-                return -1;
-            }
-            if(categoryStats.totalTasksWithOnTimeStatus<5){
-                return 1;
-            }
-            if(categoryStats.onTime/categoryStats.totalTasksWithOnTimeStatus > t1.onTime/t1.totalTasksWithOnTimeStatus){
-                return 1;
-            }
-            else{
-//                if(categoryStats.onTime/categoryStats.totalTasksWithOnTimeStatus == t1.onTime/t1.totalTasksWithOnTimeStatus){
-//                    if(categoryStats.onTime/)
-//                }
-//                else {
-//                    return -1;
-//                }
-                return -1;
-            }
-        }
-    }
-
-    public class WorstOnTimeComparator implements Comparator<StatsFragment.CategoryStats> {
-
-
-        @Override
-        public int compare(StatsFragment.CategoryStats categoryStats, StatsFragment.CategoryStats t1) {
-            if(t1.totalTasksWithOnTimeStatus<5){
-                return -1;
-            }
-            if(categoryStats.totalTasksWithOnTimeStatus<5){
-                return 1;
-            }
-            if(categoryStats.onTime/categoryStats.totalTasksWithOnTimeStatus < t1.onTime/t1.totalTasksWithOnTimeStatus){
-                return 1;
-            }
-            else{
-                return -1;
-            }
-        }
-    }
-
-
-
-
 }
