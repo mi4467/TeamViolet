@@ -86,51 +86,57 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         // Required empty public constructor
     }
 
-    //@Override
-    //public void onCreate(Bundle savedInstanceState){
-
-    //}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View layout = inflater.inflate(R.layout.fragment_task_creator, container, false);
-        Button pickColor = (Button) layout.findViewById(R.id.color_button);                             //for first card view
-        Button submitCat = (Button) layout.findViewById(R.id.submit_cat);
+        initAddTaskListeners(layout);
+        initCatListeners(layout);
+        initReoccAddTaskListeners(layout);
+        setUpToast();
+        return layout;
+    }
 
-        Button pickStartTime = (Button) layout.findViewById(R.id.start_time_reocc_picker);              //for the third card view
-        Button pickEndTime = (Button) layout.findViewById(R.id.end_time_reocc_picker);
-        Button pickDate = (Button) layout.findViewById(R.id.date_picker);
-        Button submitReocc = (Button) layout.findViewById(R.id.submit_reocc);
-        Button pickStartDate = (Button) layout.findViewById(R.id.start_date);
-        Button pickEndDate = (Button) layout.findViewById(R.id.end_date);
-
+    public void initAddTaskListeners(View view){
+        View layout = view;
         Button pickCatTask = (Button) layout.findViewById(R.id.pick_cat_task_adder);
         Button pickStartTimeTask = (Button) layout.findViewById(R.id.start_time_taskadder);             //for the second card view
         Button pickEndTimeTask = (Button) layout.findViewById(R.id.end_time_taskadder);
         Button pickDateTask = (Button) layout.findViewById(R.id.add_task_date_picker);
-        Button pickOpions = (Button)   layout.findViewById(R.id.reocc_cat_list);
         Button submitTask = (Button) layout.findViewById(R.id.submit_task);
-
-        pickColor.setOnClickListener(this);                                                             //add listeners
-        submitCat.setOnClickListener(this);
-
         pickCatTask.setOnClickListener(this);
         pickStartTimeTask.setOnClickListener(this);
         pickEndTimeTask.setOnClickListener(this);
         pickDateTask.setOnClickListener(this);
         submitTask.setOnClickListener(this);
 
+    }
+
+    public void initReoccAddTaskListeners(View view){
+        View layout = view;
+        Button pickStartTime = (Button) layout.findViewById(R.id.start_time_reocc_picker);              //for the third card view
+        Button pickEndTime = (Button) layout.findViewById(R.id.end_time_reocc_picker);
+        Button pickDate = (Button) layout.findViewById(R.id.date_picker);
+        Button submitReocc = (Button) layout.findViewById(R.id.submit_reocc);
+        Button pickStartDate = (Button) layout.findViewById(R.id.start_date);
+        Button pickEndDate = (Button) layout.findViewById(R.id.end_date);
+        Button pickOptions = (Button)   layout.findViewById(R.id.reocc_cat_list);
         pickStartTime.setOnClickListener(this);
-        pickOpions.setOnClickListener(this);
+        pickOptions.setOnClickListener(this);
         pickEndTime.setOnClickListener(this);
         pickDate.setOnClickListener(this);
         submitReocc.setOnClickListener(this);
         pickStartDate.setOnClickListener(this);
         pickEndDate.setOnClickListener(this);
-        setUpToast();
-        return layout;
+
+    }
+
+    public void initCatListeners(View view){
+        View layout = view;
+        Button pickColor = (Button) layout.findViewById(R.id.color_button);                             //for first card view
+        Button submitCat = (Button) layout.findViewById(R.id.submit_cat);
+        pickColor.setOnClickListener(this);                                                             //add listeners
+        submitCat.setOnClickListener(this);
     }
 
     public void setUpToast(){
@@ -159,21 +165,13 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                 .initialColor(0xffffffff)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
-                .setOnColorSelectedListener(new OnColorSelectedListener() {
-                    @Override
-                    public void onColorSelected(int selectedColor) {
-                        // toast("onColorSelected: 0x" + Integer.toHexString(selectedColor));
-                    }
-                })
-                .setPositiveButton("ok", new ColorPickerClickListener() {
+                .setPositiveButton("Confirm", new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                        //TextView yolo = (TextView) getActivity().findViewById(R.id.colorbox);
                         color = selectedColor;
-                        //yolo.setBackgroundColor(selectedColor);
                     }
                 })
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     }
@@ -193,8 +191,10 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                         return true;
                     }
                 })
-                .positiveText("confirm")
-                .negativeText("cancel")
+                .positiveText("Confirm")
+                .positiveColor(Color.WHITE)
+                .negativeText("Cancel")
+                .negativeColor(Color.WHITE)
                 .backgroundColor(Color.parseColor("#263238"))
                 .show();
     }
@@ -210,8 +210,10 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                         return true;
                     }
                 })
-                .positiveText("confirm")
-                .negativeText("cancel")
+                .positiveText("Confirm")
+                .negativeColor(Color.WHITE)
+                .negativeText("Cancel")
+                .positiveColor(Color.WHITE)
                 .backgroundColor(Color.parseColor("#263238"))
                 .show();
     }
@@ -227,8 +229,10 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                         return true;
                     }
                 })
-                .positiveText("confirm")
-                .negativeText("cancel")
+                .positiveText("Confirm")
+                .positiveColor(Color.WHITE)
+                .negativeText("Cancel")
+                .negativeColor(Color.WHITE)
                 .backgroundColor(Color.parseColor("#263238"))
                 .show();
     }
@@ -296,19 +300,13 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
     private void enterReoccTasksInDB()  {
-          TaskCreatorFragment.reoccTaskName = ((EditText) getActivity().findViewById(R.id.reocc_task_name)).getText().toString();
-          if(!checkValidityOfReoccTask()){
-              return;
-          }
-          SQLfunctionHelper.enterReoccTasksInDB(getContext(), startYear, startMonth, startDate, endYear, endMonth, endDay, startHourReocc, startMinuteReocc,
+        TaskCreatorFragment.reoccTaskName = ((EditText) getActivity().findViewById(R.id.reocc_task_name)).getText().toString();
+        if(!checkValidityOfReoccTask()){
+            return;
+        }
+        SQLfunctionHelper.enterReoccTasksInDB(getContext(), startYear, startMonth, startDate, endYear, endMonth, endDay, startHourReocc, startMinuteReocc,
                   endHourReocc, endMinuteReocc, days, reoccTaskName, categoriesReocc);
         cleanUpCardViewThree();
-        Snacky.builder().setActivity(getActivity())
-                .setText(" Already Marked Complete!")
-                .setDuration(Snacky.LENGTH_INDEFINITE)
-                .setActionText(android.R.string.ok)
-                .setBackgroundColor(Color.parseColor("#B71C1C"))
-                .error().show();
     }
 
     public static String constructDateStr(int y, int m, int d){
@@ -326,24 +324,28 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         return new String(result);
     }
 
+    private boolean catCheck(String cat){
+        if(TaskCreatorFragment.color==null){
+            Log.d("CategorySQL", "No Color");
+            Toasty.error(getContext(), "Pick A Color!", Toast.LENGTH_LONG, true).show();
+            return false;
+        }
+        if(TaskCreatorFragment.categoryName.equals("")){
+            Log.d("CategorySQL", "this is cat" + cat + "!");
+            Toasty.error(getContext(), "Give A Name!", Toast.LENGTH_LONG, true).show();
+            return false ;
+        }
+        return true;
+    }
+
     private void enterCatInDB() {
         EditText txt = (EditText) getActivity().findViewById(R.id.cat_name);
         String cat = txt.getText().toString();      //paramaters
         TaskCreatorFragment.categoryName=cat;
         Integer color = this.color;
-        if(TaskCreatorFragment.color==null){
-            Log.d("CategorySQL", "No Color");
-            Toasty.error(getContext(), "Pick A Color!", Toast.LENGTH_LONG, true).show();
+        if(!catCheck(cat)){
             return;
         }
-        if(TaskCreatorFragment.categoryName.equals("")){
-            Log.d("CategorySQL", "this is cat" + cat + "!");
-            Toasty.error(getContext(), "Give A Name!", Toast.LENGTH_LONG, true).show();
-            return;
-        }
-        TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
-        SQLiteDatabase read = categoryHelper.getReadableDatabase();
-        SQLiteDatabase write = categoryHelper.getWritableDatabase();
         if(SQLfunctionHelper.enterCatInDB(getActivity(), categoryName, color)){
             TaskCreatorFragment.categoryName = null;
             TaskCreatorFragment.color = null;
@@ -363,9 +365,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         String dueDate = constructDateStr(TaskCreatorFragment.year, TaskCreatorFragment.month, TaskCreatorFragment.date);
         String startTime = TaskCreatorFragment.startHour + "-" + TaskCreatorFragment.startMinute + "-00";
         String endTime = TaskCreatorFragment.endHour + "-" + TaskCreatorFragment.endMinute + "-00";
-        TimeTrackerDataBaseHelper categoryHelper = new TimeTrackerDataBaseHelper(getContext());
-        SQLiteDatabase write = categoryHelper.getWritableDatabase();
-        SQLiteDatabase read = categoryHelper.getReadableDatabase();
         SQLfunctionHelper.enterTaskInDB(getActivity(), taskName, dueDate, startTime, endTime, taskCategoryNames);
         cleanUpCardViewTwo();
     }
@@ -398,9 +397,7 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         TaskCreatorFragment.categoriesReocc=null;
     }
 
-    public boolean checkValidityOfReoccTask(){
-      //  Log.d("ReoccTest", TaskCreatorFragment.startYear + " " + TaskCreatorFragment.startMonth + " " + TaskCreatorFragment.startDate);
-      //  Log.d("ReoccTest", TaskCreatorFragment.endYear + " " + TaskCreatorFragment.endMonth +  " " + TaskCreatorFragment.endDay);
+    private boolean reoccNullCheck(){
         if(TaskCreatorFragment.reoccTaskName == null || TaskCreatorFragment.reoccTaskName.equals("") ){                      //change
             Toasty.error(getContext(), "Make A Task!", Toast.LENGTH_LONG, true).show();
             return false;
@@ -429,7 +426,14 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
             Toasty.error(getContext(), "Choose Days!", Toast.LENGTH_LONG, true).show();
             return false;
         }
-
+        return true;
+    }
+    public boolean checkValidityOfReoccTask(){
+      //  Log.d("ReoccTest", TaskCreatorFragment.startYear + " " + TaskCreatorFragment.startMonth + " " + TaskCreatorFragment.startDate);
+      //  Log.d("ReoccTest", TaskCreatorFragment.endYear + " " + TaskCreatorFragment.endMonth +  " " + TaskCreatorFragment.endDay);
+        if(!reoccNullCheck()){
+            return false;
+        }
         //Check the following three validity cases, if either start date or end date is before the current date, if end date is before start date, and if end time is less than start time(
         //All of them should be implemented, just test again
         Log.d("ReoccTest", TaskCreatorFragment.startHourReocc + " " + TaskCreatorFragment.startMinuteReocc);
@@ -459,7 +463,8 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
     }
 
 
-    public boolean checkValidityOfTask(){
+
+    private boolean taskNullCheck(){
         if(TaskCreatorFragment.taskName.equals("")){
             Toasty.error(getContext(), "Make A Task!", Toast.LENGTH_LONG, true).show();
             return false;
@@ -484,6 +489,12 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
             Toasty.error(getContext(), "Invalid End Time!", Toast.LENGTH_LONG, true).show();
             return false;
         }
+        return true;
+    }
+    public boolean checkValidityOfTask(){
+        if(!taskNullCheck()){
+            return false;
+        }
         Calendar today = Calendar.getInstance();
         Integer cday = today.get(Calendar.DAY_OF_MONTH);
         Integer cmonth = today.get(Calendar.MONTH);
@@ -494,103 +505,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         }
         Toasty.success(getContext(), "Successfully Added!", Toast.LENGTH_LONG, true).show();
         return true;
-    }
-
-
-    public static void setColor(Integer color) {
-        TaskCreatorFragment.color = color;
-    }
-
-    public static void setCategoryName(String categoryName) {
-        TaskCreatorFragment.categoryName = categoryName;
-    }
-
-    public static void setYear(Integer year) {
-        TaskCreatorFragment.year = year;
-    }
-
-    public static void setMonth(Integer month) {
-        TaskCreatorFragment.month = month;
-    }
-
-    public static void setDate(Integer date) {
-        TaskCreatorFragment.date = date;
-    }
-
-    public static void setStartYear(Integer startYear) {
-        TaskCreatorFragment.startYear = startYear;
-    }
-
-    public static void setStartDate(Integer startDate) {
-        TaskCreatorFragment.startDate = startDate;
-    }
-
-    public static void setStartMonth(Integer startMonth) {
-        TaskCreatorFragment.startMonth = startMonth;
-    }
-
-    public static void setEndYear(Integer endYear) {
-        TaskCreatorFragment.endYear = endYear;
-    }
-
-    public static void setEndMonth(Integer endMonth) {
-        TaskCreatorFragment.endMonth = endMonth;
-    }
-
-    public static void setEndDay(Integer endDay) {
-        TaskCreatorFragment.endDay = endDay;
-    }
-
-    public static void setStartMinuteReocc(Integer startMinuteReocc) {
-        TaskCreatorFragment.startMinuteReocc = startMinuteReocc;
-    }
-
-    public static void setStartHourReocc(Integer startHourReocc) {
-        TaskCreatorFragment.startHourReocc = startHourReocc;
-    }
-
-    public static void setEndMinuteReocc(Integer endMinuteReocc) {
-        TaskCreatorFragment.endMinuteReocc = endMinuteReocc;
-    }
-
-    public static void setEndHourReocc(Integer endHourReocc) {
-        TaskCreatorFragment.endHourReocc = endHourReocc;
-    }
-
-    public static void setDays(Integer[] days) {
-        TaskCreatorFragment.days = days;
-    }
-
-    public static void setCategoriesReocc(CharSequence[] categoriesReocc) {
-        TaskCreatorFragment.categoriesReocc = categoriesReocc;
-    }
-
-    public static void setReoccTaskName(String reoccTaskName) {
-        TaskCreatorFragment.reoccTaskName = reoccTaskName;
-    }
-
-    public static void setTaskName(String taskName) {
-        TaskCreatorFragment.taskName = taskName;
-    }
-
-    public static void setTaskCategoryNames(CharSequence[] taskCategoryNames) {
-        TaskCreatorFragment.taskCategoryNames = taskCategoryNames;
-    }
-
-    public static void setStartMinute(Integer startMinute) {
-        TaskCreatorFragment.startMinute = startMinute;
-    }
-
-    public static void setStartHour(Integer startHour) {
-        TaskCreatorFragment.startHour = startHour;
-    }
-
-    public static void setEndMinute(Integer endMinute) {
-        TaskCreatorFragment.endMinute = endMinute;
-    }
-
-    public static void setEndHour(Integer endHour) {
-        TaskCreatorFragment.endHour = endHour;
     }
 
 

@@ -7,9 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,36 +18,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.alamkanak.weekview.MonthLoader;
-import com.alamkanak.weekview.WeekView;
-import com.alamkanak.weekview.WeekViewEvent;
-import com.framgia.library.calendardayview.CalendarDayView;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.BarGraphSeries;
-import com.jjoe64.graphview.series.DataPoint;
-
-import junit.framework.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
-
-import de.mateware.snacky.Snacky;
 import es.dmoral.toasty.Toasty;
-import greco.lorenzo.com.lgsnackbar.LGSnackbarManager;
-import greco.lorenzo.com.lgsnackbar.style.LGSnackBarTheme;
-import greco.lorenzo.com.lgsnackbar.style.LGSnackBarThemeManager;
-
-import static java.security.AccessController.getContext;
-
 
 public class TaskActivity extends AppCompatActivity implements View.OnClickListener{
     private Integer taskID = 0;
@@ -86,19 +61,9 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
-        Intent intent = getIntent();
-        taskID = intent.getIntExtra("TASK_ID", -1);
-        Log.d("TaskDebug", "Task id is: " + taskID);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle("Task Creator Center");
-
-        ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setTitle("Task Center");
-
-        info = SQLfunctionHelper.getTaskInfo(this, taskID);
-        stats = SQLfunctionHelper.getTaskStats(this, taskID);
+        extractIntentInfo();
+        initBars();
+        initCursors();
         initTimeInformation();
         initOrgInformation();
         initStats();
@@ -106,9 +71,28 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         setUpToast();
     }
 
+    private void extractIntentInfo(){
+        Intent intent = getIntent();
+        taskID = intent.getIntExtra("TASK_ID", -1);
+        Log.d("TaskDebug", "Task id is: " + taskID);
+    }
+
+    private void initBars(){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("Task Creator Center");
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setTitle("Task Center");
+    }
+
+    private void initCursors(){
+        info = SQLfunctionHelper.getTaskInfo(this, taskID);
+        stats = SQLfunctionHelper.getTaskStats(this, taskID);
+    }
+
     private boolean verifyOnTime(int id){
-        SQLiteDatabase readableDatabase = TimeTrackerDataBaseHelper.getInstance(this).getReadableDatabase();
-        Cursor check = readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " +id, null);
+        Cursor check = SQLfunctionHelper.queryWithString(this, "SELECT * FROM TASK_INFORMATION WHERE _ID = " +id);
         check.moveToFirst();
         String[] dueDate = check.getString(2).split("-");
         int dueYear = Integer.parseInt(dueDate[0]);
@@ -117,22 +101,12 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         String[] dueTime = check.getString(5).split("-");
         int dueHour = Integer.parseInt(dueTime[0]);
         int dueMin = Integer.parseInt(dueTime[1]);
-        Log.d("MarkCompleteDebug", Arrays.toString(dueDate));
-        Log.d("MarkCompleteDebug", Arrays.toString(dueTime));
         Calendar today = Calendar.getInstance();
         int current_hour = today.get(Calendar.HOUR);
         int current_minute = today.get(Calendar.MINUTE);
         int cday = today.get(Calendar.DAY_OF_MONTH);
         int cmonth = today.get(Calendar.MONTH)+1;
         int cyear = today.get(Calendar.YEAR);
-        Log.d("MarkCompleteDebug" , "Year: " + cyear + " Month: " + cmonth + " Day: " + cday);
-        Log.d("MarkCompleteDebug" , " DUE DATE IS: Year: " + dueYear + " Month: " + dueMonth + " Day: " + dueDay);
-        Log.d("MarkCompleteDebug", ((dueYear==cyear))  +"");
-        Log.d("MarkCompleteDebug", ((dueMonth==cmonth))  +"");
-        Log.d("MarkCompleteDebug", ((dueDay<cday))  +"");
-
-
-        Log.d("MarkCompleteDebug", ((dueYear==cyear && dueMonth==cmonth && dueDay<cday))  +"");
         if(dueYear<cyear ||  (dueYear==cyear && dueMonth<cmonth) || (dueYear==cyear && dueMonth==cmonth && dueDay<cday) ){
             return false;
         }
@@ -150,7 +124,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private boolean checkValidityOfTask(){
+    private boolean nullCheck(){
         if(year==null){
             Toasty.error(this, "You didn't choose a date. Choose a date!", Toast.LENGTH_LONG, true).show();
             return false;
@@ -163,9 +137,15 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
             Toasty.error(this, "No Date Selected!", Toast.LENGTH_LONG, true).show();
             return false;
         }
-        //add a check to see if we are late, if we are late, then return false
         if(endHour<startHour || (endHour==startHour && endMinute<startMinute)){
             Toasty.error(this, "Invalid End Time!", Toast.LENGTH_LONG, true).show();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkValidityOfTask(){
+        if(!nullCheck()){
             return false;
         }
         Calendar today = Calendar.getInstance();
@@ -185,14 +165,12 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         addCat.setOnClickListener(this);
         Button removeCat = findViewById(R.id.task_act_removeCat);
         removeCat.setOnClickListener(this);
-
         Button markComp = findViewById(R.id.task_act_mark_complete);
         markComp.setOnClickListener(this);
         Button delete = findViewById(R.id.task_act_delete);
         delete.setOnClickListener(this);
         ToggleButton notification = findViewById(R.id.task_act_notification_toggle);
         notification.setOnClickListener(this);
-
         Button startTime = findViewById(R.id.task_act_start_time);
         startTime.setOnClickListener(this);
         Button endTime = findViewById(R.id.task_act_end_time);
@@ -201,7 +179,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         dueDate.setOnClickListener(this);
         Button enter = findViewById(R.id.task_act_date_enter);
         enter.setOnClickListener(this);
-
     }
 
     private void initOrgInformation(){
@@ -210,7 +187,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         String name = info.getString(1);
         TextView taskName = findViewById(R.id.name_record);
         taskName.setText(taskHeader + name);
-
         String categories = "\n";
         for(int i =9; i<stats.getColumnCount(); i++){
             //UPDATE THE ONTIME AND COMPLETED FOR THAT CATEGORY
@@ -221,9 +197,29 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         }
         categories = categories.substring(0, categories.length()-2);
         Log.d("TaskActivityDebug", "Column List is: " + categories);
-
         TextView catRecord = findViewById(R.id.category_record);
         catRecord.setText(catHeader + categories);
+    }
+
+    private String getTimeString(String[] timeArray){
+        String time = "";
+        if(Integer.parseInt(timeArray[0])%12==0){
+            time += 12 + ":";
+        }
+        else {
+            time += Integer.parseInt(timeArray[0]) % 12 + ":";
+        }
+        if(Integer.parseInt(timeArray[1])<10){
+            time += "0";
+        }
+        time += Integer.parseInt(timeArray[1]) + " ";
+        if(Integer.parseInt(timeArray[0])<12){
+            time += "AM";
+        }
+        else{
+            time += "PM";
+        }
+        return time;
     }
 
     private void initTimeInformation(){
@@ -234,51 +230,17 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         TextView dueDate = findViewById(R.id.due_date_record);
         dueDate.setText(dueDateText + date);
         String[] startTimeRep = info.getString(3).split("-");
-        String startTime = "";
-        if(Integer.parseInt(startTimeRep[0])%12==0){
-            startTime += 12 + ":";
-        }
-        else {
-            startTime += Integer.parseInt(startTimeRep[0]) % 12 + ":";
-        }
-        if(Integer.parseInt(startTimeRep[1])<10){
-            startTime += "0";
-        }
-        startTime += Integer.parseInt(startTimeRep[1]) + " ";
-        if(Integer.parseInt(startTimeRep[0])<12){
-            startTime += "AM";
-        }
-        else{
-            startTime += "PM";
-        }
+        String startTime = getTimeString(startTimeRep);
         TextView startTimeView = findViewById(R.id.start_time_record);
         startTimeView.setText(startTimeText + startTime);
-
         String[] endTimeRep = info.getString(5).split("-");
-        String endTime = "";
-        if(Integer.parseInt(endTimeRep[0])%12==0){
-            endTime += 12 + ":";
-        }
-        else {
-            endTime += Integer.parseInt(endTimeRep[0]) % 12 + ":";
-        }
-        if(Integer.parseInt(endTimeRep[1])<10){
-            endTime += "0";
-        }
-        endTime += Integer.parseInt(endTimeRep[1]) + " ";
-        if(Integer.parseInt(endTimeRep[0])<12){
-            endTime += "AM";
-        }
-        else{
-            endTime += "PM";
-        }
+        String endTime = getTimeString(endTimeRep);
         TextView endTimeView = findViewById(R.id.endt_time_record);
         endTimeView.setText(endTimeText + endTime);
     }
 
     private void initStats(){
         stats.moveToFirst();
-
         int completed = stats.getInt(4);
         int onTime = stats.getInt(8);
         int late = stats.getInt(7);
@@ -287,7 +249,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         TextView notCompletedView = findViewById(R.id.incomplete_record);
         TextView onTimeView = findViewById(R.id.onTime_record);
         TextView lateView = findViewById(R.id.late_record);
-
         if(completed==1){
             completedView.setText(completeHeader + "Yes");
             notCompletedView.setText(incompleteHeader + "No");
@@ -400,10 +361,8 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     public void changeTaskDate(){
         if(!checkValidityOfTask()){
-            //send out a toast
             return;
         }
         SQLfunctionHelper.deleteNotif(this, info);

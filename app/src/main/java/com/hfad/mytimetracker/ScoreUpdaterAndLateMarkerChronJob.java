@@ -79,7 +79,6 @@ public class ScoreUpdaterAndLateMarkerChronJob extends BroadcastReceiver {
         if(onTimeAndComplete>0){
             Log.d("ChronDebug", "We are increasing streak");
             writableDatabase.execSQL("UPDATE USER_STATS SET CURRENT_STREAK = CURRENT_STREAK + 1");
-            //update streak accordingly in response to having completed some task on time
             updateTotalStreak(readableDatabase, writableDatabase);
         }
         else{

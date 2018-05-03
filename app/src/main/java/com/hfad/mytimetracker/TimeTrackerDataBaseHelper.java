@@ -19,19 +19,16 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
     private static TimeTrackerDataBaseHelper singleton;     //we make this class a singleton
 
-    public TimeTrackerDataBaseHelper(Context context){
+    private TimeTrackerDataBaseHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
     }
 
-    public static TimeTrackerDataBaseHelper getInstance(Context c){
+    public synchronized static TimeTrackerDataBaseHelper getInstance(Context c){
         if(singleton==null){
             singleton = new TimeTrackerDataBaseHelper(c);
         }
         return singleton;
     }
-
-
-
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
@@ -89,14 +86,6 @@ public class TimeTrackerDataBaseHelper extends SQLiteOpenHelper {
         initialVal.put("TODAY_SCORE", 0);
         initialVal.put("TOTAL_SCORE", 0);
         sqLiteDatabase.insert("USER_STATS", null, initialVal);
-    }
-
-    private void addTaskCategory(SQLiteDatabase sqLiteDatabase, String category){
-        category = category.trim();
-        category = category.replace(" ", "_");
-        //category = category.toUpperCase();
-        sqLiteDatabase.execSQL("ALTER TABLE TASK_INFORMATION ADD COLUMN " + category + " BOOLEAN;");
-        sqLiteDatabase.execSQL("ALTER TABLE TASK_STATS ADD COLUMN " + category + " BOOLEAN;");
     }
 
     @Override

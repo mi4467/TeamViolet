@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         public void initalizeDatabase (Context context) {
             SQLiteDatabase mydatabase = openOrCreateDatabase("MyTimeTrackerDB",MODE_PRIVATE,null);
-            TimeTrackerDataBaseHelper yo = new TimeTrackerDataBaseHelper(context);
+            TimeTrackerDataBaseHelper yo = TimeTrackerDataBaseHelper.getInstance(MainActivity.this);
             initializeStetho(context);
         }
 

@@ -40,7 +40,6 @@ import es.dmoral.toasty.Toasty;
  */
 public class CalendarFragment extends Fragment  {
     private int currentId;
-    SQLiteDatabase readableDatabase;
     Button button;
     String currentDate;
     public CalendarFragment() {
@@ -51,81 +50,56 @@ public class CalendarFragment extends Fragment  {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View layout = inflater.inflate(R.layout.fragment_calendar, container, false);
-        NestedScrollView C = layout.findViewById(R.id.nested_scroll_view);
-        C.smoothScrollTo(0,0);
-        CalendarView view = layout.findViewById(R.id.simpleCalendarView);
-        view.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
-                TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
-                currentDate = TaskCreatorFragment.constructDateStr(i, i1, i2);
-                Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
-                Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
-                Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
-                Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
-                RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                recyclerView.setAdapter(new CalendarFragment.SimpleAdapter(recyclerView, data));
-            }
-        });
-        Calendar today = Calendar.getInstance();
-        Integer cday = today.get(Calendar.DAY_OF_MONTH);
-        Integer cmonth = today.get(Calendar.MONTH);
-        Integer cyear = today.get(Calendar.YEAR);
-        RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
-        readableDatabase = dataBaseHelper.getReadableDatabase();
-        String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
-        currentDate = date;
-        Log.d("CursorDebug", date);
-        Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
-        Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
-        recyclerView.setAdapter(new SimpleAdapter(recyclerView, data));
+        initListeners(layout);
+        setDate(Calendar.getInstance());
+        setUpRecyclerView(layout);
         setUpToast();
-        //pass in a cursor, then use this cursor to bind in data
         return layout;
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        Calendar today = Calendar.getInstance();
+        setUpRecyclerView(getView());
+    }
+
+    public void initListeners(View view){
+        final View layout = view;
+        CalendarView calendarView = layout.findViewById(R.id.simpleCalendarView);
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
+                TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
+                setDate(i, i1, i2);
+                setUpRecyclerView(layout);
+            }
+        });
+    }
+    public void setDate(Calendar today){
         Integer cday = today.get(Calendar.DAY_OF_MONTH);
         Integer cmonth = today.get(Calendar.MONTH);
         Integer cyear = today.get(Calendar.YEAR);
-        RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
+        currentDate = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
+    }
+
+    public void setDate(Integer year, Integer month, Integer day){
+        currentDate = TaskCreatorFragment.constructDateStr(year, month, day);
+    }
+
+
+    public void setUpRecyclerView(View view){
+        final View layout = view;
+        Cursor data = SQLfunctionHelper.queryWithParams(getContext(), "TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate});
+        RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
-        readableDatabase = dataBaseHelper.getReadableDatabase();
-        String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
-        currentDate = date;
-        Log.d("CursorDebug", date);
-        Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
-        Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
-        int resId = R.anim.layout_animation_fall_down;
-        recyclerView.setAdapter(new SimpleAdapter(recyclerView, data));       //pass in a cursor, then use this cursor to bind in data
+        recyclerView.setAdapter(new SimpleAdapter(recyclerView, data));       //pa
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && getView()!=null) {
-            Calendar today = Calendar.getInstance();
-            Integer cday = today.get(Calendar.DAY_OF_MONTH);
-            Integer cmonth = today.get(Calendar.MONTH);
-            Integer cyear = today.get(Calendar.YEAR);
-            TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
-            readableDatabase = dataBaseHelper.getReadableDatabase();
-            String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
-            currentDate = date;
-            Log.d("CursorDebug", date);
-            Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
-            Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
-            int resId = R.anim.layout_animation_fall_down;
-            RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerView.setAdapter(new SimpleAdapter(recyclerView, data));
+        if(isVisibleToUser && getView()!=null) {
+            setUpRecyclerView(getView());
         }
     }
 
