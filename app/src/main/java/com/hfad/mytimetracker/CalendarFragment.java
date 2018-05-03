@@ -1,18 +1,11 @@
 package com.hfad.mytimetracker;
 
-
-import android.arch.persistence.room.Database;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,14 +17,8 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import net.cachapa.expandablelayout.ExpandableLayout;
-
-import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.Calendar;
-
-import de.mateware.snacky.Snacky;
 import es.dmoral.toasty.Toasty;
 
 
@@ -45,7 +32,6 @@ public class CalendarFragment extends Fragment  {
     public CalendarFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -272,7 +258,6 @@ public class CalendarFragment extends Fragment  {
 
             @Override
             public void onExpansionUpdate(float expansionFraction, int state) {
-                Log.d("ExpandableLayout", "State: " + state);
                 if (state == ExpandableLayout.State.EXPANDING) {
                     recyclerView.smoothScrollToPosition(getAdapterPosition());
                 }

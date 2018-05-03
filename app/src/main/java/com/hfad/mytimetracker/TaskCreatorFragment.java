@@ -149,7 +149,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
 
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
-        Log.d("time picker test", "it entered the showTimePickerDialog");
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
@@ -248,12 +247,10 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
                 showColorWheelDialog(view);
                 break;
             case R.id.start_time_reocc_picker:
-                Log.d("ReoccTest", "was called");
                 TimePickerFragment.flag=2;
                 showTimePickerDialog(view);
                 break;
             case R.id.end_time_reocc_picker:
-                Log.d("ReoccTest", "was called as well");
                 TimePickerFragment.flag=3;
                 showTimePickerDialog(view);
                 break;
@@ -326,12 +323,10 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
 
     private boolean catCheck(String cat){
         if(TaskCreatorFragment.color==null){
-            Log.d("CategorySQL", "No Color");
             Toasty.error(getContext(), "Pick A Color!", Toast.LENGTH_LONG, true).show();
             return false;
         }
         if(TaskCreatorFragment.categoryName.equals("")){
-            Log.d("CategorySQL", "this is cat" + cat + "!");
             Toasty.error(getContext(), "Give A Name!", Toast.LENGTH_LONG, true).show();
             return false ;
         }
@@ -429,15 +424,9 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         return true;
     }
     public boolean checkValidityOfReoccTask(){
-      //  Log.d("ReoccTest", TaskCreatorFragment.startYear + " " + TaskCreatorFragment.startMonth + " " + TaskCreatorFragment.startDate);
-      //  Log.d("ReoccTest", TaskCreatorFragment.endYear + " " + TaskCreatorFragment.endMonth +  " " + TaskCreatorFragment.endDay);
         if(!reoccNullCheck()){
             return false;
         }
-        //Check the following three validity cases, if either start date or end date is before the current date, if end date is before start date, and if end time is less than start time(
-        //All of them should be implemented, just test again
-        Log.d("ReoccTest", TaskCreatorFragment.startHourReocc + " " + TaskCreatorFragment.startMinuteReocc);
-        Log.d("ReoccTest", TaskCreatorFragment.endHourReocc + " " + TaskCreatorFragment.endMinuteReocc);
         if(TaskCreatorFragment.endHourReocc<TaskCreatorFragment.startHourReocc || (TaskCreatorFragment.endHourReocc==TaskCreatorFragment.startHourReocc && TaskCreatorFragment.endMinuteReocc<TaskCreatorFragment.startMinuteReocc)){
             Toasty.error(getContext(), "Invalid Times!", Toast.LENGTH_LONG, true).show();
             return false;
@@ -524,7 +513,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            Log.d("ReoccTest", flag + "");
             if(flag==0){
                 TaskCreatorFragment.startMinute = minute;
                 TaskCreatorFragment.startHour = hourOfDay;
@@ -555,7 +543,6 @@ public class TaskCreatorFragment extends Fragment implements  View.OnClickListen
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
 
-            // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 

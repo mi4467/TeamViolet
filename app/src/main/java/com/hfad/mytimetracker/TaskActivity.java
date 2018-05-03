@@ -6,7 +6,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.graphics.Color;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
@@ -14,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -74,7 +72,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     private void extractIntentInfo(){
         Intent intent = getIntent();
         taskID = intent.getIntExtra("TASK_ID", -1);
-        Log.d("TaskDebug", "Task id is: " + taskID);
     }
 
     private void initBars(){
@@ -189,14 +186,11 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         taskName.setText(taskHeader + name);
         String categories = "\n";
         for(int i =9; i<stats.getColumnCount(); i++){
-            //UPDATE THE ONTIME AND COMPLETED FOR THAT CATEGORY
-            Log.d("TaskActivityDebug", "Column " + i + " is: " + stats.getColumnName(i));
             if(stats.getInt(i)==1){
                 categories +="\n\t\t\t" + "\u2022 " + stats.getColumnName(i) + " \n";
             }
         }
         categories = categories.substring(0, categories.length()-2);
-        Log.d("TaskActivityDebug", "Column List is: " + categories);
         TextView catRecord = findViewById(R.id.category_record);
         catRecord.setText(catHeader + categories);
     }
@@ -226,7 +220,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         info.moveToFirst();
         String[] dateRep = info.getString(2).split("-");
         String date = dateRep[1] + "/" + dateRep[2] + "/" + dateRep[0];
-        Log.d("TaskActivityDebug", DatabaseUtils.dumpCursorToString(info));
         TextView dueDate = findViewById(R.id.due_date_record);
         dueDate.setText(dueDateText + date);
         String[] startTimeRep = info.getString(3).split("-");
@@ -244,7 +237,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         int completed = stats.getInt(4);
         int onTime = stats.getInt(8);
         int late = stats.getInt(7);
-        Log.d("DynamicStatsTest", "Completed is: " + completed);
         TextView completedView = findViewById(R.id.completed_record);
         TextView notCompletedView = findViewById(R.id.incomplete_record);
         TextView onTimeView = findViewById(R.id.onTime_record);
@@ -320,42 +312,33 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         switch(view.getId()){
             case R.id.task_act_addCat:
                 showAddCategorySelectionDialog();
-                Log.d("TaskListenerDebug", "AddCategory Was Clicked");
                 break;
             case R.id.task_act_removeCat:
                 showRemoveCatSelection();
-                Log.d("TaskListenerDebug", "RemoveCategory Was Clicked");
                 break;
             case R.id.task_act_mark_complete:
                 markTaskComplete();
                 initStats();
-                Log.d("TaskListenerDebug", "MarkComplete Was Clicked");
                 break;
             case R.id.task_act_delete:
                 deleteTask();
-                Log.d("TaskListenerDebug", "Delete Was Clicked");
                 break;
             case R.id.task_act_notification_toggle:
                 adjustNotification(view);
-                Log.d("TaskListenerDebug", "NOtificationToggle Was Clicked");
                 break;
             case R.id.task_act_start_time:
                 TaskActivity.TimePickerFragment.flag=0;
                 showTimePickerDialog(view);
-                Log.d("TaskListenerDebug", "Start Time Was Clicked");
                 break;
             case R.id.task_act_end_time:
                 TaskActivity.TimePickerFragment.flag=1;
                 showTimePickerDialog(view);
-                Log.d("TaskListenerDebug", "End Time Was Clicked");
                 break;
             case R.id.task_act_due_date:
                 showDatePickerDialog(view);
-                Log.d("TaskListenerDebug", "Due Date Was Clicked");
                 break;
             case R.id.task_act_date_enter:
                 changeTaskDate();
-                Log.d("TaskListenerDebug", "Enter Was Clicked");
                 break;
         }
     }
@@ -369,7 +352,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         String dueDate = TaskCreatorFragment.constructDateStr(year, month, date);
         String startTime = startHour + "-" + startMinute + "-00";
         String endTime = endHour + "-" + endMinute + "-00";
-        Log.d("TaskActivityTimeDebug", "We are about to enter the change time data");
         SQLfunctionHelper.changeTimeData(this, taskID, dueDate, startTime, endTime);
         info = SQLfunctionHelper.getTaskInfo(this, taskID);
         SQLfunctionHelper.createNotif(this, info);
@@ -398,7 +380,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void deleteTask(){                               //test
-        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(this);
         SQLfunctionHelper.deleteTask(taskID, this);
         super.finish();
         return;
@@ -407,9 +388,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     public void adjustNotification(View button){
         ToggleButton not = (ToggleButton) button;
         boolean param = false;
-        Log.d("NotificationDebug", "Is it false: " + not.isChecked());
         if(!not.isChecked()){
-            Log.d("NotificationDebug", "We should be canceling the notification");
             param = false;      //basically when it says notification off
             SQLfunctionHelper.deleteNotif(this, info);
         }
@@ -422,7 +401,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
-        Log.d("time picker test", "it entered the showTimePickerDialog");
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
@@ -442,7 +420,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            Log.d("ReoccTest", flag + "");
             if(flag==0){
                 TaskActivity.startMinute = minute;
                 TaskActivity.startHour = hourOfDay;
@@ -481,7 +458,6 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
             TaskActivity.year = year;
             TaskActivity.month = month;
             TaskActivity.date = day;
-            Log.d("TaskActivityDebug", TaskActivity.year + "/" + TaskActivity.month + "/" + TaskActivity.date);
         }
     }
 }

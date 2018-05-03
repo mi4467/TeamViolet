@@ -158,7 +158,6 @@ public class StatsFragment extends Fragment {
             public void onClick(View view) {
                 DatePickerFragment.flag=0;
                 showDatePickerDialog(view);
-                Log.d("StatsDebug", "Date is: " + completeMonth + "/" + completeDay);
             }
         });
 
@@ -166,7 +165,6 @@ public class StatsFragment extends Fragment {
         completionWeekEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("Penis", "It should be cleared");
                 setUpCompletionWeekLineGraph(layout);
             }
         });
@@ -295,7 +293,6 @@ public class StatsFragment extends Fragment {
         final PieChart chart = layout.findViewById(R.id.incomplete_pie_chart);
         chart.setData(results);
         chart.invalidate();
-        chart.setDrawSliceText(false);
         setChartLegend(chart);
         chart.getDescription().setEnabled(false);
         chart.setCenterTextColor(Color.WHITE);
@@ -485,7 +482,6 @@ public class StatsFragment extends Fragment {
             return;
         }
         String date = TaskCreatorFragment.constructDateStr(completeYear, completeMonth, completeDay);
-        Log.d("StatsDebug", "The date passed into the data is: " +date);
         ArrayList<DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), this, date);
         completedLineData = data;
         Collections.reverse(completedLineData);
@@ -544,7 +540,6 @@ public class StatsFragment extends Fragment {
             return;
         }
         String date = TaskCreatorFragment.constructDateStr(onTimeYear, onTimeMonth, onTimeDay);
-        Log.d("StatsDebug", "The date passed into the data is: " +date);
         ArrayList<DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), this, date);
         onTimeLineData = data;
         Collections.reverse(onTimeLineData);
@@ -671,8 +666,6 @@ public class StatsFragment extends Fragment {
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             if(DatePickerFragment.flag==0){
-                Log.d("StatsDebug", "Flag is 0");
-                Log.d("StatsDebug", month + "/" + day);
                 StatsFragment.completeYear = year;
                 StatsFragment.completeMonth = month;
                 StatsFragment.completeDay = day;

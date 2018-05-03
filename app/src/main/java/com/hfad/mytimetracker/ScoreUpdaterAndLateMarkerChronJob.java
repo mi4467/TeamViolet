@@ -1,7 +1,5 @@
 package com.hfad.mytimetracker;
 
-import android.app.job.JobParameters;
-import android.app.job.JobService;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,7 +9,6 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
-
 import java.util.Calendar;
 
 public class ScoreUpdaterAndLateMarkerChronJob extends BroadcastReceiver {

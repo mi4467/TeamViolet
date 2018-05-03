@@ -174,7 +174,6 @@ public class SQLfunctionHelper {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");      //year.month.day
             Date start = sdf.parse(startDate);
             Date end = sdf.parse(endDate);
-
             GregorianCalendar gcal = new GregorianCalendar();
             gcal.setTime(start);
             while (!gcal.getTime().after(end)) {
@@ -252,32 +251,21 @@ public class SQLfunctionHelper {
         TimeTrackerDataBaseHelper categoryHelper = TimeTrackerDataBaseHelper.getInstance(c);
         SQLiteDatabase write = categoryHelper.getWritableDatabase();
         SQLiteDatabase read = categoryHelper.getReadableDatabase();
-
         ContentValues recordParamaters = new ContentValues();                   //insert task info, insert task stats
         recordParamaters.put("TASK_NAME", taskName);
-        //recordParamaters.put("TASK_CATEGORY", TaskCreatorFragment.taskCategoryName);
         recordParamaters.put("DUE_DATE", dueDate);
         recordParamaters.put("START_TIME", startTime);
         recordParamaters.put("END_TIME", endTime);
         recordParamaters.put("NOTIFICATION", 1);
-
-        //construct date value, start time value, end time value
         write.insert("TASK_INFORMATION", null, recordParamaters);
-        Log.d("InsertTaskTest", "it worked");
-
         Cursor id = read.rawQuery("SELECT MAX(_ID) FROM TASK_INFORMATION", null);
-
         id.moveToFirst();
         Integer lastID = id.getInt(0);
         id = read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + lastID, null);
         createNotif(c, id);
-
-
-        Log.d("TaskNOtificationDebug", DatabaseUtils.dumpCursorToString(id));
         id.moveToFirst();
         Cursor notifCursor = read.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " + id.getInt(0), null);
         createNotif(c, notifCursor);
-
         id.moveToFirst();
         ContentValues recordParamaterstwo = new ContentValues();
         recordParamaterstwo.put("TASK_NAME", taskName);
@@ -290,16 +278,13 @@ public class SQLfunctionHelper {
         recordParamaterstwo.put("DUE_DATE", dueDate);
         Log.d("TestAddTask", taskCategoryNames.length + "");
         for(int i =0; i<taskCategoryNames.length; i++){
-            Log.d("TestAddTask", taskCategoryNames[i].toString());
             recordParamaterstwo.put(taskCategoryNames[i].toString(), "1");
             write.execSQL("UPDATE TASK_CATEGORY_INFO " +
                     "SET NOT_COMPLETED = NOT_COMPLETED + 1 " +
                     "WHERE CATEGORY_NAME = \"" +
                     taskCategoryNames[i] + "\"");
-            // write.execSQL("UPDATE TASK_CATEGORY_INFO SET NOT_COMPLETED = NOT_COMPLETED + 1 WHERE CATEGORY_NAME = " + "\"Jul\"");
         }
         write.insert("TASK_STATS", null, recordParamaterstwo);      //issue here
-        Log.d("InsertTaskTest", "it worked");
     }
 
     public static Cursor getTasksGivenDate(Context c, String date){

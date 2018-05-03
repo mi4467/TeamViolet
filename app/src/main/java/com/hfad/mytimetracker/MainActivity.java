@@ -2,21 +2,14 @@ package com.hfad.mytimetracker;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
-import android.support.design.internal.BottomNavigationItemView;
-import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,18 +17,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
-
-import com.amitshekhar.DebugDB;
 import com.facebook.stetho.Stetho;
-
-import junit.framework.Test;
-
-import java.lang.reflect.Field;
 import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     MenuItem prevMenuItem;
@@ -125,23 +108,18 @@ public class MainActivity extends AppCompatActivity {
                             switch(item.getItemId()) {
                                 case R.id.task_calendar:
                                     viewPager.setCurrentItem(0);
-                                    Log.d("Manual Selection", "Task Calender");
                                     break;
                                 case R.id.task_viewer:
                                     viewPager.setCurrentItem(1);
-                                    Log.d("Manual Selection", "Task Viewer");
                                     break;
                                 case R.id.home:
                                     viewPager.setCurrentItem(2);
-                                    Log.d("Manual Selection", "Home");
                                     break;
                                 case R.id.task_creator:
                                     viewPager.setCurrentItem(3);
-                                    Log.d("Manual Selection", "Task Creator");
                                     break;
                                 case R.id.stats_viewer:
                                     viewPager.setCurrentItem(4);
-                                    Log.d("Manual Selection", "Stats Viewer");
                                     break;
                             }
                             return true;

@@ -129,7 +129,6 @@ public class HomeFragment extends Fragment {
         String[] daterep = gcal.getTime().toString().split(" ");
         initMonthMapper();
         Cursor result = SQLfunctionHelper.getTasksGivenDate(getContext(), TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2])));
-        Log.d("HomeTodaysListsDebug", android.database.DatabaseUtils.dumpCursorToString(result));
         ArrayList<String> completedTasks = new ArrayList<>();
         ArrayList<String> notCompletedTasks = new ArrayList<>();
         result.moveToFirst();
@@ -205,7 +204,6 @@ public class HomeFragment extends Fragment {
         }
         data.sort(new BestCompletionComparator());
         if(data.size()==0){
-            Log.d("HelpfulTipsDebug", "We have no viable categories");
             return;
         }
         StringBuilder s = getHelpfulTipString(data);
@@ -277,8 +275,6 @@ public class HomeFragment extends Fragment {
         String date = getDate();
         final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
         Collections.reverse(data);
-        Log.d("HomeDebug", data.toString());
-        //above is getting the weeks data, same as before
         ArrayList<Entry> totalWithCompleteStatus = new ArrayList<>();
         for(int i =0; i< data.size(); i++){
             totalWithCompleteStatus.add(new Entry((float) i, (float) data.get(i).totalTasksWithCompleteStatus));
