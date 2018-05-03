@@ -24,6 +24,19 @@ import java.util.Map;
 
 public class SQLfunctionHelper {
 
+    public static Cursor queryWithString(Context c, String cmd){
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase readableDatabase = helper.getReadableDatabase();
+        return readableDatabase.rawQuery(cmd, null);
+    }
+
+    public static Cursor queryWithParams(Context c, String table, String[] fields, String ques, String[] cond){
+        TimeTrackerDataBaseHelper db = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase read = db.getWritableDatabase();
+        return read.query(table, fields, ques, cond, null, null, null);
+    }
+
+
     public static String[] getCategoryList(Context c){
         TimeTrackerDataBaseHelper db = TimeTrackerDataBaseHelper.getInstance(c);
         SQLiteDatabase read = db.getWritableDatabase();

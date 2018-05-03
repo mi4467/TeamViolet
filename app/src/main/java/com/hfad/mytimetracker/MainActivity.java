@@ -45,37 +45,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         InitalizerHelper helper = new InitalizerHelper();
         helper.initalizeDatabase(this);
         helper.initalizeBottomNavagationBar();
         helper.initalizeToolBar();
-        ViewPager viewPager = findViewById(R.id.pager);
-        viewPager.setCurrentItem(2);
-
-        Calendar calendar = Calendar.getInstance();
-
-        Date date = new Date(System.currentTimeMillis());
-
-        calendar.set(Calendar.HOUR_OF_DAY, 11);
-        calendar.set(Calendar.MINUTE, 45);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Log.d("ChronDebug", calendar.getTime().toString());
-
-        Intent intent = new Intent(this, ScoreUpdaterAndLateMarkerChronJob.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        AlarmManager manager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        manager.setRepeating(manager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-
-    }
-
-    private void setUpChronJob(){
-        ComponentName componentName = new ComponentName(this, ScoreUpdaterAndLateMarkerChronJob.class);
-//        JobInfo jobInfor = new JobInfo.Builder(12, componentName)
-//                                .setPeriodic(21600000)
-
+        helper.setUpChronJob();
+        helper.setUpViewPager();
     }
 
 
@@ -95,18 +70,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-        //return true; //put in fragment for settings
-
-//        SettingsFragment settings = new SettingsFragment();
-//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-//        viewPager.setCurrentItem(3);
-
-//        ft.replace(viewPager.getCurrentItem(), settings);
-//        ft.addToBackStack(null);
-//        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-//        ft.commit();
-        // return  super.onOptionsItemSelected(item);
     }
 
 
@@ -115,25 +78,39 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        private void setUpViewPager(){
+            ViewPager viewPager = findViewById(R.id.pager);
+            viewPager.setCurrentItem(2);
+        }
+
+        private void setUpChronJob(){
+            Intent intent = new Intent(MainActivity.this, ScoreUpdaterAndLateMarkerChronJob.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager manager = (AlarmManager)MainActivity.this.getSystemService(Context.ALARM_SERVICE);
+            manager.setRepeating(manager.RTC, getCalendarForChron().getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        }
+
+        private Calendar getCalendarForChron(){
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 11);
+            calendar.set(Calendar.MINUTE, 45);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            return  calendar;
+        }
+
+
         public void initalizeDatabase (Context context) {
             SQLiteDatabase mydatabase = openOrCreateDatabase("MyTimeTrackerDB",MODE_PRIVATE,null);
             TimeTrackerDataBaseHelper yo = new TimeTrackerDataBaseHelper(context);
-            //yo.getReadableDatabase();
+            initializeStetho(context);
+        }
 
+        public void initializeStetho(Context context){
             Stetho.initialize(Stetho.newInitializerBuilder(context)
                     .enableDumpapp(Stetho.defaultDumperPluginsProvider(context))
                     .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(context))
                     .build());
-            Cursor c = null;
-
-            try{
-                c = mydatabase.query("TASK_CATEGORY_INFO", null, null, null, null, null, null);
-                Log.d("TableTest", "Table exists");
-            }
-            catch(Exception e ){
-                Log.d("TableTest", " shit is broke");
-            }
-            Log.d("yolo", mydatabase.isOpen() + " hello " + DebugDB.getAddressLog());
         }
 
         public void initalizeBottomNavagationBar() {
@@ -171,7 +148,17 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
             );
+            initalizePagerAdapter(bottomNavigationView);
+        }
 
+        public void initalizeToolBar(){
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+
+        }
+
+        public void initalizePagerAdapter(BottomNavigationView bnv) {
+            final BottomNavigationView bottomNavigationView = bnv;
             SectionsPagerAdapter pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
             ViewPager pager = (ViewPager) findViewById(R.id.pager);
             pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -182,11 +169,10 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onPageSelected(int position) {
-                    if (prevMenuItem != null) {
+                    if(prevMenuItem != null){
                         prevMenuItem.setChecked(false);
                     }
-                    else
-                    {
+                    else{
                         bottomNavigationView.getMenu().getItem(0).setChecked(false);
                     }
 
@@ -200,15 +186,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             pager.setAdapter(pagerAdapter);
-        }
-
-        public void initalizeToolBar(){
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-
-        }
-
-        public void initalizePagerAdapter(BottomNavigationView bottomNavigationView) {
         }
 
     }
@@ -228,20 +205,15 @@ public class MainActivity extends AppCompatActivity {
             BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
             switch (position){
                 case 0:
-                    //bottomNavigationView.getItem(R.id.task_calendar);
                     return new CalendarFragment();
                 case 1:
-                    // bottomNavigationView.setSelectedItemId(R.id.task_viewer);
                     return new TasksListFragment();
                 case 2:
-                    // bottomNavigationView.setSelectedItemId(R.id.home);
                     return new HomeFragment();
                 case 3:
-                    // bottomNavigationView.setSelectedItemId(R.id.task_creator);
                     bottomNavigationView.getMenu().findItem(R.id.stats_viewer).setChecked(false);
                     return new TaskCreatorFragment();
                 case 4:
-                    // bottomNavigationView.setSelectedItemId(R.id.stats_viewer);
                     bottomNavigationView.getMenu().findItem(R.id.stats_viewer).setChecked(true);
                     return new StatsFragment();
             }

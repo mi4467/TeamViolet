@@ -41,9 +41,7 @@ import es.dmoral.toasty.Toasty;
 public class CalendarFragment extends Fragment  {
     private int currentId;
     SQLiteDatabase readableDatabase;
-    SQLiteDatabase writableDatabase;
     Button button;
-    View yolo;
     String currentDate;
     public CalendarFragment() {
         // Required empty public constructor
@@ -67,7 +65,7 @@ public class CalendarFragment extends Fragment  {
                 Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
                 RecyclerView recyclerView = layout.findViewById(R.id.recycler_view);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                recyclerView.setAdapter(new CalendarFragment.SimpleAdapter(recyclerView, data, stats));
+                recyclerView.setAdapter(new CalendarFragment.SimpleAdapter(recyclerView, data));
             }
         });
         Calendar today = Calendar.getInstance();
@@ -78,15 +76,12 @@ public class CalendarFragment extends Fragment  {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
         readableDatabase = dataBaseHelper.getReadableDatabase();
-        writableDatabase = dataBaseHelper.getWritableDatabase();
         String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
         currentDate = date;
-        Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
         Log.d("CursorDebug", date);
         Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
-        int resId = R.anim.layout_animation_fall_down;
-        recyclerView.setAdapter(new SimpleAdapter(recyclerView, data, stats));
+        recyclerView.setAdapter(new SimpleAdapter(recyclerView, data));
         setUpToast();
         //pass in a cursor, then use this cursor to bind in data
         return layout;
@@ -103,15 +98,13 @@ public class CalendarFragment extends Fragment  {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
         readableDatabase = dataBaseHelper.getReadableDatabase();
-        writableDatabase = dataBaseHelper.getWritableDatabase();
         String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
         currentDate = date;
-        Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
         Log.d("CursorDebug", date);
         Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
         Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
         int resId = R.anim.layout_animation_fall_down;
-        recyclerView.setAdapter(new SimpleAdapter(recyclerView, data, stats));       //pass in a cursor, then use this cursor to bind in data
+        recyclerView.setAdapter(new SimpleAdapter(recyclerView, data));       //pass in a cursor, then use this cursor to bind in data
     }
 
     @Override
@@ -122,23 +115,21 @@ public class CalendarFragment extends Fragment  {
             Integer cday = today.get(Calendar.DAY_OF_MONTH);
             Integer cmonth = today.get(Calendar.MONTH);
             Integer cyear = today.get(Calendar.YEAR);
-            RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             TimeTrackerDataBaseHelper dataBaseHelper = TimeTrackerDataBaseHelper.getInstance(getActivity());
             readableDatabase = dataBaseHelper.getReadableDatabase();
-            writableDatabase = dataBaseHelper.getWritableDatabase();
             String date = TaskCreatorFragment.constructDateStr(cyear, cmonth, cday);
             currentDate = date;
-            Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
             Log.d("CursorDebug", date);
             Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ date}, null, null, null);
             Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(data));
             int resId = R.anim.layout_animation_fall_down;
-            recyclerView.setAdapter(new SimpleAdapter(recyclerView, data, stats));
+            RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            recyclerView.setAdapter(new SimpleAdapter(recyclerView, data));
         }
     }
 
-    public void setUpToast(){
+    private void setUpToast(){
         Toasty.Config.getInstance()
                 .setErrorColor(Color.parseColor("#B71C1C"))
                 .setSuccessColor(Color.parseColor("#1B5E20"))
@@ -148,8 +139,6 @@ public class CalendarFragment extends Fragment  {
 
     private void markComplete(int id){
         boolean result = SQLfunctionHelper.markComplete(id, TimeTrackerDataBaseHelper.getInstance(getContext()), verifyOnTime(id));
-        Log.d("SnackyDebug", "We entered and got: " + result);
-        Log.d("SnackyDebug", "We entered and got: " + getActivity());
         if(result){
             Toasty.success(getContext(), "Marked Complete!", Toast.LENGTH_LONG, true).show();
         }
@@ -159,7 +148,7 @@ public class CalendarFragment extends Fragment  {
     }
 
     private boolean verifyOnTime(int id){
-        Cursor check = readableDatabase.rawQuery("SELECT * FROM TASK_INFORMATION WHERE _ID = " +id, null);
+        Cursor check = SQLfunctionHelper.queryWithString(getContext(), "SELECT * FROM TASK_INFORMATION WHERE _ID = " +id);
         check.moveToFirst();
         String[] dueDate = check.getString(2).split("-");
         int dueYear = Integer.parseInt(dueDate[0]);
@@ -168,22 +157,12 @@ public class CalendarFragment extends Fragment  {
         String[] dueTime = check.getString(5).split("-");
         int dueHour = Integer.parseInt(dueTime[0]);
         int dueMin = Integer.parseInt(dueTime[1]);
-        Log.d("MarkCompleteDebug", Arrays.toString(dueDate));
-        Log.d("MarkCompleteDebug", Arrays.toString(dueTime));
         Calendar today = Calendar.getInstance();
         int current_hour = today.get(Calendar.HOUR);
         int current_minute = today.get(Calendar.MINUTE);
         int cday = today.get(Calendar.DAY_OF_MONTH);
         int cmonth = today.get(Calendar.MONTH)+1;
         int cyear = today.get(Calendar.YEAR);
-        Log.d("MarkCompleteDebug" , "Year: " + cyear + " Month: " + cmonth + " Day: " + cday);
-        Log.d("MarkCompleteDebug" , " DUE DATE IS: Year: " + dueYear + " Month: " + dueMonth + " Day: " + dueDay);
-        Log.d("MarkCompleteDebug", ((dueYear==cyear))  +"");
-        Log.d("MarkCompleteDebug", ((dueMonth==cmonth))  +"");
-        Log.d("MarkCompleteDebug", ((dueDay<cday))  +"");
-
-
-        Log.d("MarkCompleteDebug", ((dueYear==cyear && dueMonth==cmonth && dueDay<cday))  +"");
         if(dueYear<cyear ||  (dueYear==cyear && dueMonth<cmonth) || (dueYear==cyear && dueMonth==cmonth && dueDay<cday) ){
             return false;
         }
@@ -192,7 +171,6 @@ public class CalendarFragment extends Fragment  {
                 return true;
             }
             if(current_hour<dueHour || (current_hour==dueHour && current_minute<dueMin)){
-                //Toast.makeText(getActivity(), "This Time is Invalid! Make End Time After Start Time", Toast.LENGTH_SHORT).show();
                 return true;
             }
             else{
@@ -204,11 +182,10 @@ public class CalendarFragment extends Fragment  {
 
     private void deleteTask(int id){
         SQLfunctionHelper.deleteTask(id, getContext());
-        Cursor stats = readableDatabase.rawQuery("SELECT * FROM TASK_STATS", null);
-        Cursor data = readableDatabase.query("TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate}, null, null, null);
+        Cursor data = SQLfunctionHelper.queryWithParams(getContext(), "TASK_INFORMATION", new String[] {"_ID", "TASK_NAME", "DUE_DATE", "START_TIME", "END_TIME"}, "DUE_DATE = ?", new String[]{ currentDate});
         RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new CalendarFragment.SimpleAdapter(recyclerView, data, stats));
+        recyclerView.setAdapter(new CalendarFragment.SimpleAdapter(recyclerView, data));
     }
 
     private void startTaskActivity(int id){
@@ -223,10 +200,9 @@ public class CalendarFragment extends Fragment  {
         private static final int UNSELECTED = -1;
         private RecyclerView recyclerView;
         private Cursor data;
-        private Cursor stats;
         private int selectedItem = UNSELECTED;
 
-        public SimpleAdapter(RecyclerView recyclerView, Cursor data, Cursor stats) {
+        public SimpleAdapter(RecyclerView recyclerView, Cursor data) {
             this.recyclerView = recyclerView;
             this.data = data;
             data.moveToFirst();
@@ -270,6 +246,10 @@ public class CalendarFragment extends Fragment  {
                 data.moveToNext();
                 expandButton.setSelected(isSelected);
                 expandableLayout.setExpanded(isSelected, false);
+                setUpTags();
+            }
+
+            public void setUpTags(){
                 ((Button)expandableLayout.findViewById(R.id.task_activity)).setTag(R.id.Button_ID, currentId);
                 ((Button)expandableLayout.findViewById(R.id.task_complete_button)).setTag(R.id.Button_ID, currentId);
                 ((Button)expandableLayout.findViewById(R.id.task_delete_button)).setTag(R.id.Button_ID, currentId);
@@ -289,27 +269,31 @@ public class CalendarFragment extends Fragment  {
                 else {
                     expandButton.setSelected(true);
                     expandableLayout.expand();
-                    ((Button)expandableLayout.findViewById(R.id.task_activity)).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            startTaskActivity((Integer)view.getTag(R.id.Button_ID));
-                        }
-                    });
-                    ((Button)expandableLayout.findViewById(R.id.task_delete_button)).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            deleteTask((Integer)view.getTag(R.id.Button_ID));
-                        }
-                    });
-                    ((Button)expandableLayout.findViewById(R.id.task_complete_button)).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            markComplete((Integer)view.getTag(R.id.Button_ID));
-                        }
-                    });
+                    setListeners();
                     selectedItem = position;
                 }
 
+            }
+
+            public void setListeners(){
+                ((Button)expandableLayout.findViewById(R.id.task_activity)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startTaskActivity((Integer)view.getTag(R.id.Button_ID));
+                    }
+                });
+                ((Button)expandableLayout.findViewById(R.id.task_delete_button)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteTask((Integer)view.getTag(R.id.Button_ID));
+                    }
+                });
+                ((Button)expandableLayout.findViewById(R.id.task_complete_button)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        markComplete((Integer)view.getTag(R.id.Button_ID));
+                    }
+                });
             }
 
             @Override
