@@ -87,7 +87,6 @@ public class TasksListFragment extends Fragment {
     }
     private void setUpStatsCursor(){
         stats = SQLfunctionHelper.queryWithString(getContext(), sqlCommand);
-        Log.d("CursorDebug", DatabaseUtils.dumpCursorToString(stats));
     }
 
     private void setUpListeners(View view){
@@ -100,7 +99,6 @@ public class TasksListFragment extends Fragment {
         pickCat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("ButtonDebug", "We picked a category");
                 showCategorySelectionDialog();
             }
         });
@@ -108,7 +106,6 @@ public class TasksListFragment extends Fragment {
         pickCompStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("ButtonDebug", "We picked a completeion");
                 showCompletionSelectionDialog();
             }
         });
@@ -116,14 +113,12 @@ public class TasksListFragment extends Fragment {
         pickOnTimeStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("ButtonDebug", "We picked a ontime");
                 showOnTimeSelectionDialog();
             }
         });
         enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("ButtonDebug", "We entered to submit a task");
                 filter(layout);
             }
         });
@@ -142,7 +137,6 @@ public class TasksListFragment extends Fragment {
 
     private boolean checkIfValidFilter(){
         if(taskCategoryNames==null){
-            Log.d("ButtonDebug", "We are returning");
             Toasty.error(getContext(), "Choose Categories!", Toast.LENGTH_LONG, true).show();
             return false;
         }
@@ -477,7 +471,6 @@ public class TasksListFragment extends Fragment {
 
             @Override
             public void onExpansionUpdate(float expansionFraction, int state) {
-                Log.d("ExpandableLayout", "State: " + state);
                 if (state == ExpandableLayout.State.EXPANDING) {
                     recyclerView.smoothScrollToPosition(getAdapterPosition());
                 }

@@ -19,16 +19,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme" />
-        <activity
             android:name=".TaskActivity"
             android:label="TaskActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme"></activity>
-        <activity android:name=".TestMapScroll"></activity>
+
         <receiver android:name=".ScoreUpdaterAndLateMarkerChronJob" android:enabled="true"/>
         <receiver android:name="com.hfad.mytimetracker.DigestPublisher" android:enabled="true"/>
         <receiver android:name="com.hfad.mytimetracker.NotificationPublisher" android:enabled="true"/>

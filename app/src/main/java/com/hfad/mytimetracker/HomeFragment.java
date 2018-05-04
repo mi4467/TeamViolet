@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
@@ -55,38 +56,27 @@ import lecho.lib.hellocharts.model.Axis;
 
 
 public class HomeFragment extends Fragment {
-    private static ArrayList<StatsFragment.CategoryStats> completedBarData = null;
-    private static ArrayList<StatsFragment.CategoryStats> onTimeBarData = null;
     private static String currentStr = "Current Streak: ";
     private static String todayScr = "\nToday's Score:  ";
     private static String longestStr = "Longest Streak: ";
     private static String totlScr = "\nTotal Score:       " ;
+    private static Map<String, Integer> monthMapper;
+
     public HomeFragment(){
 
     }
 
     @SuppressLint("RestrictedAPI")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-//        BottomNavigationView bottomNavigationView = (BottomNavigationView) getActivity().findViewById(R.id.bottom_navigation);
-//        bottomNavigationView.getMenu().getItem(3).setChecked(true);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View layout = inflater.inflate(R.layout.fragment_home, container, false);
-
-          initBestCompleteBar(layout);        //these functions set up the respective cardviews
-//        initBestOnTimeBar(layout);          //as of right now these hold dummy data, in these functions implement the neccessary sql needed to show this
-          initWorstCompleteBar(layout);
-          initTaskListView(layout);
-//        initWorstOnTimeBar(layout);
-          initCompleteLineChart(layout);
-          initOnTimeLineChart(layout);
-          initUserStats(layout);
-//        initIncompletePieChart(layout);
-//        initLatePieChart(layout);
-          //testGraph(layout);
-//          mpLineGraphWeekCompletion(layout);
-
+        initBestCompleteBar(layout);        //these functions set up the respective cardviews
+        initWorstCompleteBar(layout);
+        initTaskListView(layout);
+        initCompleteLineChart(layout);
+        initOnTimeLineChart(layout);
+        initUserStats(layout);
+        initMonthMapper();
         return layout;
     }
 
@@ -94,7 +84,6 @@ public class HomeFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser && getView()!=null) {
-            // Do your stuff here
             initTaskListView(getView());
             initCompleteLineChart(getView());
             initOnTimeLineChart(getView());
@@ -105,28 +94,8 @@ public class HomeFragment extends Fragment {
 
     }
 
-
-    public void initUserStats(View layout){
-        Cursor userStats = TimeTrackerDataBaseHelper.getInstance(getContext()).getReadableDatabase().rawQuery("SELECT * FROM USER_STATS", null);
-        userStats.moveToFirst();
-        TextView currentString = layout.findViewById(R.id.current_streak);
-        TextView tdayScr = layout.findViewById(R.id.today_score);
-        TextView longStr = layout.findViewById(R.id.longest_streak);
-        TextView totalScr = layout.findViewById(R.id.total_score);
-        currentString.setText(currentStr + userStats.getInt(0));
-        longStr.setText(longestStr + userStats.getInt(1));
-        tdayScr.setText(todayScr + userStats.getInt(2));
-        totalScr.setText(totlScr + userStats.getInt(3));
-        //for total score and tday score, put a check to see if its negative
-        //if its negative, append one more space 
-    }
-
-
-    public void initTaskListView(View layout){
-        GregorianCalendar gcal = new GregorianCalendar();
-        gcal.setTime(Calendar.getInstance().getTime());
-        String[] daterep = gcal.getTime().toString().split(" ");
-        Map<String, Integer> monthMapper = new HashMap<>();
+    private void initMonthMapper(){
+        monthMapper = new HashMap<>();
         monthMapper.put("Jan", 0);
         monthMapper.put("Feb", 1);
         monthMapper.put("Mar", 2);
@@ -139,9 +108,27 @@ public class HomeFragment extends Fragment {
         monthMapper.put("Oct", 9);
         monthMapper.put("Nov", 10);
         monthMapper.put("Dec", 11);
-        Cursor result = SQLfunctionHelper.getTasksGivenDate(getContext(), TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2])));
-        Log.d("HomeTodaysListsDebug", android.database.DatabaseUtils.dumpCursorToString(result));
+    }
+    public void initUserStats(View layout){
+        Cursor userStats = TimeTrackerDataBaseHelper.getInstance(getContext()).getReadableDatabase().rawQuery("SELECT * FROM USER_STATS", null);
+        userStats.moveToFirst();
+        TextView currentString = layout.findViewById(R.id.current_streak);
+        TextView tdayScr = layout.findViewById(R.id.today_score);
+        TextView longStr = layout.findViewById(R.id.longest_streak);
+        TextView totalScr = layout.findViewById(R.id.total_score);
+        currentString.setText(currentStr + userStats.getInt(0));
+        longStr.setText(longestStr + userStats.getInt(1));
+        tdayScr.setText(todayScr + userStats.getInt(2));
+        totalScr.setText(totlScr + userStats.getInt(3));
+    }
 
+
+    public void initTaskListView(View layout){
+        GregorianCalendar gcal = new GregorianCalendar();
+        gcal.setTime(Calendar.getInstance().getTime());
+        String[] daterep = gcal.getTime().toString().split(" ");
+        initMonthMapper();
+        Cursor result = SQLfunctionHelper.getTasksGivenDate(getContext(), TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2])));
         ArrayList<String> completedTasks = new ArrayList<>();
         ArrayList<String> notCompletedTasks = new ArrayList<>();
         result.moveToFirst();
@@ -162,19 +149,12 @@ public class HomeFragment extends Fragment {
             }
             result.moveToNext();
         }
+        setUpTaskViews(layout, completed, incomplete);
+    }
 
-        Log.d("HomeListViewDebug", completed);
-        Log.d("HomeListViewDebug", incomplete);
-
-//         completed = new String[completedTasks.size()];
-//        String[] notCompleted = new String[notCompletedTasks.size()];
-//
-//        ArrayAdapter<String> completedAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, completed);
-//        ArrayAdapter<String> notCompletedAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, notCompleted);
-
+    private void setUpTaskViews(View layout, String completed, String incomplete ){
         TextView completedList = layout.findViewById(R.id.completed_listview);
         TextView notCompletedList = layout.findViewById(R.id.not_completed_listview);
-
         if(!completed.equals("")){
             completedList.setText("Completed Tasks\n" + completed);
             completedList.setGravity(Gravity.CENTER);
@@ -191,13 +171,28 @@ public class HomeFragment extends Fragment {
             notCompletedList.setText("Incomplete Tasks\n\nNo Tasks Left To Do Today");
             notCompletedList.setGravity(Gravity.CENTER);
         }
-
-        //completedList.setAdapter(completedAdapter);
-        //notCompletedList.setAdapter(notCompletedAdapter);
-
-
     }
 
+
+    private StringBuilder getHelpfulTipString(ArrayList<StatsFragment.CategoryStats> data){
+        int i = 0;
+        StringBuilder s = new StringBuilder();
+        for(i = 0; i<5 && i<data.size(); i++){
+            if(data.get(i).totalTasksWithOnTimeStatus!=0) {
+                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
+            }
+            else{
+                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + "N/A" + "\n");
+            }
+        }
+        if(i==5){
+            s.append("....\n");
+        }
+        if(i==0){
+            s.append("\nNo Qualifying Data\n");
+        }
+        return s;
+    }
 
     public void initBestCompleteBar(View layout){
         ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), new StatsFragment());
@@ -207,38 +202,15 @@ public class HomeFragment extends Fragment {
                 i--;
             }
         }
-
         data.sort(new BestCompletionComparator());
-
-        //ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
         if(data.size()==0){
-            Log.d("HelpfulTipsDebug", "We have no viable categories");
             return;
         }
-//        completedBarData = new ArrayList<>();
-
-        int i = 0;
-        StringBuilder s = new StringBuilder();
-        for(i = 0; i<5 && i<data.size(); i++){
-            //completedBarData.add(data.get(i));
-            if(data.get(i).totalTasksWithOnTimeStatus!=0) {
-                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
-            }
-            else{
-                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + "N/A" + "\n");
-            }
-        }
-        if(i==5){
-            s.append("....\n");
-        }
-        if(i==0){
-            s.append("\nNo Qualifying Data\n");
-        }
-
+        StringBuilder s = getHelpfulTipString(data);
         TextView text = layout.findViewById(R.id.best_categories);
         text.setText(s.substring(1));
     }
-//
+
     public void initWorstCompleteBar(View layout){
         ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), new StatsFragment());
         for(int i =0; i<data.size(); i++){
@@ -247,62 +219,62 @@ public class HomeFragment extends Fragment {
                 i--;
             }
         }
-
         data.sort(new BestCompletionComparator());
         Collections.reverse(data);
-
-        //ArrayList<StatsFragment.CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
         if(data.size()==0){
             return;
         }
-//        completedBarData = new ArrayList<>();
-
-        int i = 0;
-        StringBuilder s = new StringBuilder();
-        for(i = 0; i<5 && i<data.size(); i++){
-            //completedBarData.add(data.get(i));
-            if(data.get(i).totalTasksWithOnTimeStatus!=0) {
-                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + data.get(i).onTime * 100 / data.get(i).totalTasksWithOnTimeStatus + "%\n");
-            }
-            else{
-                s.append("\n" + data.get(i).name + "\n" + "\t\t\t\t\u2022" + "\t\tCompleted:\t" + data.get(i).complete * 100 / data.get(i).totalTasksWithCompleteStatus + "%\n" + "\t\t\t\t\u2022" + "\t\tOn-Time: \t\t\t" + "N/A" + "\n");
-            }
-        }
-        if(i==5){
-            s.append("....\n");
-        }
-        if(i==0){
-            s.append("\nNo Qualifying Data\n");
-        }
-
+        StringBuilder s = getHelpfulTipString(data);
         TextView text = layout.findViewById(R.id.worst_categories);
         text.setText(s.substring(1));
     }
 
-    public void initCompleteLineChart(View layout){
+    private void setChartProperties(LineChart chart, IAxisValueFormatter formatter){
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setGranularity(1f);       //interval
+        xAxis.setValueFormatter(formatter);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextColor(Color.WHITE);
+        chart.getDescription().setEnabled(false);
+        chart.getAxisLeft().setGranularity(1f);
+        chart.getAxisLeft().setTextColor(Color.WHITE);
+        chart.getAxisRight().setEnabled(false);
+        chart.getLegend().setTextColor(Color.WHITE);
+        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
+
+    }
+
+    public void lineColorsInit(LineDataSet yellow, LineDataSet green, LineDataSet red){
+        yellow.setAxisDependency(YAxis.AxisDependency.LEFT);
+        yellow.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
+        yellow.setCircleColor(Color.parseColor("#827717"));
+        yellow.setCircleColorHole(Color.parseColor("#EEFF41"));
+        yellow.setValueTextColor(Color.WHITE);
+        green.setAxisDependency(YAxis.AxisDependency.LEFT);
+        green.setColor(Color.parseColor("#689F38"));    //Dark Green
+        green.setCircleColor(Color.parseColor("#33691E"));
+        green.setCircleColorHole(Color.parseColor("#64DD17"));
+        green.setValueTextColor(Color.WHITE);
+        red.setAxisDependency(YAxis.AxisDependency.LEFT);
+        red.setColor(Color.parseColor("#D32F2F"));    //Dark Red
+        red.setCircleColor(Color.parseColor("#B71C1C"));
+        red.setCircleColorHole(Color.parseColor("#FF5252"));
+        red.setValueTextColor(Color.WHITE);
+    }
+
+    public String getDate(){
         GregorianCalendar gcal = new GregorianCalendar();
         gcal.setTime(Calendar.getInstance().getTime());
-
-        Map<String, Integer> monthMapper = new HashMap<>();
-        monthMapper.put("Jan", 0);
-        monthMapper.put("Feb", 1);
-        monthMapper.put("Mar", 2);
-        monthMapper.put("Apr", 3);
-        monthMapper.put("May", 4);
-        monthMapper.put("Jun", 5);
-        monthMapper.put("Jul", 6);
-        monthMapper.put("Aug", 7);
-        monthMapper.put("Sep", 8);
-        monthMapper.put("Oct", 9);
-        monthMapper.put("Nov", 10);
-        monthMapper.put("Dec", 11);
-
         String[] daterep = gcal.getTime().toString().split(" ");
-        String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+        initMonthMapper();
+        return TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+    }
+
+
+    public void initCompleteLineChart(View layout){
+        String date = getDate();
         final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
         Collections.reverse(data);
-        Log.d("HomeDebug", data.toString());
-        //above is getting the weeks data, same as before
         ArrayList<Entry> totalWithCompleteStatus = new ArrayList<>();
         for(int i =0; i< data.size(); i++){
             totalWithCompleteStatus.add(new Entry((float) i, (float) data.get(i).totalTasksWithCompleteStatus));
@@ -316,36 +288,17 @@ public class HomeFragment extends Fragment {
             incomplete.add(new Entry((float) i, (float) data.get(i).incomplete));
         }
         LineDataSet total = new LineDataSet(totalWithCompleteStatus, "Total Tasks");
-        total.setAxisDependency(YAxis.AxisDependency.LEFT);
-        total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
-        total.setCircleColor(Color.parseColor("#827717"));
-        total.setCircleColorHole(Color.parseColor("#EEFF41"));
-        total.setValueTextColor(Color.WHITE);
         LineDataSet completeTasks = new LineDataSet(complete, "Completed Tasks");
-        completeTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
-        completeTasks.setColor(Color.parseColor("#689F38"));    //Dark Green
-        completeTasks.setCircleColor(Color.parseColor("#33691E"));
-        completeTasks.setCircleColorHole(Color.parseColor("#64DD17"));
-        completeTasks.setValueTextColor(Color.WHITE);
         LineDataSet incompleteTasks = new LineDataSet(incomplete, "Incomplete Tasks");
-        incompleteTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
-        incompleteTasks.setColor(Color.parseColor("#D32F2F"));    //Dark Red
-        incompleteTasks.setCircleColor(Color.parseColor("#B71C1C"));
-        incompleteTasks.setCircleColorHole(Color.parseColor("#FF5252"));
-        incompleteTasks.setValueTextColor(Color.WHITE);
-
-        //above is creating entry lists and their data sets
+        lineColorsInit(total, completeTasks, incompleteTasks);
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(total);
         dataSets.add(completeTasks);
         dataSets.add(incompleteTasks);
-
         LineData chartData = new LineData(dataSets);
-
         LineChart chart = layout.findViewById(R.id.complete_line_chart);
         chart.setData(chartData);
         chart.invalidate();
-
         final String[] days = new String[7];
         for(int i =0; i<days.length; i++){
             days[i] = data.get(i).date;
@@ -354,53 +307,19 @@ public class HomeFragment extends Fragment {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-
-                // String[] date = data.get(data.size()-1-((int) value)).date.split("-");
-                //
-                //                        return date[1] + "/" + date[2];
                 String[] dateRep = days[(int) value].split("-");
                 return dateRep[1] + "/" + dateRep[2];
             }
 
             // we don't draw numbers, so no decimal digits needed
         };
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setGranularity(1f);       //interval
-        xAxis.setValueFormatter(formatter);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(Color.WHITE);
-        chart.getDescription().setEnabled(false);
-        chart.getAxisLeft().setGranularity(1f);
-        chart.getAxisLeft().setTextColor(Color.WHITE);
-        chart.getAxisRight().setEnabled(false);
-        chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
+        setChartProperties(chart, formatter);
     }
 
     public void initOnTimeLineChart(View layout){
-        GregorianCalendar gcal = new GregorianCalendar();
-        gcal.setTime(Calendar.getInstance().getTime());
-
-        Map<String, Integer> monthMapper = new HashMap<>();
-        monthMapper.put("Jan", 0);
-        monthMapper.put("Feb", 1);
-        monthMapper.put("Mar", 2);
-        monthMapper.put("Apr", 3);
-        monthMapper.put("May", 4);
-        monthMapper.put("Jun", 5);
-        monthMapper.put("Jul", 6);
-        monthMapper.put("Aug", 7);
-        monthMapper.put("Sep", 8);
-        monthMapper.put("Oct", 9);
-        monthMapper.put("Nov", 10);
-        monthMapper.put("Dec", 11);
-
-        String[] daterep = gcal.getTime().toString().split(" ");
-        String date = TaskCreatorFragment.constructDateStr(Integer.parseInt(daterep[5]), monthMapper.get(daterep[1]), Integer.parseInt(daterep[2]));
+        String date = getDate();
         final ArrayList<StatsFragment.DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), new StatsFragment(), date);
         Collections.reverse(data);
-        Log.d("HomeDebug", data.toString());
-        //above is getting the weeks data, same as before
         ArrayList<Entry> totalWithCompleteStatus = new ArrayList<>();
         for(int i =0; i< data.size(); i++){
             totalWithCompleteStatus.add(new Entry((float) i, (float) data.get(i).totalTasksWithOnTimeStatus));
@@ -414,35 +333,17 @@ public class HomeFragment extends Fragment {
             incomplete.add(new Entry((float) i, (float) data.get(i).late));
         }
         LineDataSet total = new LineDataSet(totalWithCompleteStatus, "Total Qualifying Tasks");
-        total.setAxisDependency(YAxis.AxisDependency.LEFT);
-        total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
-        total.setCircleColor(Color.parseColor("#827717"));
-        total.setCircleColorHole(Color.parseColor("#EEFF41"));
-        total.setValueTextColor(Color.WHITE);
         LineDataSet onTime = new LineDataSet(complete, "On-Time Tasks");
-        onTime.setAxisDependency(YAxis.AxisDependency.LEFT);
-        onTime.setColor(Color.parseColor("#689F38"));    //Dark Green
-        onTime.setCircleColor(Color.parseColor("#33691E"));
-        onTime.setCircleColorHole(Color.parseColor("#64DD17"));
-        onTime.setValueTextColor(Color.WHITE);
         LineDataSet late = new LineDataSet(incomplete, "Late Tasks");
-        late.setAxisDependency(YAxis.AxisDependency.LEFT);
-        late.setColor(Color.parseColor("#D32F2F"));    //Dark Red
-        late.setCircleColor(Color.parseColor("#B71C1C"));
-        late.setCircleColorHole(Color.parseColor("#FF5252"));
-        late.setValueTextColor(Color.WHITE);
-        //above is creating entry lists and their data sets
+        lineColorsInit(total, onTime, late);
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(total);
         dataSets.add(onTime);
         dataSets.add(late);
-
         LineData chartData = new LineData(dataSets);
-
         LineChart chart = layout.findViewById(R.id.onTime_line_chart);
         chart.setData(chartData);
         chart.invalidate();
-
         final String[] days = new String[7];
         for(int i =0; i<days.length; i++){
             days[i] = data.get(i).date;
@@ -451,28 +352,13 @@ public class HomeFragment extends Fragment {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-
-                // String[] date = data.get(data.size()-1-((int) value)).date.split("-");
-                //
-                //                        return date[1] + "/" + date[2];
                 String[] dateRep = days[(int) value].split("-");
                 return dateRep[1] + "/" + dateRep[2];
             }
 
             // we don't draw numbers, so no decimal digits needed
         };
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setGranularity(1f);       //interval
-        xAxis.setValueFormatter(formatter);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(Color.WHITE);
-        chart.getDescription().setEnabled(false);
-        chart.getAxisLeft().setGranularity(1f);
-        chart.getAxisLeft().setTextColor(Color.WHITE);
-        chart.getAxisRight().setEnabled(false);
-        chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
-
+        setChartProperties(chart, formatter);
     }
 
     public class BestCompletionComparator implements Comparator<StatsFragment.CategoryStats> {

@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.db.chart.model.Bar;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -87,17 +88,13 @@ public class StatsFragment extends Fragment {
         // Required empty public constructor
     }
 
-
-
     @SuppressLint("RestrictedAPI")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         final View layout = inflater.inflate(R.layout.fragment_stats, container, false);
         initListeners(layout);
         initField();
-        initLayout(layout);
         setUpCompletionWeekLineGraph(layout);
         setUpOnTimeWeekLineGraph(layout);
         setUpCompletePieGraph(layout);
@@ -110,31 +107,15 @@ public class StatsFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser && getView()!=null) {
-            // Do your stuff here
             View layout = getView();
             initListeners(layout);
             initField();
-            initLayout(layout);
             setUpCompletionWeekLineGraph(layout);
             setUpOnTimeWeekLineGraph(layout);
             setUpLatePieGraph(layout);
             setUpCompletePieGraph(layout);
         }
 
-    }
-
-    public void initLayout(View layout){
-//        TextView completeBar = layout.findViewById(R.id.completed_key_pick_three);
-//        completeBar.setBackgroundColor(Color.GREEN);
-//        TextView incompleteBar = layout.findViewById(R.id.not_completed_key_pick_three);
-//        incompleteBar.setBackgroundColor(Color.RED);
-//
-//        TextView onTimeBar = layout.findViewById(R.id.onTime_key_pick_three);
-//        onTimeBar.setBackgroundColor(Color.GREEN);
-//        TextView lateBar = layout.findViewById(R.id.late_key_pick_three);
-//        lateBar.setBackgroundColor(Color.RED);
-//        categoriesComplete = SQLfunctionHelper.getCategoryList(getContext());
-//        setUpCompletionBarGraph(layout);
     }
 
     public void initListeners(final View layout){
@@ -177,7 +158,6 @@ public class StatsFragment extends Fragment {
             public void onClick(View view) {
                 DatePickerFragment.flag=0;
                 showDatePickerDialog(view);
-                Log.d("StatsDebug", "Date is: " + completeMonth + "/" + completeDay);
             }
         });
 
@@ -185,9 +165,6 @@ public class StatsFragment extends Fragment {
         completionWeekEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("Penis", "It should be cleared");
-//                GraphView completeWeek = layout.findViewById(R.id.task_complete_week_graph_filter);
-//                completeWeek.removeAllSeries();
                 setUpCompletionWeekLineGraph(layout);
             }
         });
@@ -198,7 +175,6 @@ public class StatsFragment extends Fragment {
             public void onClick(View view) {
                 DatePickerFragment.flag=1;
                 showDatePickerDialog(view);
-                //setUpOnTimeLineGraph();
             }
         });
 
@@ -239,15 +215,69 @@ public class StatsFragment extends Fragment {
 
     }
 
-    public void setUpCompletePieGraph(View layout){
-        ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
+    public boolean filterCategoryStats(ArrayList<CategoryStats> data, boolean completion){
+        if(data.size() == 0){
+            return false;
+        }
         for(int i =0; i< data.size(); i++){
-            if(data.get(i).incomplete==0){
+            if(data.size() == 0){
+                return false;
+            }
+            if(data.get(i).incomplete==0 && completion){
                 data.remove(i);
                 i--;
             }
+            if(data.size() == 0){
+                return false;
+            }
+            if(data.get(i).late==0 && !completion){
+                data.remove(i);
+                i--;
+
+            }
         }
         if(data.size()==0){
+            return false;
+        }
+        return true;
+    }
+
+    public void setChartLegend(Chart chart){
+        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
+        chart.getLegend().setTextColor(Color.WHITE);
+        chart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        chart.getLegend().setWordWrapEnabled(true);
+    }
+
+    public void adjustXAxis(Chart chart, IAxisValueFormatter formatter){
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setGranularity(1f);       //interval
+        xAxis.setValueFormatter(formatter);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextColor(Color.WHITE);
+    }
+
+    public void lineColorsInit(LineDataSet yellow, LineDataSet green, LineDataSet red){
+        yellow.setAxisDependency(YAxis.AxisDependency.LEFT);
+        yellow.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
+        yellow.setCircleColor(Color.parseColor("#827717"));
+        yellow.setCircleColorHole(Color.parseColor("#EEFF41"));
+        yellow.setValueTextColor(Color.WHITE);
+        green.setAxisDependency(YAxis.AxisDependency.LEFT);
+        green.setColor(Color.parseColor("#689F38"));    //Dark Green
+        green.setCircleColor(Color.parseColor("#33691E"));
+        green.setCircleColorHole(Color.parseColor("#64DD17"));
+        green.setValueTextColor(Color.WHITE);
+        red.setAxisDependency(YAxis.AxisDependency.LEFT);
+        red.setColor(Color.parseColor("#D32F2F"));    //Dark Red
+        red.setCircleColor(Color.parseColor("#B71C1C"));
+        red.setCircleColorHole(Color.parseColor("#FF5252"));
+        red.setValueTextColor(Color.WHITE);
+    }
+
+    public void setUpCompletePieGraph(View layout){
+        ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
+        if(!filterCategoryStats(data, true)){
             return;
         }
         ArrayList<Integer> colors = new ArrayList<>();
@@ -272,11 +302,7 @@ public class StatsFragment extends Fragment {
         final PieChart chart = layout.findViewById(R.id.incomplete_pie_chart);
         chart.setData(results);
         chart.invalidate();
-        chart.setDrawSliceText(false);
-        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
-        chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        chart.getLegend().setWordWrapEnabled(true);
+        setChartLegend(chart);
         chart.getDescription().setEnabled(false);
         chart.setCenterTextColor(Color.WHITE);
         chart.setHoleColor(Color.parseColor("#607D8B"));
@@ -297,14 +323,8 @@ public class StatsFragment extends Fragment {
 
     public void setUpLatePieGraph(View layout){
         ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
-        if(data.size()==0){
+        if(!filterCategoryStats(data, false)){
             return;
-        }
-        for(int i =0; i< data.size(); i++){
-            if(data.get(i).late==0){
-                data.remove(i);
-                i--;
-            }
         }
         ArrayList<Integer> colors = new ArrayList<>();
         ArrayList<PieEntry> slices = new ArrayList<>();
@@ -329,11 +349,7 @@ public class StatsFragment extends Fragment {
         final PieChart chart = layout.findViewById(R.id.late_pie_chart);
         chart.setData(results);
         chart.invalidate();
-        chart.setDrawSliceText(false);
-        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
-        chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        chart.getLegend().setWordWrapEnabled(true);
+        setChartLegend(chart);
         chart.getDescription().setEnabled(false);
         chart.setHoleColor(Color.parseColor("#607D8B"));
         chart.setCenterTextColor(Color.WHITE);
@@ -366,8 +382,6 @@ public class StatsFragment extends Fragment {
         for(int i =0; i<onTimeBarData.size(); i++){
             incomplete.add(new BarEntry((float) i, (float) onTimeBarData.get(i).late));
         }
-        //above is collecting the data
-
         BarDataSet completedTasks = new BarDataSet(complete, "On-time Tasks");
         completedTasks.setColor(Color.parseColor("#689F38"));
         completedTasks.setValueTextColor(Color.WHITE);
@@ -377,11 +391,6 @@ public class StatsFragment extends Fragment {
         float groupSpace = .06f;
         float barSpace = .02f;
         float barWidth = .45f;
-
-//        ArrayList<IBarDataSet> dataSets = new ArrayList<>();
-//        dataSets.add(completedTasks);
-//        dataSets.add(incompleteTasks);
-
         final String[] cat = new String[data.size()];
         for(int i =0; i<cat.length; i++){
             cat[i] = onTimeBarData.get(i).name;
@@ -390,11 +399,6 @@ public class StatsFragment extends Fragment {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-
-                // String[] date = data.get(data.size()-1-((int) value)).date.split("-");
-                //
-                //                        return date[1] + "/" + date[2];
-                //String[] dateRep = days[(int) value].split("-");
                 if((int) value>=cat.length || value <0){
                     return "";
                 }
@@ -403,20 +407,14 @@ public class StatsFragment extends Fragment {
 
             // we don't draw numbers, so no decimal digits needed
         };
-
         BarData barData = new BarData(completedTasks, incompleteTasks);
         barData.setBarWidth(barWidth);
         BarChart chart = layout.findViewById(R.id.onTime_cat_barchart);
-
+        adjustXAxis(chart, formatter);
         XAxis xAxis = chart.getXAxis();
-        xAxis.setGranularity(1f);       //interval
-        xAxis.setValueFormatter(formatter);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(Color.WHITE);
         xAxis.setCenterAxisLabels(true);
         xAxis.setAxisMaximum((float) onTimeBarData.size());
-        chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setWordWrapEnabled(true);
+        setChartLegend(chart);
         chart.getAxisRight().setEnabled(false);
         chart.getAxisLeft().setTextColor(Color.WHITE);
         chart.setNoDataText("No Categories Were Selected. Choose Up To Three Categories!");
@@ -442,8 +440,6 @@ public class StatsFragment extends Fragment {
         for(int i =0; i<completedBarData.size(); i++){
             incomplete.add(new BarEntry((float) i, (float) completedBarData.get(i).incomplete));
         }
-        //above is collecting the data
-
         BarDataSet completedTasks = new BarDataSet(complete, "Completed Tasks");
         completedTasks.setColor(Color.parseColor("#689F38"));
         completedTasks.setValueTextColor(Color.WHITE);
@@ -453,7 +449,6 @@ public class StatsFragment extends Fragment {
         float groupSpace = .06f;
         float barSpace = .02f;
         float barWidth = .45f;
-
         final String[] cat = new String[data.size()];
         for(int i =0; i<cat.length; i++){
             cat[i] = completedBarData.get(i).name;
@@ -470,22 +465,16 @@ public class StatsFragment extends Fragment {
 
             // we don't draw numbers, so no decimal digits needed
         };
-
         BarData barData = new BarData(completedTasks, incompleteTasks);
         barData.setBarWidth(barWidth);
         BarChart chart = layout.findViewById(R.id.complete_cat_barchart);
-
+        adjustXAxis(chart, formatter);
         XAxis xAxis = chart.getXAxis();
-        xAxis.setGranularity(1f);       //interval
-        xAxis.setValueFormatter(formatter);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(Color.WHITE);
         xAxis.setCenterAxisLabels(true);
         xAxis.setAxisMaximum((float) completedBarData.size());
-        chart.getLegend().setTextColor(Color.WHITE);
+        setChartLegend(chart);
         chart.getAxisRight().setEnabled(false);
         chart.getAxisLeft().setTextColor(Color.WHITE);
-        chart.getLegend().setWordWrapEnabled(true);
         chart.setNoDataText("No Categories Were Selected. Choose Up To Three Categories!");
         chart.setData(barData);
         chart.groupBars(0f, groupSpace, barSpace);
@@ -502,11 +491,9 @@ public class StatsFragment extends Fragment {
             return;
         }
         String date = TaskCreatorFragment.constructDateStr(completeYear, completeMonth, completeDay);
-        Log.d("StatsDebug", "The date passed into the data is: " +date);
         ArrayList<DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), this, date);
         completedLineData = data;
         Collections.reverse(completedLineData);
-
         ArrayList<Entry> totalWithCompleteStatus = new ArrayList<>();
         for(int i =0; i< completedLineData.size(); i++){
             totalWithCompleteStatus.add(new Entry((float) i, (float) completedLineData.get(i).totalTasksWithCompleteStatus));
@@ -520,36 +507,17 @@ public class StatsFragment extends Fragment {
             incomplete.add(new Entry((float) i, (float) completedLineData.get(i).incomplete));
         }
         LineDataSet total = new LineDataSet(totalWithCompleteStatus, "Total Tasks");
-        total.setAxisDependency(YAxis.AxisDependency.LEFT);
-        total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
-        total.setCircleColor(Color.parseColor("#827717"));
-        total.setCircleColorHole(Color.parseColor("#EEFF41"));
-        total.setValueTextColor(Color.WHITE);
         LineDataSet completeTasks = new LineDataSet(complete, "Completed Tasks");
-        completeTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
-        completeTasks.setColor(Color.parseColor("#689F38"));    //Dark Green
-        completeTasks.setCircleColor(Color.parseColor("#33691E"));
-        completeTasks.setCircleColorHole(Color.parseColor("#64DD17"));
-        completeTasks.setValueTextColor(Color.WHITE);
         LineDataSet incompleteTasks = new LineDataSet(incomplete, "Incomplete Tasks");
-        incompleteTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
-        incompleteTasks.setColor(Color.parseColor("#D32F2F"));    //Dark Red
-        incompleteTasks.setCircleColor(Color.parseColor("#B71C1C"));
-        incompleteTasks.setCircleColorHole(Color.parseColor("#FF5252"));
-        incompleteTasks.setValueTextColor(Color.WHITE);
-
-        //above is creating entry lists and their data sets
+        lineColorsInit(total, completeTasks, incompleteTasks);
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(total);
         dataSets.add(completeTasks);
         dataSets.add(incompleteTasks);
-
         LineData chartData = new LineData(dataSets);
-
         LineChart chart = layout.findViewById(R.id.complete_line_chart_filter);
         chart.setData(chartData);
         chart.invalidate();
-
         final String[] days = new String[7];
         for(int i =0; i<days.length; i++){
             days[i] = completedLineData.get(i).date;
@@ -564,20 +532,14 @@ public class StatsFragment extends Fragment {
 
             // we don't draw numbers, so no decimal digits needed
         };
-
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setGranularity(1f);       //interval
-        xAxis.setValueFormatter(formatter);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(Color.WHITE);
-
+        adjustXAxis(chart, formatter);
         chart.setScaleEnabled(false);
         chart.getDescription().setEnabled(false);
         chart.getAxisLeft().setGranularity(1f);
         chart.getAxisLeft().setTextColor(Color.WHITE);
         chart.getAxisRight().setEnabled(false);
-        chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
+        setChartLegend(chart);
+        chart.invalidate();
 
     }
 
@@ -587,11 +549,9 @@ public class StatsFragment extends Fragment {
             return;
         }
         String date = TaskCreatorFragment.constructDateStr(onTimeYear, onTimeMonth, onTimeDay);
-        Log.d("StatsDebug", "The date passed into the data is: " +date);
         ArrayList<DayStats> data = SQLfunctionHelper.getWeekOnTimeTasksFilter(getContext(), this, date);
         onTimeLineData = data;
         Collections.reverse(onTimeLineData);
-
         ArrayList<Entry> totalWithLateStatus = new ArrayList<>();
         for(int i =0; i< onTimeLineData.size(); i++){
             totalWithLateStatus.add(new Entry((float) i, (float) onTimeLineData.get(i).totalTasksWithOnTimeStatus));
@@ -605,36 +565,17 @@ public class StatsFragment extends Fragment {
             late.add(new Entry((float) i, (float) onTimeLineData.get(i).late));
         }
         LineDataSet total = new LineDataSet(totalWithLateStatus, "Total Tasks");
-        total.setAxisDependency(YAxis.AxisDependency.LEFT);
-        total.setColor(Color.parseColor("#AFB42B"));    //Dark Yellow
-        total.setCircleColor(Color.parseColor("#827717"));
-        total.setCircleColorHole(Color.parseColor("#EEFF41"));
-        total.setValueTextColor(Color.WHITE);
         LineDataSet onTimeTasks = new LineDataSet(onTime, "On-time Tasks");
-        onTimeTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
-        onTimeTasks.setColor(Color.parseColor("#689F38"));    //Dark Green
-        onTimeTasks.setCircleColor(Color.parseColor("#33691E"));
-        onTimeTasks.setCircleColorHole(Color.parseColor("#64DD17"));
-        onTimeTasks.setValueTextColor(Color.WHITE);
         LineDataSet lateTasks = new LineDataSet(late, "Late Tasks");
-        lateTasks.setAxisDependency(YAxis.AxisDependency.LEFT);
-        lateTasks.setColor(Color.parseColor("#D32F2F"));    //Dark Red
-        lateTasks.setCircleColor(Color.parseColor("#B71C1C"));
-        lateTasks.setCircleColorHole(Color.parseColor("#FF5252"));
-        lateTasks.setValueTextColor(Color.WHITE);
-
-        //above is creating entry lists and their data sets
+        lineColorsInit(total, onTimeTasks, lateTasks);
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(total);
         dataSets.add(onTimeTasks);
         dataSets.add(lateTasks);
-
         LineData chartData = new LineData(dataSets);
-
         LineChart chart = layout.findViewById(R.id.onTime_line_chart_filter);
         chart.setData(chartData);
         chart.invalidate();
-
         final String[] days = new String[7];
         for(int i =0; i<days.length; i++){
             days[i] = onTimeLineData.get(i).date;
@@ -649,19 +590,14 @@ public class StatsFragment extends Fragment {
 
             // we don't draw numbers, so no decimal digits needed
         };
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setGranularity(1f);       //interval
-        xAxis.setValueFormatter(formatter);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(Color.WHITE);
+        adjustXAxis(chart, formatter);
         chart.getDescription().setEnabled(false);
         chart.getAxisLeft().setGranularity(1f);
         chart.getAxisLeft().setTextColor(Color.WHITE);
         chart.getAxisRight().setEnabled(false);
         chart.setScaleEnabled(false);
-        chart.getLegend().setTextColor(Color.WHITE);
-        chart.getLegend().setForm(Legend.LegendForm.CIRCLE);
-        chart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        setChartLegend(chart);
+        chart.invalidate();
 
     }
 
@@ -739,8 +675,6 @@ public class StatsFragment extends Fragment {
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             if(DatePickerFragment.flag==0){
-                Log.d("StatsDebug", "Flag is 0");
-                Log.d("StatsDebug", month + "/" + day);
                 StatsFragment.completeYear = year;
                 StatsFragment.completeMonth = month;
                 StatsFragment.completeDay = day;
@@ -774,18 +708,6 @@ public class StatsFragment extends Fragment {
             totalTasksWithOnTimeStatus = o+l;
         }
 
-        @Override
-        public String toString(){
-            return "NAME = " + this.name + "\n" +
-                    "COLOR = " + this.color + "\n" +
-                    "Complete # = " + this.complete + "\n" +
-                    "InComplete # = " + this.incomplete + "\n" +
-                    "onTime # = " + this.onTime + "\n" +
-                    "Late # = " + this.late + "\n" +
-                    "totalC = " + this.totalTasksWithCompleteStatus + "\n" +
-                    "totalO = " + this.totalTasksWithOnTimeStatus;
-        }
-
     }
 
     public class DayStats {
@@ -805,17 +727,6 @@ public class StatsFragment extends Fragment {
             onTime = o;
             late = l;
             totalTasksWithOnTimeStatus = l+o;
-        }
-
-        @Override
-        public String toString(){
-            return "DATE = " + this.date + "\n" +
-                    "Complete # = " + this.complete + "\n" +
-                    "InComplete # = " + this.incomplete + "\n" +
-                    "TotalWithComplete # = " + this.totalTasksWithCompleteStatus + "\n" +
-                    "onTime # = " + this.onTime + "\n" +
-                    "Late # = " + this.late + "\n" +
-                    "TotalWithPunct # = " + this.totalTasksWithOnTimeStatus;
         }
 
     }
