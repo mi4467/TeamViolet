@@ -85,6 +85,6 @@ public class ScoreUpdaterAndLateMarkerChronJob extends BroadcastReceiver {
         }
         writableDatabase.execSQL("UPDATE USER_STATS SET TODAY_SCORE = 0");      // reset the today score paramater
         Log.d("ChronDebug", "It Sent");
-        Toast.makeText(context, "We are calculating streak/score", Toast.LENGTH_LONG).show();
+       
     }
 }
