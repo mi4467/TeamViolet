@@ -304,6 +304,7 @@ public class StatsFragment extends Fragment {
         chart.invalidate();
         setChartLegend(chart);
         chart.getDescription().setEnabled(false);
+        chart.setDrawEntryLabels(false);
         chart.setCenterTextColor(Color.WHITE);
         chart.setHoleColor(Color.parseColor("#607D8B"));
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
@@ -351,6 +352,7 @@ public class StatsFragment extends Fragment {
         chart.invalidate();
         setChartLegend(chart);
         chart.getDescription().setEnabled(false);
+        chart.setDrawEntryLabels(false);
         chart.setHoleColor(Color.parseColor("#607D8B"));
         chart.setCenterTextColor(Color.WHITE);
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
