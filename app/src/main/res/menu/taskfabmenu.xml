@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/delete_button"
+        android:icon="@android:drawable/btn_star"
+        android:title="Delete" />
+    <item
+        android:id="@+id/mark_complete_button"
+        android:icon="@android:drawable/btn_star"
+        android:title="Mark Complete"/>
+    <item
+        android:id="@+id/more_info_button"
+        android:icon="@android:drawable/btn_star"
+        android:title="More Info" />
+</menu>

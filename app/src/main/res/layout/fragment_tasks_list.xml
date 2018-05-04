@@ -1,0 +1,118 @@
+
+
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nested_scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.hfad.mytimetracker.CalendarFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <!--<CalendarView-->
+            <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+            <!--android:orientation="vertical"-->
+            <!--android:id="@+id/simpleCalendarView"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="fill_parent"-->
+            <!--/>-->
+
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_margin="5dp"
+            card_view:cardCornerRadius="4dp"
+            card_view:cardBackgroundColor="@color/cardview_bgcolor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:text="Filter Tasks"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/tasks_list_category_filter_button"
+                        android:text="@string/category_filter"
+                        android:layout_width="wrap_content"
+                        android:layout_weight="3"
+                        android:layout_height="wrap_content" />
+                    <Button
+                        android:id="@+id/tasks_list_on_time_status_filter_button"
+                        android:text="@string/on_time_filter"
+                        android:layout_width="wrap_content"
+                        android:layout_weight="4"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:layout_weight="4"
+                        android:id="@+id/tasks_list_completed_status_filter_button"
+                        android:text="@string/completion_filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        android:layout_weight="1"
+                        android:id="@+id/tasks_list_filter_button"
+                        android:text="@string/enter_filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="200dp"
+            >
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                >
+                <!-- TODO: Update blank fragment layout -->
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view_task_list_viewer"
+                    android:scrollbars="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_gravity="bottom|end"
+                    android:layout_weight="1"
+                    android:layoutAnimation="@anim/layout_animation_fall_down"
+                    />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

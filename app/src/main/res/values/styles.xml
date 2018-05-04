@@ -1,0 +1,22 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here.#0091EA #455A64 #006064 #01579B-->
+        <item name="colorPrimary">#004D40</item>
+        <item name="colorPrimaryDark">#424242</item>
+        <item name="colorAccent">#004D40</item>
+    </style>
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorPrimary">#004D40</item>
+        <item name="colorPrimaryDark">#424242</item>
+        <item name="colorAccent">#004D40</item>
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+</resources>

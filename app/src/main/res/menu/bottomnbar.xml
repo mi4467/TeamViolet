@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- This is menu for bottom navigation bar, should be in every activity/fragment -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/task_calendar"
+        android:enabled="true"
+        android:title="@string/calendar_viewer"
+        android:icon="@drawable/calendar_navpic"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/task_viewer"
+        android:enabled="true"
+        android:title="@string/task_viewer"
+        android:icon="@drawable/task_list_navpic"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/home"
+        android:enabled="true"
+        android:title="@string/home"
+        android:icon="@drawable/ic_home_black_24dp"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/task_creator"
+        android:enabled="true"
+        android:title="@string/task_creator"
+        android:icon="@drawable/tak_creator_navpic"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/stats_viewer"
+        android:enabled="true"
+        android:title="@string/stats_viewer"
+        android:icon="@drawable/stats_navbar_pic"
+        app:showAsAction="ifRoom"
+        />
+
+</menu>
