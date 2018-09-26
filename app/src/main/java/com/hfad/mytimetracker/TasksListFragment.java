@@ -26,6 +26,8 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -165,7 +167,7 @@ public class TasksListFragment extends Fragment {
     private void addCategoryParams(StringBuilder cmd){
         cmd.append("SELECT * FROM TASK_STATS WHERE ( ");
         for(int i = 0; i<taskCategoryNames.length-1; i++){
-            cmd.append(taskCategoryNames[i].toString() + " = 1 OR");
+            cmd.append(taskCategoryNames[i].toString() + " = 1 OR ");
         }
         cmd.append(" " + taskCategoryNames[taskCategoryNames.length-1] + "=1 ) ");
     }
@@ -372,7 +374,7 @@ public class TasksListFragment extends Fragment {
 
         private static final int UNSELECTED = -1;
         private RecyclerView recyclerView;
-        private Cursor data;
+        private ArrayList<TaskData> data;
         private Cursor stats;
         private int selectedItem = UNSELECTED;
 
@@ -381,6 +383,7 @@ public class TasksListFragment extends Fragment {
             this.stats = stats;
             this.stats.moveToFirst();
         }
+
 
         @Override
         public TasksListFragment.SimpleAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -396,6 +399,17 @@ public class TasksListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return stats.getCount();
+        }
+
+        public class TaskData {
+            int id;
+            String name;
+
+            public TaskData(int id, String name){
+                this.id = id;
+                this.name = name;
+            }
+
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, ExpandableLayout.OnExpansionUpdateListener {

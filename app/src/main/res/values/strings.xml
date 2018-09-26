@@ -17,14 +17,14 @@
     <string name="cat_name">Category Name</string>
     <string name="cat_color">Category Color</string>
 
-    <string name="pick_cat">Pick Category</string>
+    <string name="pick_cat">Category</string>
     <string name="create_task">Name Task</string>
     <string name="str_time">Start Time</string>
     <string name="end_time">End Time</string>
     <string name="due_date">Due Date</string>
 
     <string name="add_rtask">Add Reoccurring Task</string>
-    <string name="days">Days:</string>
+    <string name="days">Days</string>
 
     <string name="days_dialog_title">Days of the Week</string>
     <string-array name="days_list">

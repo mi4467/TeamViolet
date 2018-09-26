@@ -1,16 +1,19 @@
 package com.hfad.mytimetracker;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -99,6 +102,8 @@ public class StatsFragment extends Fragment {
         setUpOnTimeWeekLineGraph(layout);
         setUpCompletePieGraph(layout);
         setUpLatePieGraph(layout);
+        setUpCategoryOnTime(layout);
+        setUpCategoryStatsCompletion(layout);
         setUpToast();
         return layout;
     }
@@ -117,6 +122,7 @@ public class StatsFragment extends Fragment {
         }
 
     }
+
 
     public void initListeners(final View layout){
         Button completionFilter = layout.findViewById(R.id.filterCompletionButton);
@@ -215,17 +221,20 @@ public class StatsFragment extends Fragment {
 
     }
 
-    public boolean filterCategoryStats(ArrayList<CategoryStats> data, boolean completion){
+    public boolean filterCategoryStats(ArrayList<CategoryStats> data, boolean completion) {
         if(data.size() == 0){
             return false;
         }
         for(int i =0; i< data.size(); i++){
+            Log.d("PieDebug", "I is: " + i);
             if(data.size() == 0){
                 return false;
             }
-            if(data.get(i).incomplete==0 && completion){
+            if(data.get(i).incomplete==0 && completion){        //add null checks
                 data.remove(i);
                 i--;
+                Log.d("PieDebug", "I is: " + i);
+                continue;
             }
             if(data.size() == 0){
                 return false;
@@ -233,7 +242,7 @@ public class StatsFragment extends Fragment {
             if(data.get(i).late==0 && !completion){
                 data.remove(i);
                 i--;
-
+                continue;
             }
         }
         if(data.size()==0){
@@ -324,7 +333,9 @@ public class StatsFragment extends Fragment {
 
     public void setUpLatePieGraph(View layout){
         ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(SQLfunctionHelper.getCategoryList(getContext()), getContext(), this);
+        //Log.d("PieGraph", data.toString());
         if(!filterCategoryStats(data, false)){
+            Toasty.error(getContext(), "Exited at First If", Toast.LENGTH_LONG, true).show();
             return;
         }
         ArrayList<Integer> colors = new ArrayList<>();
@@ -335,6 +346,7 @@ public class StatsFragment extends Fragment {
         }
         final Integer hole = divisor;
         if(divisor==0){
+            Toasty.error(getContext(), "Exited at Second If", Toast.LENGTH_LONG, true).show();
             return;
         }
         for(int i =0 ; i<data.size(); i++){
@@ -428,6 +440,34 @@ public class StatsFragment extends Fragment {
         chart.invalidate();
     }
 
+    public void setUpCategoryStatsCompletion(View layout){
+        String[] categoryList = SQLfunctionHelper.getCategoryList(getContext());
+        if(categoryList.length<5){
+            categoriesComplete = categoryList;
+        }
+        else{
+            categoriesComplete = new String[5];
+            for(int i =0; i<5; i++){
+                categoriesComplete[i] = categoryList[i];
+            }
+        }
+        setUpCompletionBarGraph(layout);
+    }
+
+    public void setUpCategoryOnTime(View layout){
+        String[] categoryList = SQLfunctionHelper.getCategoryList(getContext());
+        if(categoryList.length<5){
+            categoriesOnTime = categoryList;
+        }
+        else{
+            categoriesOnTime = new String[5];
+            for(int i =0; i<5; i++){
+                categoriesOnTime[i] = categoryList[i];
+            }
+        }
+        setUpOnTimeBarGraph(layout);
+    }
+
     public void setUpCompletionBarGraph(View layout){
         ArrayList<CategoryStats> data = SQLfunctionHelper.filterBarGraph(categoriesComplete, getContext(), this);
         if(data.size()==0){
@@ -509,7 +549,7 @@ public class StatsFragment extends Fragment {
             incomplete.add(new Entry((float) i, (float) completedLineData.get(i).incomplete));
         }
         LineDataSet total = new LineDataSet(totalWithCompleteStatus, "Total Tasks");
-        LineDataSet completeTasks = new LineDataSet(complete, "Completed Tasks");
+        final LineDataSet completeTasks = new LineDataSet(complete, "Completed Tasks");
         LineDataSet incompleteTasks = new LineDataSet(incomplete, "Incomplete Tasks");
         lineColorsInit(total, completeTasks, incompleteTasks);
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
@@ -540,11 +580,40 @@ public class StatsFragment extends Fragment {
         chart.getAxisLeft().setGranularity(1f);
         chart.getAxisLeft().setTextColor(Color.WHITE);
         chart.getAxisRight().setEnabled(false);
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int index = (int) e.getX();
+                Cursor positive = SQLfunctionHelper.getTaskListLineGraph(completedLineData.get(index).date, true, getContext());
+                positive.moveToFirst();
+                Cursor negative = SQLfunctionHelper.getTaskListLineGraph(completedLineData.get(index).date, false, getContext());
+                negative.moveToFirst();
+                Log.d("HighlightDebug", DatabaseUtils.dumpCursorToString(positive));
+                Log.d("HighlightDebug", DatabaseUtils.dumpCursorToString(negative));
+                //showCompleteLineAlert(getView());
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
         setChartLegend(chart);
         chart.invalidate();
 
     }
 
+    public void showCompleteLineAlert(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Selected Date");
+
+        final View layout = getLayoutInflater().inflate(R.layout.linegraph_alertlist_dialog, null);
+        builder.setView(layout);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
     public void setUpOnTimeWeekLineGraph(View layout){
         if(StatsFragment.onTimeYear==null){
             Toast.makeText(getActivity(), "You Did Not Select A Date. Try Again", Toast.LENGTH_SHORT).show();

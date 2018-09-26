@@ -22,7 +22,21 @@ public class SQLfunctionHelper {
     public static Cursor queryWithString(Context c, String cmd){
         TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
         SQLiteDatabase readableDatabase = helper.getReadableDatabase();
+        Log.d("TaskFilterDebug", "This is command: " + cmd);
         return readableDatabase.rawQuery(cmd, null);
+    }
+
+    public static Cursor getTaskListLineGraph(String date, boolean green, Context c){
+        TimeTrackerDataBaseHelper helper = TimeTrackerDataBaseHelper.getInstance(c);
+        SQLiteDatabase readableDatabase = helper.getReadableDatabase();
+        if(green){
+            Log.d("TaskListDebug," ,"SELECT TASK_NAME FROM TASK_STATS WHERE DUE_DATE=\"" + date + "\" AND ON_TIME=1");
+            return readableDatabase.rawQuery("SELECT TASK_NAME FROM TASK_STATS WHERE DUE_DATE = \"" + date + "\" AND ON_TIME = 1", null);
+        }
+        else{
+            Log.d("TaskListDebug," ,"SELECT TASK_NAME FROM TASK_STATS WHERE DUE_DATE=\"" + date + "\" AND NOT_ON_TIME=1");
+            return readableDatabase.rawQuery("SELECT TASK_NAME FROM TASK_STATS WHERE DUE_DATE = \"" + date + "\" AND NOT_ON_TIME = 1", null);
+        }
     }
 
     public static Cursor queryWithParams(Context c, String table, String[] fields, String ques, String[] cond){

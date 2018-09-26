@@ -195,7 +195,7 @@
                                 android:weightSum="2"
                                 android:layout_height="wrap_content">
                                 <Button
-                                    android:text="Choose Category"
+                                    android:text="Category"
                                     android:id="@+id/filterCompletionButton"
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
@@ -263,7 +263,7 @@
                                 android:weightSum="2"
                                 android:layout_height="wrap_content">
                                 <Button
-                                    android:text="Choose Category"
+                                    android:text="Category"
                                     android:id="@+id/filterOnTimeButton"
                                     android:layout_width="0dp"
                                     android:layout_weight="1"

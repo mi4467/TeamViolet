@@ -151,13 +151,13 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="@string/str_time" />
+                        android:text="Start" />
                     <Button
                         android:id="@+id/end_time_taskadder"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="@string/end_time" />
+                        android:text="End" />
                     <Button
                         android:id="@+id/add_task_date_picker"
                         android:layout_width="0dp"
@@ -266,20 +266,20 @@
                                 android:id="@+id/start_time_reocc_picker"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/str_time"
+                                android:text="Start"
                                 android:clickable="true"
                                 />
                             <Button
                                 android:id="@+id/end_time_reocc_picker"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/end_time"
+                                android:text="End"
                                 />
                             <Button
                                 android:id="@+id/reocc_cat_list"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@string/create_cat"
+                                android:text="Category"
                                 />
 
                         </LinearLayout>
@@ -294,14 +294,14 @@
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
-                                android:text="Start Date"
+                                android:text="1st Day"
                                 />
                             <Button
                                 android:id="@+id/end_date"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
-                                android:text="End Date"
+                                android:text="Last Day"
                                 />
                             <Button
                                 android:id="@+id/date_picker"

@@ -320,8 +320,8 @@
                                     <ToggleButton
                                         android:id="@+id/task_act_notification_toggle"
                                         android:layout_width="match_parent"
-                                        android:textOff="Notification Off"
-                                        android:textOn="Notification On"
+                                        android:textOff="Alert Off"
+                                        android:textOn="Alert On"
                                         android:layout_height="wrap_content" />
                                 </LinearLayout>
                             </LinearLayout>
